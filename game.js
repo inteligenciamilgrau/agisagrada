@@ -1307,7 +1307,10 @@ class Lobista extends Entity {
     if (!this.dead) this.drawShadow();
     ctx.save();
     if (this.dead && !hasAnim(this.spriteKey, 'death')) ctx.globalAlpha = Math.max(0, 1 - (this.deadTimer || 0) * 1.6);
-    const action = this.dead ? 'death' : (this.state === 'attack' ? 'attack' : 'walk');
+    // sem animação de morte? desvanece usando o próprio sprite (ex: clones do herói)
+    const action = this.dead
+      ? (hasAnim(this.spriteKey, 'death') ? 'death' : 'walk')
+      : (this.state === 'attack' ? 'attack' : 'walk');
     this.drawSprite(this.spriteKey, action, (sx, sy) =>
       drawPlaceholderHumanoid(sx, sy, { ...this.colors, label: this.label, facing: this.facing, t: time + this.phase }));
     ctx.restore();
@@ -2979,7 +2982,7 @@ function drawWorldMap() {
     ctx.fillText('🔒 Complete as 5 missões pra liberar o TREINO no Brasil!', px2 + 18, py2 + 63);
   } else if (done) {
     ctx.fillStyle = '#66ff88';
-    ctx.fillText('✔ MISSÃO CONCLUÍDA (pode rejogar)', px2 + 18, py2 + 63);
+    ctx.fillText('✔ MISSÃO CONCLUÍDA', px2 + 18, py2 + 63);
   } else {
     ctx.fillStyle = '#ffd23f';
     ctx.fillText('▶ DISPONÍVEL — aperte ESPAÇO!', px2 + 18, py2 + 63);
@@ -2987,12 +2990,18 @@ function drawWorldMap() {
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
   ctx.fillText('← → escolher destino · ESPAÇO embarcar · T ver o plano', W / 2, H - 8);
 
-  // navegação
+  // navegação: ordem GEOGRÁFICA (por longitude) e só missões ainda não feitas
+  const selectable = WORLD_SPOTS
+    .map((s, i) => i)
+    .filter(i => WORLD_SPOTS[i].final || !phasesDone.has(WORLD_SPOTS[i].phase))
+    .sort((a, b) => WORLD_SPOTS[a].x - WORLD_SPOTS[b].x);
+  if (selectable.length && !selectable.includes(worldSel)) worldSel = selectable[0];
   const left = keys['arrowleft'] || keys['a'], right = keys['arrowright'] || keys['d'];
   if (!left && !right) worldMoveLock = false;
-  if (!worldMoveLock) {
-    if (left)  { worldSel = (worldSel + WORLD_SPOTS.length - 1) % WORLD_SPOTS.length; worldMoveLock = true; beep(440, 0.05); }
-    if (right) { worldSel = (worldSel + 1) % WORLD_SPOTS.length; worldMoveLock = true; beep(440, 0.05); }
+  if (!worldMoveLock && selectable.length) {
+    const pos = selectable.indexOf(worldSel);
+    if (left)  { worldSel = selectable[(pos + selectable.length - 1) % selectable.length]; worldMoveLock = true; beep(440, 0.05); }
+    if (right) { worldSel = selectable[(pos + 1) % selectable.length]; worldMoveLock = true; beep(440, 0.05); }
   }
 }
 
@@ -3844,7 +3853,9 @@ function frame(ts) {
     drawWorldMap();
     if (enterPressed) {
       const spot = WORLD_SPOTS[worldSel];
-      if (spot.final && !worldAllDone()) {
+      if (phasesDone.has(spot.phase) && !spot.final) {
+        beep(150, 0.15, 'sawtooth'); // já concluída, não repete
+      } else if (spot.final && !worldAllDone()) {
         worldLockedMsg = 2;
         beep(150, 0.2, 'sawtooth'); // trancado!
       } else {
