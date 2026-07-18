@@ -3802,7 +3802,7 @@ let menuIndex = 0, menuReturnState = 'title', menuMoveLock = false;
 function drawMenu() {
   drawBackground();
   ctx.fillStyle = '#000c'; ctx.fillRect(0, 0, W, H);
-  const pw = 480, ph = 330;
+  const pw = 480, ph = 100 + menuItems.length * 44 + 44; // cresce com os itens
   const px = W / 2 - pw / 2, py = H / 2 - ph / 2;
   ctx.fillStyle = '#0d0d1acc'; ctx.fillRect(px, py, pw, ph);
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 3; ctx.strokeRect(px, py, pw, ph);
