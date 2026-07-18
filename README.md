@@ -4,7 +4,35 @@ Beat 'em up estilo *Streets of Rage* criado pela comunidade **Inteligência Mil 
 uma paródia de Indiana Jones no mundo da IA. Bob e seus escudeiros percorrem o mundo
 juntando as peças pra treinar a primeira AGI brasileira: o **CURUPIRA-1**. 🇧🇷
 
-**▶ Jogue direto no navegador** (GitHub Pages) — sem instalar nada.
+**▶ [Jogue direto no navegador](https://inteligenciamilgrau.github.io/agisagrada/)** — sem instalar nada. 🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES
+
+![Pôster do jogo](sprites/title_bg.png)
+
+## 📸 Telas do jogo
+
+| O elenco (heróis em cima, chefões embaixo) |
+|:--:|
+| ![Personagens](docs/personagens.png) |
+
+| Mapa-múndi de missões | O Plano da AGI Sagrada |
+|:--:|:--:|
+| ![Mapa-múndi](sprites/worldmap.png) | ![Plano](sprites/plano_bg.png) |
+
+| São Paulo (Fase 0) | Salão Oval dourado (Fase 1) |
+|:--:|:--:|
+| ![São Paulo](sprites/bg_saopaulo.png) | ![Washington](sprites/bg_washington.png) |
+
+| Gigafábrica (Fase 2) | Biblioteca Infinita (Fase 4) |
+|:--:|:--:|
+| ![Fábrica](sprites/bg_fabrica.png) | ![Biblioteca](sprites/bg_biblioteca.png) |
+
+| Muralha de Firewall (Fase 5) | A Fundição Sagrada (fase secreta!) |
+|:--:|:--:|
+| ![Muralha](sprites/bg_muralha.png) | ![Formosa](sprites/bg_formosa.png) |
+
+| A lenda começa... (cutscene de abertura) |
+|:--:|
+| ![Abertura](sprites/story/intro-1.png) |
 
 ## 🎮 Controles
 
