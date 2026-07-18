@@ -461,7 +461,7 @@ const TRACKS = {
     // lamento breve (todo grande modelo já divergiu no treino)
     bars: [Mi(57),Mi(57),Mj(53),Mj(52), Mi(57),Mi(50),Mj(52),Mi(57)] },
 };
-const PHASE_MUSIC = { 0: 'saopaulo', 1: 'washington', 2: 'fabrica', 3: 'vale', 4: 'biblioteca', 5: 'muralha', 6: 'final' };
+const PHASE_MUSIC = { 0: 'saopaulo', 1: 'washington', 2: 'fabrica', 3: 'vale', 4: 'biblioteca', 5: 'muralha', 6: 'final', 7: 'biblioteca' };
 
 let currentTrackName = 'abertura';
 function setTrack(name) {
@@ -610,8 +610,10 @@ let time = 0, dt = 0, lastTs = 0;
 const conquests = {
   checkpoint: false, itaipu: false, investimento: false, pesquisadores: false,
   dados: false, eficiencia: false, predio: false, treino: false,
-  blueprints: false, playbook: false, // bônus de guilda (não são peças do plano)
+  blueprints: false, playbook: false, litografia: false, // bônus (não são peças do plano)
 };
+// Moedas de Silício escondidas (3 destravam a Ilha Formosa!)
+const siliconCoins = new Set();
 
 // ---- O PLANO DA AGI SAGRADA (o mapa que amarra a história) ----
 // cada fase conquista uma PEÇA do laboratório; o treino só é possível no final
@@ -813,6 +815,18 @@ function drawProjectiles() {
       ctx.restore();
       continue;
     }
+    if (p.type === 'beam') {
+      // feixe ultravioleta da litografia
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.shadowColor = '#cc66ff'; ctx.shadowBlur = 14;
+      ctx.fillStyle = '#e6ccff';
+      ctx.fillRect(-30, -4, 60, 8);
+      ctx.fillStyle = '#aa55ee';
+      ctx.fillRect(-30, -2, 60, 4);
+      ctx.restore();
+      continue;
+    }
     if (p.type === 'binary') {
       // dígitos incandescentes do sopro do dragão
       ctx.save();
@@ -886,6 +900,32 @@ function drawDrops() {
     ctx.font = '20px serif'; ctx.textAlign = 'center';
     ctx.fillText(d.type === 'cafe' ? '☕' : '🧉', sx, sy);
   }
+}
+
+// ---- Moeda de Silício da fase (escondida — 3 destravam a Ilha Formosa) ----
+function updateDrawCoin() {
+  const c = currentPhase.coin;
+  if (!c || siliconCoins.has(currentPhase.id)) return;
+  // coleta
+  if (Math.abs(player.x - c.x) < 34 && Math.abs(player.gy - c.gy) < 24 && player.jumpH === 0) {
+    siliconCoins.add(currentPhase.id);
+    sfx.pickup(); playFanfare();
+    spawnText(c.x - camX, c.gy - 80, `🔘 MOEDA DE SILÍCIO! (${siliconCoins.size}/3)`, '#aaddff', 1.4);
+    if (siliconCoins.size >= 3) {
+      spawnText(W / 2, 200, '🏝️ UMA ILHA MISTERIOSA APARECEU NO MAPA!', '#66ff88', 1.5);
+    }
+    return;
+  }
+  // moeda girando com brilho
+  const sx = c.x - camX, sy = c.gy - 24 + Math.sin(time * 3) * 5;
+  if (sx < -40 || sx > W + 40) return;
+  const spin = Math.abs(Math.sin(time * 4));
+  ctx.save();
+  ctx.shadowColor = '#88ccff'; ctx.shadowBlur = 12;
+  ctx.fillStyle = '#b8d4e8';
+  ctx.beginPath(); ctx.ellipse(sx, sy, 11 * Math.max(0.2, spin), 11, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#5588aa'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.restore();
 }
 
 // ---- Entidade base ----
@@ -2409,6 +2449,112 @@ class DeepZeek extends Entity {
   }
 }
 
+// ---- MINI-CHEFE da Ilha Formosa: O GÊMEO DE LITOGRAFIA ----
+class Gemeo extends Entity {
+  constructor(x, gy) {
+    super(x, gy);
+    this.hp = this.maxHp = 240;
+    this.speed = 95;
+    this.scaleMul = 1.35;
+    this.isBoss = true;
+    this.bossName = '🔮 O GÊMEO DE LITOGRAFIA — precisão de 3 nanômetros, paciência de zero 🔮';
+    this.attackCd = 2;
+    this.talkCd = 5;
+    this.rageLevel = 0;
+  }
+  get screenY() { return this.gy - this.jumpH - (this.dead ? 0 : 10 + Math.sin(time * 2.8) * 6); }
+  update() {
+    this.hitFlash = Math.max(0, this.hitFlash - dt);
+    if (this.dead) {
+      this.deadTimer = (this.deadTimer || 0) + dt;
+      if (this.deadTimer > 1.2) this.removeMe = true;
+      return;
+    }
+    // holograma: a cada 25% de vida, teleporta pro outro lado do herói
+    const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
+    if (lostQuarters > this.rageLevel) {
+      this.rageLevel = lostQuarters;
+      spawnText(this.screenX, this.screenY - 160, '✨ REALINHAMENTO ÓPTICO!', '#cc88ff', 1.3);
+      this.x = player.x > camX + W / 2 ? camX + 120 : camX + W - 120;
+      this.attackCd = 0.7;
+      shake = 0.2; beep(1300, 0.15, 'sine');
+    }
+    this.talkCd -= dt;
+    if (this.talkCd <= 0) {
+      this.talkCd = 5 + Math.random() * 3;
+      const falas = ['DEDOS. OLEOSOS.', 'UM ESPIRRO DESALINHA TUDO.', 'PRECISÃO É AMOR.', 'VOCÊS TREMEM DEMAIS.'];
+      spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#cc88ff', 1.1);
+    }
+    const dx = player.x - this.x, dy = player.gy - this.gy;
+    this.facing = Math.sign(dx) || 1;
+    this.attackCd -= dt;
+
+    if (this.state === 'beam') {
+      const done = this.advanceAnim(10, hasAnim('gemeo', 'attack_beam') ? 6 : 4, false);
+      if (this.frame === 3 && !this.hitDone) {
+        this.hitDone = true;
+        sfx.throw();
+        projectiles.push({
+          type: 'beam',
+          x: this.x + this.facing * 50,
+          gy: this.gy,
+          h: 70,
+          vx: this.facing * 480,
+          vy: (player.gy - this.gy) * 0.5,
+          dmg: 10, t: 0,
+        });
+        spawnText(this.screenX, this.screenY - 130, '💜 FEIXE UV!', '#cc88ff', 1.2);
+      }
+      if (done) { this.setState('idle'); this.attackCd = Math.max(1, 2 - this.rageLevel * 0.25); }
+      return;
+    }
+    if (this.state === 'hurtstate') {
+      if (this.advanceAnim(10, hasAnim('gemeo', 'hurt') ? 4 : 2, false)) this.setState('idle');
+      return;
+    }
+
+    if (this.attackCd <= 0) { this.setState('beam'); this.hitDone = false; return; }
+    const wantDist = 260;
+    const dist = Math.abs(dx);
+    const dir = dist > wantDist ? Math.sign(dx) : -Math.sign(dx);
+    this.x += dir * this.speed * dt;
+    this.x = Math.max(camX + 60, Math.min(camX + W - 60, this.x));
+    if (Math.abs(dy) > 10) this.gy += Math.sign(dy) * this.speed * 0.5 * dt;
+    this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
+    this.setStateIf('idle');
+    this.advanceAnim(6, hasAnim('gemeo', 'idle') ? 4 : 2);
+  }
+  takeHit(dmg, dir, isSpecial) {
+    this.hp -= dmg;
+    this.hitFlash = 0.12;
+    this.x += dir * (isSpecial ? 22 : 5);
+    spawnText(this.screenX, this.screenY - 150, `${dmg}`, '#ffd23f');
+    if (this.hp <= 0 && !this.dead) {
+      this.dead = true;
+      this.setState('hurtstate');
+      sfx.enemyDie(); shake = 0.5;
+      player.score += 1800;
+      bossDefeated = true;
+    } else if (isSpecial && !this.dead && this.state !== 'beam') {
+      this.setState('hurtstate');
+    }
+  }
+  draw() {
+    if (!this.dead) this.drawShadow(28);
+    ctx.save();
+    if (this.dead) ctx.globalAlpha = Math.max(0, 1 - (this.deadTimer || 0) * 0.8);
+    const action = this.state === 'beam' && hasAnim('gemeo', 'attack_beam') ? 'attack_beam'
+                 : (this.state === 'hurtstate' || this.dead) && hasAnim('gemeo', 'hurt') ? 'hurt'
+                 : 'idle';
+    this.drawSprite('gemeo', action, (sx, sy) => {
+      ctx.font = '52px serif'; ctx.textAlign = 'center';
+      ctx.fillText('🔮', sx, sy - 40);
+    });
+    ctx.restore();
+    if (!this.dead) drawBossBar(this);
+  }
+}
+
 // barra de chefe genérica no topo
 function drawBossBar(boss) {
   if (gameState === 'bossdialog') return;
@@ -2593,6 +2739,7 @@ const PHASES = [
       ['BOB', 'Peça 3: GRANA ✔. Agora falta GENTE que saiba treinar modelo. E soube que o Vale do Silício anda demitindo os melhores...'],
     ],
     onVictory: () => { conquests.blueprints = true; conquests.investimento = true; },
+    coin: { x: 1980, gy: 500 }, // 🔘 moeda de silício escondida no fim da esteira
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new OptimusBot(640, 430), new OptimusBot(700, 470), new OptimusBot(760, 500)] },
       { camLock: 900,  spawned: false, make: () => [new OptimusBot(1540, 440), new OptimusBot(1600, 480), new Drone(1480, 430), new Drone(1660, 460)] },
@@ -2633,6 +2780,7 @@ const PHASES = [
       ['BOB', 'Peça 4: GENTE ✔. Mas modelo brasileiro sem dado brasileiro é papagaio de sotaque estranho. Falta o acervo... e eu sei quem aspirou TUDO.'],
     ],
     onVictory: () => { conquests.playbook = true; conquests.pesquisadores = true; },
+    coin: { x: 1180, gy: 410 }, // 🔘 atrás dos puffs coloridos
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new GerenteProduto(640, 430), new GerenteProduto(710, 480)] },
       { camLock: 900,  spawned: false, make: () => [new GerenteProduto(1540, 440), new Lobista(1600, 480), new Drone(1480, 430)] },
@@ -2710,6 +2858,7 @@ const PHASES = [
       ['BOB', 'PLANO QUASE COMPLETO! Falta só... um teto. VOLTA PRO BRASIL: a comunidade já marcou o MUTIRÃO do galpão pro fim de semana!'],
     ],
     onVictory: () => { conquests.eficiencia = true; },
+    coin: { x: 2600, gy: 480 }, // 🔘 num tijolo solto da muralha
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new Drone(640, 430), new Drone(700, 470), new Drone(760, 500)] },
       { camLock: 900,  spawned: false, make: () => [new CloneTemu(1540, 440), new Drone(1480, 430), new Drone(1660, 470)] },
@@ -2750,7 +2899,7 @@ const PHASES = [
       ['DEEP-ZEEK', '*de camarote, terminando o pastel* — Eficiente. Aprovado. *envia um pull request*'],
       ['SISTEMA', '🏆 A AGI SAGRADA NUNCA ESTEVE NUMA FORTALEZA. ESTAVA NA COMUNIDADE. SEMPRE ESTEVE.'],
       ['LORO', '...isso tudo foi gerado ou aconteceu de verdade? *olha pra câmera*'],
-      ['SISTEMA', '🇧🇷 FIM! Obrigado, membro Mil Grau! Em breve: a FASE SECRETA da Ilha Formosa. Comenta tuas ideias no canal! 🔥'],
+      ['SISTEMA', '🇧🇷 FIM! Obrigado, membro Mil Grau! Dica: 3 Moedas de Silício brilham escondidas pelo mundo... 🏝️ Comenta tuas ideias no canal! 🔥'],
     ],
     onVictory: () => { conquests.treino = true; },
     makeWaves: () => [],
@@ -2775,6 +2924,43 @@ const PHASES = [
           const b = new Dario(W + 140, 460); b.hp = b.maxHp = 200;
           return [b, new Crawler(-80, 430), new Crawler(W + 220, 490)];
         } },
+    ],
+  },
+  {
+    id: 7,
+    title: '⭐ FASE SECRETA — A FUNDIÇÃO SAGRADA',
+    place: 'Ilha Formosa 🏝️',
+    bg: 'formosa',
+    stageLen: 3400,
+    intro: [
+      ['BOB', 'Ilha Formosa. A Fundição Sagrada. Dizem que TODA IA do mundo nasce das máquinas desta ilha.'],
+      ['LORO', 'as moedas! as moedas brilharam! *arrepio de pena*'],
+      ['GRÃO-MESTRE', '*surge entre os vapores da sala limpa* — Três Moedas de Silício. Vocês foram... curiosos. Entrem.'],
+      ['GRÃO-MESTRE', 'Mas saibam: TODAS as facções vêm atrás do que guardamos aqui. Todas fingem que não dependem de nós. Todas dependem.'],
+      ['BOB', 'A Máquina Sagrada de Litografia... é REAL. *arrepio no fio do bigode*'],
+      ['GRÃO-MESTRE', 'Trinta anos gravando silício. Vocês têm dez minutos e um papagaio. Vai dar certo.'],
+    ],
+    bossDialog: [
+      ['???', '*a luz roxa dobra sobre si mesma e ganha forma*'],
+      ['GÊMEO', 'EU SOU O GÊMEO DE LITOGRAFIA. GUARDIÃO DA PRECISÃO. VOCÊS TRAZEM... DEDOS OLEOSOS.'],
+      ['BOB', 'A gente só quer APRENDER a máquina! Nem vamos encostar!'],
+      ['GÊMEO', 'TODOS DIZEM ISSO. DEPOIS ESPIRRAM. INICIANDO PROTOCOLO DE ESTERILIZAÇÃO.'],
+      ['LORO', 'eu tomo banho! às vezes! quando chove!'],
+    ],
+    victory: [
+      ['GRÃO-MESTRE', '*aplaude devagar* — O Gêmeo aprovou vocês. Ele só é... zeloso. Como todos nós.'],
+      ['BOB', 'A máquina não se leva, né?'],
+      ['GRÃO-MESTRE', 'Se aprende. *entrega um pergaminho* — O Manuscrito da Litografia. E uma mini-fundição semente. Plantem no Brasil.'],
+      ['SISTEMA', '📜 CONQUISTA SECRETA: MANUSCRITO DA LITOGRAFIA! O treino do CURUPIRA será 30% MAIS RÁPIDO!'],
+      ['SISTEMA', '🏝️ Fase secreta completa! Soberania de verdade não se compra. Se FABRICA.'],
+      ['LORO', 'fabrica! fabrica! *guarda o pergaminho na mochila com a asa*'],
+    ],
+    onVictory: () => { conquests.litografia = true; },
+    makeWaves: () => [
+      { camLock: 250,  spawned: false, make: () => [new Lobista(640, 430), new OptimusBot(700, 470), new Drone(760, 500)] },
+      { camLock: 900,  spawned: false, make: () => [new Advogado(1540, 440), new GerenteProduto(1600, 480), new Crawler(1480, 430), new Drone(1660, 460)] },
+      { camLock: 1650, spawned: false, make: () => [new CloneTemu(2300, 420), new OptimusBot(2370, 470), new Lobista(2430, 500), new Drone(2250, 440)] },
+      { camLock: 2440, spawned: false, bossIntro: true, make: () => [new Gemeo(3080, 460), new Drone(2980, 430), new Drone(3180, 490)] },
     ],
   },
 ];
@@ -2875,6 +3061,7 @@ const WORLD_SPOTS = [
   { phase: 4, x: 0.50, y: 0.28, flag: '📚', name: 'Biblioteca Infinita (local confidencial)', boss: 'Dário Amô-Dei', peca: '📚 DADOS' },
   { phase: 5, x: 0.78, y: 0.36, flag: '🐉', name: 'Grande Muralha, China', boss: 'Xi Deep-Zeek', peca: '🔲 CHIPS' },
   { phase: 6, x: 0.33, y: 0.70, flag: '🇧🇷', name: 'LABS IMG, Brasil', boss: 'TODOS ELES', peca: '🔥 O TREINO', final: true },
+  { phase: 7, x: 0.865, y: 0.42, flag: '🏝️', name: 'Ilha Formosa — A Fundição Sagrada', boss: 'O Gêmeo de Litografia', peca: '📜 LITOGRAFIA (secreta!)', secret: true },
 ];
 const phasesDone = new Set();
 let worldSel = 0, worldMoveLock = false, worldLockedMsg = 0;
@@ -2887,7 +3074,8 @@ const CONTINENTS = [
   [[0.82,0.58],[0.92,0.58],[0.93,0.68],[0.84,0.70]],                                                 // Oceania
 ];
 
-function worldAllDone() { return WORLD_SPOTS.filter(s => !s.final).every(s => phasesDone.has(s.phase)); }
+function worldAllDone() { return WORLD_SPOTS.filter(s => !s.final && !s.secret).every(s => phasesDone.has(s.phase)); }
+function secretUnlocked() { return siliconCoins.size >= 3; }
 
 // arte final do mapa-múndi (gerada pelo Codex) — o esboço procedural é o fallback
 const worldmapImg = new Image();
@@ -2941,6 +3129,16 @@ function drawWorldMap() {
     const done = phasesDone.has(s.phase);
     const locked = s.final && !worldAllDone();
     const sel = i === worldSel;
+    // ilha secreta: só um "?" fantasma até achar as 3 Moedas de Silício
+    if (s.secret && !secretUnlocked()) {
+      ctx.save();
+      ctx.globalAlpha = 0.25 + Math.sin(time * 2) * 0.1;
+      ctx.font = '18px serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#88ccff';
+      ctx.fillText('?', sx, sy + 6);
+      ctx.restore();
+      continue;
+    }
     // pino
     if (sel) {
       ctx.strokeStyle = '#ffd23f';
@@ -2994,6 +3192,7 @@ function drawWorldMap() {
   const selectable = WORLD_SPOTS
     .map((s, i) => i)
     .filter(i => WORLD_SPOTS[i].final || !phasesDone.has(WORLD_SPOTS[i].phase))
+    .filter(i => !(WORLD_SPOTS[i].secret && !secretUnlocked()))
     .sort((a, b) => WORLD_SPOTS[a].x - WORLD_SPOTS[b].x);
   if (selectable.length && !selectable.includes(worldSel)) worldSel = selectable[0];
   const left = keys['arrowleft'] || keys['a'], right = keys['arrowright'] || keys['d'];
@@ -3178,6 +3377,7 @@ function drawHUD() {
   if (conquests.playbook)   ctx.fillText('💰', 210 + ci++ * 16, 44);
   if (conquests.dados)      ctx.fillText('📚', 210 + ci++ * 16, 44);
   if (conquests.eficiencia) ctx.fillText('🔲', 210 + ci++ * 16, 44);
+  if (conquests.litografia) ctx.fillText('📜', 210 + ci++ * 16, 44);
   ctx.textAlign = 'right'; ctx.fillStyle = '#fff';
   ctx.font = 'bold 14px Courier New';
   ctx.fillText(`SCORE ${player.score}`, W - 20, 30);
@@ -3196,7 +3396,7 @@ function drawHUD() {
 }
 
 // ---- Diálogos estilo VERSUS: herói à esquerda, vilão à direita ----
-const VILLAIN_SPEAKERS = ['???', 'ESTAGIÁRIO', 'TRUNFO', 'ILON', 'SAMUCA', 'DÁRIO', 'DEEP-ZEEK'];
+const VILLAIN_SPEAKERS = ['???', 'ESTAGIÁRIO', 'TRUNFO', 'ILON', 'SAMUCA', 'DÁRIO', 'DEEP-ZEEK', 'GÊMEO'];
 const PORTRAITS = {
   'BOB':       { char: 'bob', action: 'idle' },
   'FÊ-FÊ':     { char: 'fefe', action: 'idle' },
@@ -3210,8 +3410,10 @@ const PORTRAITS = {
   'CURUPIRA':  { char: 'curupira', action: 'idle' },
   'MIRA':      { char: 'mira', action: 'idle' },
   'ESTAGIÁRIO':{ char: 'estagiario', action: 'idle' },
+  'GÊMEO':     { char: 'gemeo', action: 'idle' },
+  'GRÃO-MESTRE': { char: 'graomestre', action: 'idle' },
 };
-const PORTRAIT_EMOJI = { '???': '❓', 'ESTAGIÁRIO': '🧑‍💼', 'SISTEMA': '🧠', 'LORO': '🦜', 'CURUPIRA': '🤖', 'MIRA': '🕵️' };
+const PORTRAIT_EMOJI = { '???': '❓', 'ESTAGIÁRIO': '🧑‍💼', 'SISTEMA': '🧠', 'LORO': '🦜', 'CURUPIRA': '🤖', 'MIRA': '🕵️', 'GRÃO-MESTRE': '🧙', 'GÊMEO': '🔮' };
 
 function drawPortrait(x, y, size, speaker, wantsLeft, borderColor) {
   ctx.save();
@@ -3686,6 +3888,7 @@ function frame(ts) {
       // jogo novo: zera o plano e as missões da campanha
       for (const k in conquests) conquests[k] = false;
       phasesDone.clear();
+      siliconCoins.clear();
       worldSel = 0;
       player = new Player(HERO_ORDER[selectedHero]);
       loadPhase(0, false);
@@ -3710,7 +3913,8 @@ function frame(ts) {
     if (currentPhase.finalPhase) {
       camX = 0; // arena fixa do lab
       // linha do tempo do boss rush, atrelada ao treino
-      treino += dt;
+      // Manuscrito da Litografia: treino 30% mais rápido!
+      treino += dt * (conquests.litografia ? 1.3 : 1);
       const prog = treino / TRAIN_TIME;
       for (const r of finalRush) {
         if (!r.spawned && prog >= r.at) {
@@ -3771,6 +3975,7 @@ function frame(ts) {
     if (currentPhase.finalPhase) { drawCurupiraMachine(); drawDeepZeekCamarote(); }
     const all = [...enemies, ...allies, player].sort((a, b) => a.gy - b.gy);
     drawDrops();
+    updateDrawCoin();
     for (const ent of all) ent.draw();
     companion.draw();
     // Saci-Bot fica de guarda perto do herói (quando o sprite chegar do Codex)
