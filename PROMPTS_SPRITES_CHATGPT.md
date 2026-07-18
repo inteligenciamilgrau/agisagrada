@@ -572,6 +572,21 @@ Scene: [CENA]
 | `intro-5.png` | heroic low-angle shot of an adventurer with fedora hat and leather jacket standing on a São Paulo rooftop at night holding a glowing golden tablet, a neon-green parrot flying beside him, moonlight, wind in the jacket |
 | `intro-6.png` | menacing swarm of small drones with red camera eyes approaching a lit studio window at night seen from outside, dark blue night, red glow reflections, tension |
 
+## 🎬 CUTSCENE DE ENCERRAMENTO (6 painéis finais)
+
+> Mesmo formato da introdução: imagens únicas de cinemática, paisagem larga.
+> Salvar como `sprites/story/final-1.png` até `final-6.png`. Use o mesmo
+> modelo de pedido da introdução (16-bit cinematic still, NO text).
+
+| Arquivo | Scene |
+|---|---|
+| `final-1.png` | inside a warm garage laboratory, a small green-and-yellow forest-spirit robot with backwards feet and fiber-optic flame hair opening its glowing screen-eyes for the first time inside a training capsule, green-gold light flooding the room, silhouettes watching in awe |
+| `final-2.png` | jubilant celebration in the garage lab: diverse crowd of researchers and community members cheering and crying with joy, confetti, a neon-green parrot fainting dramatically in the air, warm festive lighting |
+| `final-3.png` | five defeated villains (bombastic politician, billionaire on a rocket, grinning CEO, gentle professor with vacuum backpack) grumpily using computers with a glowing green-yellow AI assistant on their screens, funny defeated expressions |
+| `final-4.png` | a majestic circuit-board dragon lounging on a distant balcony at dusk, finishing a Brazilian pastel snack, one claw raised in silent approval, a small glowing holographic "merge" symbol floating beside it (abstract symbol, no text) |
+| `final-5.png` | the small forest-spirit robot standing proudly over a glowing map of Brazil, green and yellow light radiating outward across the whole continent, hopeful epic tone, community silhouettes holding hands around the glow |
+| `final-6.png` | sunrise over São Paulo rooftops: the hero team (fedora adventurer, scientist woman, gamer with keyboard, neon parrot, small glowing robot) seen from behind watching the horizon, golden morning light, peaceful epic ending shot |
+
 ## 🌍 MAPA-MÚNDI DE VIAGENS (tela de escolha de missão)
 
 > **IMPORTANTE — mande o esboço como referência:** abra o jogo, chegue na tela

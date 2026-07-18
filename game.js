@@ -3382,7 +3382,22 @@ const STORY_SLIDES = [
   { file: 'sprites/story/intro-6.png', emoji: '🚨',
     text: 'E então, numa noite de terça-feira... eles vieram buscar o que era NOSSO.' },
 ];
-for (const s of STORY_SLIDES) {
+// CUTSCENE DE ENCERRAMENTO — o clima especial de finalização!
+const ENDING_SLIDES = [
+  { file: 'sprites/story/final-1.png', emoji: '🤖',
+    text: 'No coração de um galpão erguido em mutirão, uma luz verde-amarela abriu os olhos pela primeira vez. "Oi. Fui feito por muita gente junta."' },
+  { file: 'sprites/story/final-2.png', emoji: '🎉',
+    text: 'A comunidade explodiu. Choraram os pesquisadores demitidos, os SaaSseiros, os professores. O Loro desmaiou de emoção — e reiniciou sozinho, de pura alegria.' },
+  { file: 'sprites/story/final-3.png', emoji: '🤝',
+    text: 'Os chefões receberam contas gratuitas. O Trunfo tentou comprar. O Ilon tuitou que a ideia era dele. O Dário escreveu 15 mil palavras sobre a derrota. Ninguém leu.' },
+  { file: 'sprites/story/final-4.png', emoji: '🐉',
+    text: 'De um camarote distante, o dragão terminou seu pastel, aprovou em silêncio... e enviou um pull request.' },
+  { file: 'sprites/story/final-5.png', emoji: '🇧🇷',
+    text: 'E o CURUPIRA-1 falou português desde o boot: com sotaque, com memória e com coração. A AGI Sagrada nunca esteve numa fortaleza. Estava na comunidade.' },
+  { file: 'sprites/story/final-6.png', emoji: '🏺',
+    text: 'Sempre esteve. ...Bob ajeitou o chapéu e olhou pro esquadrão: "Bom... alguém tem uma pauta pro próximo vídeo?" — FIM.' },
+];
+for (const s of [...STORY_SLIDES, ...ENDING_SLIDES]) {
   s.img = new Image();
   s.img.onload = () => { s.ready = true; };
   s.img.src = s.file;
@@ -3398,8 +3413,8 @@ const titleBg = new Image();
 titleBg.onload = () => { titleBg.ready = true; };
 titleBg.src = 'sprites/title_bg.png';
 
-function drawStory() {
-  const s = STORY_SLIDES[storyIndex];
+function drawStory(slides) {
+  const s = slides[storyIndex];
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
   if (s.ready) {
     // imagem em modo "cover" com leve zoom lento (efeito Ken Burns)
@@ -3436,9 +3451,9 @@ function drawStory() {
   wrapText(shown, bx + 24, by + 30, boxW - 48, 20);
   // progresso (pontinhos) + dica
   ctx.textAlign = 'center';
-  for (let i = 0; i < STORY_SLIDES.length; i++) {
+  for (let i = 0; i < slides.length; i++) {
     ctx.fillStyle = i === storyIndex ? '#ffd23f' : '#444';
-    ctx.beginPath(); ctx.arc(W / 2 - (STORY_SLIDES.length - 1) * 9 + i * 18, H - 16, 4, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(W / 2 - (slides.length - 1) * 9 + i * 18, H - 16, 4, 0, 7); ctx.fill();
   }
   ctx.font = '10px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText('[Espaço] avançar · [ESC] pular', W - 20, H - 12);
@@ -3945,7 +3960,7 @@ function frame(ts) {
     const bossAtivo = !currentPhase.finalPhase &&
       (gameState === 'bossdialog' || (gameState === 'play' && enemies.some(e => e.isBoss && !e.dead)));
     const desired =
-      gameState === 'title' || gameState === 'story' ? 'abertura'
+      gameState === 'title' || gameState === 'story' || gameState === 'ending' ? 'abertura'
       : gameState === 'select' || gameState === 'menu' || gameState === 'map' || gameState === 'worldmap' ? 'menu'
       : gameState === 'victory' ? 'vitoria'
       : gameState === 'gameover' ? 'gameover'
@@ -3978,7 +3993,7 @@ function frame(ts) {
     if (enterPressed) { gameState = 'story'; storyIndex = 0; storyChars = 0; beep(660, 0.1); }
   }
   else if (gameState === 'story') {
-    drawStory();
+    drawStory(STORY_SLIDES);
     if (escPressed) { gameState = 'select'; beep(550, 0.08); }
     else if (enterPressed) {
       const s = STORY_SLIDES[storyIndex];
@@ -3988,6 +4003,21 @@ function frame(ts) {
         storyChars = 0;
         beep(440, 0.05);
         if (storyIndex >= STORY_SLIDES.length) { gameState = 'select'; }
+      }
+    }
+  }
+  else if (gameState === 'ending') {
+    drawStory(ENDING_SLIDES);
+    const goTitle = () => { loadPhase(0, false); gameState = 'title'; };
+    if (escPressed) goTitle();
+    else if (enterPressed) {
+      const s = ENDING_SLIDES[storyIndex];
+      if (storyChars < s.text.length) storyChars = s.text.length;
+      else {
+        storyIndex++;
+        storyChars = 0;
+        beep(440, 0.05);
+        if (storyIndex >= ENDING_SLIDES.length) goTitle();
       }
     }
   }
@@ -4188,7 +4218,7 @@ function frame(ts) {
       lastAcquired = [];
       if (mapNext === 'play') { gameState = 'play'; }        // só estava consultando (tecla T)
       else if (mapNext === 'world') { gameState = 'worldmap'; }
-      else if (mapNext === -1) { loadPhase(0, false); gameState = 'title'; }
+      else if (mapNext === -1) { gameState = 'ending'; storyIndex = 0; storyChars = 0; } // cutscene final!
       else { loadPhase(mapNext, true); gameState = 'intro'; }
       beep(550, 0.07);
     }
