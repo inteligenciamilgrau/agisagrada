@@ -474,6 +474,11 @@ const TRACKS = {
     // fanfarra de conquista
     bars: [Mj(48),Mj(55),Mi(57),Mj(53), Mj(48),Mj(53),Mj(55),Mj(48),
            Mj(53),Mj(55),Mi(57),Mj(52), Mj(53),Mj(55),Mj(48),Mj(48)] },
+  festa:     { bpm: 148, drums: 'popdrive', bassPat: 'drive', stabs: [0, 4, 8, 12], stabInst: 'piano',
+    arp: { rate: 2, pattern: 'up', octaves: 2, inst: 'pluck', vol: 0.055 },
+    // A FESTA DA AGI: dó maior radiante, piano batucando, arpejo subindo feito fogos 🎆
+    bars: [Mj(48),Mj(53),Mj(55),Mj(48), Mj(48),Mj(53),Mj(55),Mj(48),
+           Mj(53),Mj(55),Mi(52),Mi(57), Mj(53),Mj(55),Mj(48),D7c(55)] },
   gameover:  { bpm: 66, drums: 'none', bassPat: 'half', pad: true,
     arp: { rate: 4, pattern: 'down', octaves: 1, inst: 'keys', vol: 0.05 },
     // lamento breve (todo grande modelo já divergiu no treino)
@@ -4153,9 +4158,10 @@ function frame(ts) {
     const bossAtivo = !currentPhase.finalPhase &&
       (gameState === 'bossdialog' || (gameState === 'play' && enemies.some(e => e.isBoss && !e.dead)));
     const desired =
-      gameState === 'title' || gameState === 'story' || gameState === 'ending' ? 'abertura'
+      gameState === 'title' || gameState === 'story' ? 'abertura'
+      : gameState === 'ending' ? 'festa' // a AGI nasceu: comemoração!
       : gameState === 'select' || gameState === 'menu' || gameState === 'map' || gameState === 'worldmap' ? 'menu'
-      : gameState === 'victory' ? 'vitoria'
+      : gameState === 'victory' ? (currentPhase.finalPhase ? 'festa' : 'vitoria')
       : gameState === 'gameover' ? 'gameover'
       : bossAtivo ? 'boss'
       : (PHASE_MUSIC[currentPhase.id] || 'saopaulo');
