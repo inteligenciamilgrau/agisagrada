@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: final game cinematic still
+Reference: sprites/curupira/idle/sheet-1.png is the exact forest-spirit robot identity
+Primary request: inside a warm garage laboratory, the small green-and-yellow forest-spirit robot with backwards feet and fiber-optic flame hair opens its glowing screen-eyes for the first time inside a training capsule; green-gold light floods the room while community silhouettes watch in awe
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
+Composition/framing: exact wide 16:9 landscape, robot and capsule as the clear center focal point
+Constraints: preserve robot identity; no text, letters, logos, watermark, UI, or panel borders

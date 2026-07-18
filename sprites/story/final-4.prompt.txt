@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: final game cinematic still
+Reference: sprites/deepzeek/idle/sheet-1.png is the exact circuit-board dragon identity
+Primary request: the majestic circuit-board dragon lounges peacefully on a distant high balcony at dusk, finishing a Brazilian pastel pastry; one claw is raised in silent approval beside a small glowing holographic abstract merge symbol made from converging circuit branches
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
+Composition/framing: exact wide 16:9 landscape, elegant balcony silhouette against a violet-orange skyline
+Constraints: preserve dragon identity; hologram is an abstract symbol only; no words, letters, logos, watermark, UI, or panel borders

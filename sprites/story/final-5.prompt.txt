@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: final game cinematic still
+Reference: sprites/curupira/idle/sheet-1.png is the exact forest-spirit robot identity
+Primary request: the small robot stands proudly over a large glowing map silhouette of Brazil while radiant green and yellow light spreads across the whole country; diverse community silhouettes hold hands in a wide circle around the glow
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
+Composition/framing: exact wide 16:9 landscape, low heroic angle, robot centered and Brazil map fully visible
+Constraints: preserve robot identity; no place names, text, letters, logos, watermark, UI, or panel borders

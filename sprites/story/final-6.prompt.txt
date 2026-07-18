@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: final game cinematic still
+References: Bob, Fefe, Escudeiro, Loro, and Curupira idle frames are exact hero identity references
+Primary request: at sunrise over Sao Paulo rooftops, exactly the full five-member hero team is seen mostly from behind watching the peaceful horizon together, with recognizable silhouettes and signature gear
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
+Composition/framing: exact wide 16:9 landscape, all five heroes visible, rooftop foreground and golden Sao Paulo skyline
+Constraints: preserve hero identities and colors; no text, letters, logos, watermark, UI, or panel borders

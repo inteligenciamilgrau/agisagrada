@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: final game cinematic still
+References: Trunfo, Ilon, Samuca, Dario, and Deep-Zeek idle frames are exact villain identity references
+Primary request: exactly five defeated villains sit grumpily at separate computers in a rehabilitation room, using friendly glowing green-and-yellow AI assistants on their screens; the circuit-board dragon is coiled awkwardly beside a laptop
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
+Composition/framing: exact wide 16:9 landscape, all five villains distinct and clearly visible
+Constraints: preserve villain identities; no screen text, letters, logos, watermark, UI overlay, or panel borders
