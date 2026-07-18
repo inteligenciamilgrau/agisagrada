@@ -1070,13 +1070,12 @@ class Companion {
     this.diveCd = 0;
   }
   // MERGULHO: quando o herói ataca do alto, o Loro caça o inimigo mais próximo!
+  // Sem cooldown: mesmo voltando do último ataque, ele emenda o próximo mergulho.
   diveAttack() {
-    if (this.diveCd > 0 || this.diveTarget) return;
     const alvos = enemies.filter(e => !e.dead);
     if (!alvos.length) return;
     this.diveTarget = alvos.reduce((a, b) =>
       Math.abs(a.x - player.x) < Math.abs(b.x - player.x) ? a : b);
-    this.diveCd = 2;
     spawnText(this.x - camX, this.gy - this.flyH - 30, '🦜 MERGULHO!', '#66ff88', 1.1);
     beep(1100, 0.08, 'triangle');
   }
