@@ -632,6 +632,42 @@ interesting details near the edges and corners.
 NO text, NO letters, NO watermark.
 ```
 
+## 🎬 PÔSTER DA TELA DE ABERTURA (com o elenco!)
+
+> Salvar como `sprites/title_bg.png`. O jogo desenha o LOGO por cima na parte
+> superior e os textos/menu embaixo — então o elenco deve ficar no meio, com
+> as áreas de cima e de baixo mais escuras e livres.
+> **Dica de consistência:** anexe no pedido os frames idle dos personagens
+> (`sprites/bob/idle/idle-1.png`, `fefe`, `escudeiro`, `loro/hover`) como
+> referência visual!
+
+```
+[ANEXE OS SPRITES DOS HERÓIS COMO REFERÊNCIA]
+
+Create an epic 16-bit pixel art movie-poster style key art for a retro
+beat 'em up game, wide 16:9 landscape, Indiana Jones adventure poster
+composition.
+
+Center: the hero team in dramatic poses on a São Paulo rooftop at night —
+a Brazilian adventurer with fedora hat and leather jacket holding a
+glowing golden tablet (center, largest), flanked by a wise Asian-American
+woman scientist with glowing blue eyes and a young gamer in a purple
+hoodie wielding a giant mechanical keyboard; a neon-green parrot flies
+above them.
+
+Background, looming huge and dark in the storm clouds: the shadowy faces
+of the villains — a smug politician with an extra-long red tie, a tech
+billionaire on a rocket, a grinning CEO with an asterisk halo, a gentle
+professor with a vacuum backpack, and a circuit-board dragon coiling
+through the clouds. A golden circuit-chalice glows faintly at the top of
+the sky between the clouds.
+
+Composition: keep the TOP 25% darker and less detailed (game logo goes
+there) and the BOTTOM 20% in shadow (menu text goes there).
+Vibrant retro palette, dramatic rim lighting, chunky pixels.
+NO text, NO letters, NO watermark.
+```
+
 ## 🎥 LOGOTIPO DO TÍTULO (estilo pôster de Hollywood)
 
 > Salvar como `sprites/title_logo.png`. A tela de título usa automaticamente.

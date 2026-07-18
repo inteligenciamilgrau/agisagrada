@@ -3093,6 +3093,10 @@ let storyIndex = 0, storyChars = 0;
 const titleLogo = new Image();
 titleLogo.onload = () => { titleLogo.ready = true; };
 titleLogo.src = 'sprites/title_logo.png';
+// pôster de abertura com o elenco (idem)
+const titleBg = new Image();
+titleBg.onload = () => { titleBg.ready = true; };
+titleBg.src = 'sprites/title_bg.png';
 
 function drawStory() {
   const s = STORY_SLIDES[storyIndex];
@@ -3310,8 +3314,16 @@ function wrapText(text, x, y, maxW, lh) {
 // ---- Telas ----
 function drawTitle() {
   currentPhase = PHASES[0];
-  drawBackground();
-  ctx.fillStyle = '#000a'; ctx.fillRect(0, 0, W, H);
+  if (titleBg.ready) {
+    // pôster de cinema do Codex (modo cover)
+    const scale = Math.max(W / titleBg.width, H / titleBg.height);
+    const iw = titleBg.width * scale, ih = titleBg.height * scale;
+    ctx.drawImage(titleBg, (W - iw) / 2, (H - ih) / 2, iw, ih);
+    ctx.fillStyle = 'rgba(0,0,10,0.3)'; ctx.fillRect(0, 0, W, H);
+  } else {
+    drawBackground();
+    ctx.fillStyle = '#000a'; ctx.fillRect(0, 0, W, H);
+  }
   ctx.textAlign = 'center';
   if (titleLogo.ready) {
     // logotipo estilo pôster de Hollywood gerado pelo Codex
@@ -3332,18 +3344,39 @@ function drawTitle() {
   ctx.fillText('DEMO v0.9 — JOGO COMPLETO: 7 fases, da origem ao CURUPIRA-1', W / 2, 268);
   ctx.font = '13px Courier New'; ctx.fillStyle = '#8888aa';
   ctx.fillText('uma produção da comunidade Inteligência Mil Grau', W / 2, 290);
-  // bob idle GRANDE no centro — o herói é ele!
-  if (hasAnim('bob', 'idle')) {
-    const frames = assets.anims.bob.idle;
-    const img = frames[Math.floor(time * 6) % frames.length];
-    const size = 235;
-    const y = 250;
-    const glow = ctx.createRadialGradient(W / 2, y + size * 0.6, 20, W / 2, y + size * 0.6, 130);
-    glow.addColorStop(0, 'rgba(255, 210, 63, 0.25)');
+  // o ESQUADRÃO no centro (só quando não tem o pôster do Codex)
+  if (!titleBg.ready) {
+    const glow = ctx.createRadialGradient(W / 2, 390, 20, W / 2, 390, 220);
+    glow.addColorStop(0, 'rgba(255, 210, 63, 0.22)');
     glow.addColorStop(1, 'rgba(255, 210, 63, 0)');
     ctx.fillStyle = glow;
-    ctx.fillRect(W / 2 - 140, y + size * 0.6 - 140, 280, 280);
-    ctx.drawImage(img, W / 2 - size / 2, y, size, size);
+    ctx.fillRect(W / 2 - 240, 170, 480, 380);
+    const drawHero = (key, cx, y, size, flip) => {
+      const frames = getAnim(key, 'idle') || getAnim(key, 'hover');
+      if (!frames) return;
+      const img = frames[Math.floor(time * 6) % frames.length];
+      ctx.save();
+      ctx.translate(cx, 0);
+      if (flip) ctx.scale(-1, 1);
+      ctx.drawImage(img, -size / 2, y, size, size);
+      ctx.restore();
+    };
+    // escudeiros ladeando (Escudeiro espelhado, encarando o centro)
+    drawHero('fefe', W / 2 - 155, 292, 180, false);
+    drawHero('escudeiro', W / 2 + 155, 292, 180, true);
+    // Bob GRANDE no centro — o herói é ele!
+    drawHero('bob', W / 2, 250, 235, false);
+    // Loro voando em volta do grupo
+    const lx = W / 2 + Math.sin(time * 1.4) * 190;
+    const ly = 255 + Math.cos(time * 2.1) * 22;
+    const loroFrames = getAnim('loro', 'hover');
+    if (loroFrames) {
+      const img = loroFrames[Math.floor(time * 8) % loroFrames.length];
+      ctx.save();
+      if (Math.cos(time * 1.4) < 0) { ctx.translate(lx, 0); ctx.scale(-1, 1); ctx.translate(-lx, 0); }
+      ctx.drawImage(img, lx - 42, ly - 42, 84, 84);
+      ctx.restore();
+    }
   }
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 18px Courier New'; ctx.fillStyle = '#ffd23f';
