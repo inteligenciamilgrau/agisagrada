@@ -1305,6 +1305,16 @@ class Player extends Entity {
         beep(330, 0.08, 'triangle');
         return;
       }
+      // golpe andando: patina na direção segurada enquanto a animação roda
+      let adx = 0, ady = 0;
+      if (keys['arrowleft'] || keys['a']) adx = -1;
+      if (keys['arrowright'] || keys['d']) adx = 1;
+      if (keys['arrowup'] || keys['w']) ady = -1;
+      if (keys['arrowdown'] || keys['s']) ady = 1;
+      this.x += adx * this.speed * 0.65 * dt;
+      this.gy += ady * this.speed * 0.45 * dt;
+      this.x = Math.max(camX + 40, Math.min(camX + W - 40, Math.min(this.x, currentPhase.stageLen - 40)));
+      this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
       const done = this.advanceAnim(14, 6, false);
       if (this.frame >= 2 && this.frame <= 4 && !this.attackHitDone) {
         if (this.tryHit(78, 14, this.baseDmg())) this.attackHitDone = true;
