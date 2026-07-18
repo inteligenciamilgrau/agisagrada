@@ -45,7 +45,7 @@ juntando as peças pra treinar a primeira AGI brasileira: o **CURUPIRA-1**. 🇧
 | Espaço | avançar diálogos |
 | ESC | pular história |
 | T | mapa do Plano da AGI |
-| P | opções de áudio |
+| O | opções (idioma, dificuldade e áudio) |
 | M | música on/off |
 | F | tela cheia |
 
