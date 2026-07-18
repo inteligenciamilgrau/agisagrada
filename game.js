@@ -1092,7 +1092,7 @@ class Companion {
         this.facing = Math.sign(tdx) || this.facing;
         this.flyH = Math.max(alvo.flyH !== undefined ? alvo.flyH : 40, this.flyH - 320 * dt);
         if (Math.abs(tdx) < 42 && Math.abs(tdy) < 26) {
-          const dmg = 6 + Math.floor(Math.random() * 8);
+          const dmg = 2 + Math.floor(Math.random() * 4); // bicada: 2 a 5
           alvo.takeHit(dmg, this.facing, false);
           spawnText(alvo.screenX, alvo.screenY - 100, `🦜 BICADA! (${dmg})`, '#66ff88', 1.1);
           this.echoFlash = 0.4;
