@@ -2966,7 +2966,7 @@ const PHASES = [
       ['DEEP-ZEEK', '*de camarote, terminando o pastel* — Eficiente. Aprovado. *envia um pull request*'],
       ['SISTEMA', '🏆 A AGI SAGRADA NUNCA ESTEVE NUMA FORTALEZA. ESTAVA NA COMUNIDADE. SEMPRE ESTEVE.'],
       ['LORO', '...isso tudo foi gerado ou aconteceu de verdade? *olha pra câmera*'],
-      ['SISTEMA', '🇧🇷 FIM! Obrigado, membro Mil Grau! Dica: 3 Moedas de Silício brilham escondidas pelo mundo... 🏝️ Comenta tuas ideias no canal! 🔥'],
+      ['SISTEMA', '🇧🇷 FIM! Obrigado, Membro Mestre da IA! Dica: 3 Moedas de Silício brilham escondidas pelo mundo... 🏝️ Comenta tuas ideias no canal! 🔥'],
     ],
     onVictory: () => { conquests.treino = true; },
     makeWaves: () => [],
