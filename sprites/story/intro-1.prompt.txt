@@ -2,6 +2,6 @@ Use case: illustration-story
 Asset type: game intro cinematic still
 Primary request: ancient cave-temple wall covered in prehistoric-style paintings depicting a glowing golden chalice made of circuit boards, worshipped by primitive figures, torchlight flickering on stone, mystical atmosphere
 Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
-Composition/framing: single wide landscape image, dramatic readable silhouettes, no panel borders
+Composition/framing: exact wide 16:9 landscape image, dramatic readable silhouettes, no panel borders; not square and not 3:2
 Lighting/mood: warm torchlight, deep cave shadows, sacred and mysterious
 Constraints: no text, no letters, no logos, no watermark, no UI, no modern readable symbols

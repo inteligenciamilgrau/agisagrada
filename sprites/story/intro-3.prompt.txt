@@ -2,6 +2,6 @@ Use case: illustration-story
 Asset type: game intro cinematic still
 Primary request: a stylized pixel-art world map at night with five fortress strongholds glowing in different continents: a golden palace, a robot factory, a glass technology campus, a server cathedral, and a cybernetic great wall; thin red energy beams connect the five strongholds
 Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
-Composition/framing: single wide landscape world-map view, all five landmarks readable
+Composition/framing: exact wide 16:9 landscape world-map view, all five landmarks readable; not square and not 3:2
 Lighting/mood: deep midnight blue with red and gold glows, ominous strategic overview
 Constraints: no place names, no text, no letters, no flags with writing, no logos, no watermark, no UI, no panel borders
