@@ -3326,10 +3326,14 @@ function drawTitle() {
   }
   ctx.textAlign = 'center';
   if (titleLogo.ready) {
-    // logotipo estilo pôster de Hollywood gerado pelo Codex
+    // logotipo estilo pôster de Hollywood gerado pelo Codex.
+    // blend "screen": o fundo preto do PNG some e só as letras brilham
     const lw = Math.min(W * 0.72, 640);
     const lh = lw * (titleLogo.height / titleLogo.width);
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
     ctx.drawImage(titleLogo, W / 2 - lw / 2, 170 - lh / 2, lw, lh);
+    ctx.restore();
   } else {
     ctx.font = 'bold 40px Courier New';
     ctx.fillStyle = '#ffd23f';
