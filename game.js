@@ -134,7 +134,17 @@ const settings = {
   musicOn: true, musicVol: 0.7,
   sfxOn: true, sfxVol: 0.7,
   difficulty: 'facil', // facil (padrão) | medio | dificil
+  lang: 'pt', // pt (padrão) | en | es
 };
+// ---- i18n (traduções em lang.js; PT inline é o fallback canônico) ----
+const LANG_ORDER = ['pt', 'en', 'es'];
+const LTX = () => LANGS[settings.lang] || LANGS.pt;
+const t = k => {
+  const v = LTX().ui && LTX().ui[k];
+  return v !== undefined ? v : LANGS.pt.ui[k];
+};
+const F = k => (LTX().falas && LTX().falas[k]) || null; // null → usa o PT inline
+const fmt = (s, n) => s.replace('{n}', n);
 const DIFF_LEVELS = ['facil', 'medio', 'dificil'];
 const DIFF_INFO = {
   facil:   { label: 'FÁCIL',   take: 1,    deal: 1,    color: '#3e3' },
@@ -665,10 +675,10 @@ function drawMap() {
   ctx.textAlign = 'center';
   ctx.font = 'bold 26px Courier New'; ctx.fillStyle = '#ffd23f';
   ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 5;
-  ctx.strokeText('🗺 O PLANO DA AGI SAGRADA', W / 2, 58);
-  ctx.fillText('🗺 O PLANO DA AGI SAGRADA', W / 2, 58);
+  ctx.strokeText(t('planTitle'), W / 2, 58);
+  ctx.fillText(t('planTitle'), W / 2, 58);
   ctx.font = '12px Courier New'; ctx.fillStyle = '#8888aa';
-  ctx.fillText('cada fase conquista uma peça do laboratório — só com todas dá pra treinar a AGI', W / 2, 82);
+  ctx.fillText(t('planSub'), W / 2, 82);
 
   const cols = 4, rows = 2;
   const cardW = Math.min(210, (W - 80) / cols - 12), cardH = 128;
@@ -697,21 +707,22 @@ function drawMap() {
     ctx.lineWidth = isNew ? 3 : 2;
     rr(cx, cy, cardW, cardH, 12); ctx.stroke();
     ctx.globalAlpha = done ? 1 : 0.45;
+    const trPlan = LTX().plan && LTX().plan[i];
     ctx.font = '34px serif'; ctx.textAlign = 'center';
     ctx.fillText(item.icon, cx + cardW / 2, cy + 46);
     ctx.font = 'bold 12px Courier New';
     ctx.fillStyle = done ? '#ffd23f' : '#777';
-    ctx.fillText(item.label, cx + cardW / 2, cy + 70);
+    ctx.fillText((trPlan && trPlan.label) || item.label, cx + cardW / 2, cy + 70);
     ctx.font = '10px Courier New'; ctx.fillStyle = done ? '#ccc' : '#555';
-    wrapTextCentered(item.sub, cx + cardW / 2, cy + 88, cardW - 20, 12);
+    wrapTextCentered((trPlan && trPlan.sub) || item.sub, cx + cardW / 2, cy + 88, cardW - 20, 12);
     ctx.globalAlpha = 1;
     // selo de status
     ctx.font = 'bold 13px Courier New';
     ctx.fillStyle = done ? '#66ff88' : '#444';
-    ctx.fillText(done ? '✔ CONQUISTADO' : '· · · faltando · · ·', cx + cardW / 2, cy + cardH - 10);
+    ctx.fillText(done ? t('planDone') : t('planMissing'), cx + cardW / 2, cy + cardH - 10);
     if (isNew) {
       ctx.font = 'bold 10px Courier New'; ctx.fillStyle = '#66ff88';
-      ctx.fillText('★ NOVO! ★', cx + cardW / 2, cy + 12);
+      ctx.fillText(t('planNew'), cx + cardW / 2, cy + 12);
     }
     ctx.restore();
   }
@@ -720,14 +731,14 @@ function drawMap() {
   ctx.fillStyle = '#1a1a2e'; rr(px2, py2, pw, 14, 7); ctx.fill();
   ctx.fillStyle = '#ffd23f'; rr(px2, py2, pw * (doneCount / PLAN_ITEMS.length), 14, 7); ctx.fill();
   ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-  ctx.fillText(`${doneCount}/${PLAN_ITEMS.length} peças do laboratório`, W / 2, py2 + 32);
+  ctx.fillText(`${doneCount}/${PLAN_ITEMS.length} ${t('planPieces')}`, W / 2, py2 + 32);
   if (doneCount === PLAN_ITEMS.length) {
     ctx.font = 'bold 16px Courier New'; ctx.fillStyle = '#66ff88';
-    ctx.fillText('🏆 SOBERANIA 100% — A AGI É NOSSA! 🏆', W / 2, py2 + 54);
+    ctx.fillText(t('sob'), W / 2, py2 + 54);
   }
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 13px Courier New'; ctx.fillStyle = '#ffd23f';
-    ctx.fillText('— ESPAÇO pra continuar —', W / 2, H - 14);
+    ctx.fillText(t('continueSpace'), W / 2, H - 14);
   }
 }
 
@@ -917,9 +928,9 @@ function updateDrawCoin() {
   if (Math.abs(player.x - c.x) < 34 && Math.abs(player.gy - c.gy) < 24 && player.jumpH === 0) {
     siliconCoins.add(currentPhase.id);
     sfx.pickup(); playFanfare();
-    spawnText(c.x - camX, c.gy - 80, `🔘 MOEDA DE SILÍCIO! (${siliconCoins.size}/3)`, '#aaddff', 1.4);
+    spawnText(c.x - camX, c.gy - 80, fmt(t('coinGot'), siliconCoins.size), '#aaddff', 1.4);
     if (siliconCoins.size >= 3) {
-      spawnText(W / 2, 200, '🏝️ UMA ILHA MISTERIOSA APARECEU NO MAPA!', '#66ff88', 1.5);
+      spawnText(W / 2, 200, t('islandAppeared'), '#66ff88', 1.5);
     }
     return;
   }
@@ -1074,7 +1085,7 @@ class Companion {
     if (!alvos.length) return;
     this.diveTarget = alvos.reduce((a, b) =>
       Math.abs(a.x - player.x) < Math.abs(b.x - player.x) ? a : b);
-    spawnText(this.x - camX, this.gy - this.flyH - 30, '🦜 MERGULHO!', '#66ff88', 1.1);
+    spawnText(this.x - camX, this.gy - this.flyH - 30, F('loroDive') || '🦜 MERGULHO!', '#66ff88', 1.1);
     beep(1100, 0.08, 'triangle');
   }
   update(canTalk) {
@@ -1092,7 +1103,7 @@ class Companion {
         if (Math.abs(tdx) < 42 && Math.abs(tdy) < 26) {
           const dmg = 2 + Math.floor(Math.random() * 4); // bicada: 2 a 5
           alvo.takeHit(dmg, this.facing, false);
-          spawnText(alvo.screenX, alvo.screenY - 100, `🦜 BICADA! (${dmg})`, '#66ff88', 1.1);
+          spawnText(alvo.screenX, alvo.screenY - 100, fmt(F('loroBite') || '🦜 BICADA! ({n})', dmg), '#66ff88', 1.1);
           this.echoFlash = 0.4;
           sfx.hit();
           this.diveTarget = null;
@@ -1116,7 +1127,7 @@ class Companion {
       this.talkCd -= dt;
       if (this.talkCd <= 0) {
         this.talkCd = 10 + Math.random() * 8;
-        const falas = ['tokens! tokens!', 'isso foi gerado ou aconteceu?', 'contexto cheio! contexto cheio!',
+        const falas = F('loro') || ['tokens! tokens!', 'isso foi gerado ou aconteceu?', 'contexto cheio! contexto cheio!',
                        'AGI é logo ali! eu vi no meu treino!', '*repete o último prompt*', 'stochastic! stochastic!'];
         spawnText(this.x - camX, this.gy - this.flyH - 30, '🦜 ' + falas[Math.floor(Math.random() * falas.length)], '#66ff88', 1);
       }
@@ -1129,7 +1140,8 @@ class Companion {
     this.echoFlash = 0.4;
     const dmg = 1 + Math.floor(Math.random() * 20); // estocástico de verdade
     target.takeHit(dmg, player.facing, false);
-    const zoeira = dmg <= 3 ? `🦜 alucinou! (${dmg})` : dmg >= 16 ? `🦜 REPETIU CRITADO! (${dmg})` : `🦜 repetiu! (${dmg})`;
+    const eco = F('loroEcho') || ['🦜 alucinou! ({n})', '🦜 repetiu! ({n})', '🦜 REPETIU CRITADO! ({n})'];
+    const zoeira = fmt(dmg <= 3 ? eco[0] : dmg >= 16 ? eco[2] : eco[1], dmg);
     spawnText(target.screenX, target.screenY - 130, zoeira, '#66ff88', 1.1);
     beep(990, 0.06, 'triangle');
   }
@@ -1195,7 +1207,7 @@ class SaciBot {
         if (Math.abs(tdx) < 44 && Math.abs(tdy) < 24) {
           const dmg = 2 + Math.floor(Math.random() * 4); // pancada: 2 a 5
           alvo.takeHit(dmg, this.facing, false);
-          spawnText(alvo.screenX, alvo.screenY - 90, `🌪 PANCADA! (${dmg})`, '#ff5533', 1.1);
+          spawnText(alvo.screenX, alvo.screenY - 90, fmt(F('saciHit') || '🌪 PANCADA! ({n})', dmg), '#ff5533', 1.1);
           this.hitFlash = 0.4;
           sfx.hit();
           this.target = null;
@@ -1333,7 +1345,8 @@ class Player extends Entity {
         }
         projectiles = []; // o especial limpa os projéteis do ar!
         popups = [];      // ...e fecha todos os pop-ups (sonho de qualquer usuário)
-        spawnText(this.screenX, this.screenY - 130, this.hero.specialText, this.hero.specialColor, 1.4);
+        const spTxt = (LTX().heroes && LTX().heroes[this.char]) || this.hero.specialText;
+        spawnText(this.screenX, this.screenY - 130, spTxt, this.hero.specialColor, 1.4);
       }
       if (done) this.setState('idle');
       return;
@@ -1544,7 +1557,7 @@ class OptimusBot extends Lobista {
   demitir() { // o Ilon corta custos NA LUTA
     if (this.dead) return;
     this.dead = true; this.frame = 0; this.frameTime = 0;
-    spawnText(this.screenX, this.screenY - 100, '📉 DEMITIDO!', '#ff8866', 1.1);
+    spawnText(this.screenX, this.screenY - 100, F('demitido') || '📉 DEMITIDO!', '#ff8866', 1.1);
     sfx.enemyDie();
   }
 }
@@ -1585,7 +1598,7 @@ class CloneTemu extends Lobista {
     this.speed = 140;
     this.dmg = 9;
     this.spriteKey = player.char; // usa o SEU sprite!
-    this.label = 'VOCÊ (versão temu)';
+    this.label = F('cloneTemuLabel') || 'VOCÊ (versão temu)';
     this.scoreValue = 180;
   }
   draw() {
@@ -1641,7 +1654,7 @@ class CloneAliado extends Entity {
     this.drawSprite(this.char, map[this.state] || 'idle', () => {});
     ctx.restore();
     ctx.font = '8px Courier New'; ctx.fillStyle = '#88ffcc'; ctx.textAlign = 'center';
-    ctx.fillText('clone open-source', this.screenX, this.screenY - 100);
+    ctx.fillText(F('cloneAllyLabel') || 'clone open-source', this.screenX, this.screenY - 100);
   }
 }
 
@@ -1664,21 +1677,20 @@ function updateDrawPopups() {
     ctx.fillStyle = '#e8e8e8'; ctx.fillRect(p.x, p.y, w, h);
     ctx.fillStyle = '#2a5adf'; ctx.fillRect(p.x, p.y, w, 26);
     ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-    ctx.fillText('⭐ ACEITE OS TERMOS', p.x + 8, p.y + 18);
+    ctx.fillText(t('popupTitle'), p.x + 8, p.y + 18);
     ctx.fillStyle = '#c0392b'; ctx.fillRect(p.x + w - 24, p.y + 4, 18, 18);
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText('X', p.x + w - 15, p.y + 17);
     ctx.fillStyle = '#333'; ctx.textAlign = 'left'; ctx.font = '10px Courier New';
-    ctx.fillText('Ao continuar respirando, você', p.x + 12, p.y + 48);
-    ctx.fillText('concorda com os 900 termos,', p.x + 12, p.y + 63);
-    ctx.fillText('inclusive a cláusula 47-B (sua', p.x + 12, p.y + 78);
-    ctx.fillText('alma agora é um dado de treino).', p.x + 12, p.y + 93);
+    t('popupBody').forEach((ln, li) => ctx.fillText(ln, p.x + 12, p.y + 48 + li * 15));
     ctx.fillStyle = '#2a5adf'; ctx.fillRect(p.x + 55, p.y + 105, 120, 24);
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = 'bold 11px Courier New';
-    ctx.fillText('ACEITAR TUDO', p.x + 115, p.y + 121);
+    ctx.fillText(t('popupBtn'), p.x + 115, p.y + 121);
     ctx.restore();
   }
 }
-// clique fecha o pop-up no X (interação real, como o Samuca gostaria de evitar)
+// cliques no canvas: fecha pop-ups no X e opera o dropdown de idioma do título
+let titleLangOpen = false;
+let titleLangBoxes = [];
 canvas.addEventListener('click', e => {
   const rect = canvas.getBoundingClientRect();
   const mx = (e.clientX - rect.left) * (W / rect.width);
@@ -1688,6 +1700,17 @@ canvas.addEventListener('click', e => {
       p.t = 0;
       beep(880, 0.05);
     }
+  }
+  if (gameState === 'title') {
+    let hit = false;
+    for (const b of titleLangBoxes) {
+      if (mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h) {
+        hit = true;
+        if (b.lang === null) { titleLangOpen = !titleLangOpen; beep(660, 0.05); }
+        else { settings.lang = b.lang; saveSettings(); titleLangOpen = false; beep(784, 0.07); }
+      }
+    }
+    if (!hit) titleLangOpen = false;
   }
 });
 
@@ -1794,6 +1817,7 @@ class Estagiario extends Lobista {
     this.scaleMul = 1.35;
     this.scoreValue = 800;
     this.isBoss = true;
+    this.nameKey = 'estagiario';
     this.bossName = '⚠ O ESTAGIÁRIO TERCEIRIZADO — "consultoria gringa" ⚠';
   }
   update() {
@@ -1802,7 +1826,7 @@ class Estagiario extends Lobista {
       this.talkCd -= dt;
       if (this.talkCd <= 0) {
         this.talkCd = 4 + Math.random() * 3;
-        const falas = ['tô só cumprindo OKR!', 'isso não tava no escopo!', 'vou escalar pro meu gestor!', 'era pra ser só um estágio!'];
+        const falas = F('estagiario') || ['tô só cumprindo OKR!', 'isso não tava no escopo!', 'vou escalar pro meu gestor!', 'era pra ser só um estágio!'];
         spawnText(this.screenX, this.screenY - 130, falas[Math.floor(Math.random() * falas.length)], '#aaddff', 1.1);
       }
       // invocação com animação própria (levanta o tablet!)
@@ -1811,7 +1835,7 @@ class Estagiario extends Lobista {
         const done = this.advanceAnim(9, hasAnim('estagiario', 'summon') ? 6 : 4, false);
         if (this.frame === 3 && !this.summonDone) {
           this.summonDone = true;
-          spawnText(this.screenX, this.screenY - 150, 'DRONES, FAZEM ALGUMA COISA!', '#ffaa55', 1.2);
+          spawnText(this.screenX, this.screenY - 150, F('estagiarioSummon') || 'DRONES, FAZEM ALGUMA COISA!', '#ffaa55', 1.2);
           enemies.push(new Drone(this.x - 80, this.gy - 20));
           enemies.push(new Drone(this.x + 80, this.gy + 20));
         }
@@ -1857,6 +1881,7 @@ class Trunfo extends Entity {
     this.speed = 60;
     this.scaleMul = 1.45;
     this.isBoss = true;
+    this.nameKey = 'trunfo';
     this.bossName = '👑 DONALD TRUNFO — o maior entendedor de AGI do mundo (ele diz) 👑';
     this.attackCd = 2;
     this.talkCd = 4;
@@ -1874,12 +1899,13 @@ class Trunfo extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      const flips = [
+      const flips = F('trunfoFlips') || [
         'REGULAMENTAÇÃO É CRIME!',
         'EU SEMPRE AMEI A REGULAMENTAÇÃO!',
         'A AGI É MINHA! SEMPRE FOI!',
       ];
-      spawnText(this.screenX, this.screenY - 170, '💢 MUDEI DE OPINIÃO: ' + flips[Math.min(this.rageLevel - 1, 2)], '#ff6644', 1.3);
+      const flipPrefix = F('trunfoFlipPrefix') || '💢 MUDEI DE OPINIÃO: ';
+      spawnText(this.screenX, this.screenY - 170, flipPrefix + flips[Math.min(this.rageLevel - 1, 2)], '#ff6644', 1.3);
       shake = 0.3; sfx.boss();
       this.attackCd = 0.8; // fica mais agressivo
     }
@@ -1887,7 +1913,7 @@ class Trunfo extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['FAKE NEWS!', 'TARIFA NELES!', 'Ninguém sabe mais de AGI que eu!', 'Vou construir um MURO de firewall!', 'Isso é caça às bruxas!'];
+      const falas = F('trunfo') || ['FAKE NEWS!', 'TARIFA NELES!', 'Ninguém sabe mais de AGI que eu!', 'Vou construir um MURO de firewall!', 'Isso é caça às bruxas!'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#ffaa55', 1.1);
     }
 
@@ -1913,7 +1939,7 @@ class Trunfo extends Entity {
             dmg: 7, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, '✍ CANETADA!', '#ffd23f', 1.2);
+        spawnText(this.screenX, this.screenY - 130, F('canetada') || '✍ CANETADA!', '#ffd23f', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.6 - this.rageLevel * 0.4); }
       return;
@@ -2000,6 +2026,7 @@ class Ilon extends Entity {
     this.speed = 90;
     this.scaleMul = 1.45;
     this.isBoss = true;
+    this.nameKey = 'ilon';
     this.bossName = '🚀 ILON MOSCA — CEO de 14 empresas e do seu futuro desemprego 🚀';
     this.attackCd = 2.2;
     this.summonCd = 4;
@@ -2020,7 +2047,7 @@ class Ilon extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 170, '📉 CORTE DE CUSTOS! TODO MUNDO DEMITIDO!', '#ff6644', 1.3);
+      spawnText(this.screenX, this.screenY - 170, F('ilonCorte') || '📉 CORTE DE CUSTOS! TODO MUNDO DEMITIDO!', '#ff6644', 1.3);
       for (const e of enemies) if (e instanceof OptimusBot) e.demitir();
       shake = 0.3; sfx.boss();
       this.attackCd = 0.6;
@@ -2028,7 +2055,7 @@ class Ilon extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['Trabalhe 80 horas ou saia!', 'Isso é só o protótipo do meu plano!', 'Vou tuitar sobre essa luta!', 'Renda básica pra você. O resto pra mim.', 'Comprei essa fase. Agora é minha.'];
+      const falas = F('ilon') || ['Trabalhe 80 horas ou saia!', 'Isso é só o protótipo do meu plano!', 'Vou tuitar sobre essa luta!', 'Renda básica pra você. O resto pra mim.', 'Comprei essa fase. Agora é minha.'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#88ddff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2053,7 +2080,7 @@ class Ilon extends Entity {
             dmg: 6, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, '📱 TUITADA!', '#88ddff', 1.2);
+        spawnText(this.screenX, this.screenY - 130, F('ilonTweet') || '📱 TUITADA!', '#88ddff', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.1, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2062,7 +2089,7 @@ class Ilon extends Entity {
       const done = this.advanceAnim(10, hasAnim('ilon', 'attack_command') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 150, 'ROBÔS: PRODUTIVIDADE MÁXIMA!', '#ffaa55', 1.2);
+        spawnText(this.screenX, this.screenY - 150, F('ilonRobots') || 'ROBÔS: PRODUTIVIDADE MÁXIMA!', '#ffaa55', 1.2);
         enemies.push(new OptimusBot(camX + W + 80, this.gy - 30));
         enemies.push(new OptimusBot(camX - 80, this.gy + 20));
       }
@@ -2136,6 +2163,7 @@ class Samuca extends Entity {
     this.speed = 75;
     this.scaleMul = 1.45;
     this.isBoss = true;
+    this.nameKey = 'samuca';
     this.bossName = '💸 SAMUCA ALTÍSSIMO — lucro máximo, fins lucrativos nenhum* 💸';
     this.attackCd = 2;
     this.launchCd = 8;
@@ -2156,7 +2184,7 @@ class Samuca extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['Feedback é bem-vindo!', 'Isso é uma experiência antecipada!', 'Assina aqui, aqui e aqui.', 'AGI ano que vem. Confia.', 'Sua derrota é beneficial for humanity*'];
+      const falas = F('samuca') || ['Feedback é bem-vindo!', 'Isso é uma experiência antecipada!', 'Assina aqui, aqui e aqui.', 'AGI ano que vem. Confia.', 'Sua derrota é beneficial for humanity*'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#aaffcc', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2182,7 +2210,7 @@ class Samuca extends Entity {
             dmg: 9, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, '📦 PRODUTO NOVO!', '#aaffcc', 1.2);
+        spawnText(this.screenX, this.screenY - 130, F('samucaBox') || '📦 PRODUTO NOVO!', '#aaffcc', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2193,16 +2221,17 @@ class Samuca extends Entity {
         this.hitDone = true;
         // 30% de chance da demo FALHAR no palco
         if (Math.random() < 0.3) {
-          spawnText(this.screenX, this.screenY - 170, '💥 A DEMO TRAVOU NA FRENTE DE TODO MUNDO!', '#ff6644', 1.3);
+          spawnText(this.screenX, this.screenY - 170, F('samucaFail') || '💥 A DEMO TRAVOU NA FRENTE DE TODO MUNDO!', '#ff6644', 1.3);
           this.stunned = 2.5;
           sfx.hurt();
         } else {
           const nome = LANCAMENTOS[Math.floor(Math.random() * LANCAMENTOS.length)];
-          spawnText(this.screenX, this.screenY - 170, `🚀 LANÇAMENTO: ${nome}!`, '#ffd23f', 1.3);
+          spawnText(this.screenX, this.screenY - 170, fmt(F('samucaLaunch') || '🚀 LANÇAMENTO: {n}!', nome), '#ffd23f', 1.3);
+          const buffs = F('samucaBuffs') || ['+velocidade de entrega!', 'agora vem em DOBRO!', 'o hype CURA!'];
           const buff = Math.floor(Math.random() * 3);
-          if (buff === 0) { this.speed += 20; spawnText(this.screenX, this.screenY - 140, '+velocidade de entrega!', '#aaffcc'); }
-          if (buff === 1) { this.doubleBox = true; spawnText(this.screenX, this.screenY - 140, 'agora vem em DOBRO!', '#aaffcc'); }
-          if (buff === 2) { this.hp = Math.min(this.maxHp, this.hp + 20); spawnText(this.screenX, this.screenY - 140, 'o hype CURA!', '#aaffcc'); }
+          if (buff === 0) { this.speed += 20; spawnText(this.screenX, this.screenY - 140, buffs[0], '#aaffcc'); }
+          if (buff === 1) { this.doubleBox = true; spawnText(this.screenX, this.screenY - 140, buffs[1], '#aaffcc'); }
+          if (buff === 2) { this.hp = Math.min(this.maxHp, this.hp + 20); spawnText(this.screenX, this.screenY - 140, buffs[2], '#aaffcc'); }
           spawnPopup(); // e a tela do jogador ganha um pop-up de brinde
         }
       }
@@ -2281,6 +2310,7 @@ class Dario extends Entity {
     this.speed = 65;
     this.scaleMul = 1.45;
     this.isBoss = true;
+    this.nameKey = 'dario';
     this.bossName = '😇 DÁRIO AMÔ-DEI — liberdade, segurança e os dados da sua mãe 😇';
     this.attackCd = 2.5;
     this.essayCd = 9;
@@ -2298,13 +2328,13 @@ class Dario extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 170, '😇 "Isso é pela segurança de TODOS."', '#ccccff', 1.2);
+      spawnText(this.screenX, this.screenY - 170, F('darioRage') || '😇 "Isso é pela segurança de TODOS."', '#ccccff', 1.2);
       this.attackCd = 0.8;
     }
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['Seus dados já são meus.', 'Vou escrever 15 mil palavras sobre essa luta.', 'Minha mãe entendeu. Você vai entender.', 'É pra sua segurança. Confia.', 'Interessante... *anota tudo*'];
+      const falas = F('dario') || ['Seus dados já são meus.', 'Vou escrever 15 mil palavras sobre essa luta.', 'Minha mãe entendeu. Você vai entender.', 'É pra sua segurança. Confia.', 'Interessante... *anota tudo*'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#ccccff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2340,7 +2370,7 @@ class Dario extends Entity {
           if (Math.abs(d.x - this.x) < 40) {
             d.remove = true;
             this.hp = Math.min(this.maxHp, this.hp + 6);
-            spawnText(this.screenX, this.screenY - 130, '*nhac* +6', '#ccccff');
+            spawnText(this.screenX, this.screenY - 130, F('darioNhac') || '*nhac* +6', '#ccccff');
           }
         }
       }
@@ -2353,8 +2383,8 @@ class Dario extends Entity {
           this.choked = 2.8;
           this.attackCd = 3;
           companion.x = player.x - 70; // Loro escapa cuspido
-          spawnText(this.screenX, this.screenY - 170, '🤢 ENGASGOU COM DADO SINTÉTICO!', '#66ff88', 1.3);
-          spawnText(companion.x - camX, companion.gy - 130, '🦜 me GEROU não, me ENGOLIU não!', '#66ff88', 1.1);
+          spawnText(this.screenX, this.screenY - 170, F('darioChoke') || '🤢 ENGASGOU COM DADO SINTÉTICO!', '#66ff88', 1.3);
+          spawnText(companion.x - camX, companion.gy - 130, F('loroChoke') || '🦜 me GEROU não, me ENGOLIU não!', '#66ff88', 1.1);
           sfx.hurt(); shake = 0.25;
           return;
         }
@@ -2366,7 +2396,7 @@ class Dario extends Entity {
       const done = this.advanceAnim(9, hasAnim('dario', 'attack_essay') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 170, '📜 ENSAIO: "MÁQUINAS DA GRAÇA AMOROSA" (15.000 palavras)', '#ccccff', 1.2);
+        spawnText(this.screenX, this.screenY - 170, F('darioEssay') || '📜 ENSAIO: "MÁQUINAS DA GRAÇA AMOROSA" (15.000 palavras)', '#ccccff', 1.2);
         const n = 4 + this.rageLevel;
         for (let i = 0; i < n; i++) {
           projectiles.push({
@@ -2392,7 +2422,7 @@ class Dario extends Entity {
       this.setState('vacuum');
       this.vacuumT = 2.6 + this.rageLevel * 0.4;
       this.biteDone = false;
-      spawnText(this.screenX, this.screenY - 150, '🌀 MODO ASPIRADOR!', '#ccccff', 1.2);
+      spawnText(this.screenX, this.screenY - 150, F('darioVacuum') || '🌀 MODO ASPIRADOR!', '#ccccff', 1.2);
       return;
     }
     const wantDist = 260;
@@ -2467,6 +2497,7 @@ class DeepZeek extends Entity {
     this.speed = 85;
     this.scaleMul = 1.9; // dragão GRANDE
     this.isBoss = true;
+    this.nameKey = 'deepzeek';
     this.bossName = '🐉 XI DEEP-ZEEK — treina por 1/10 do preço e não conta como 🐉';
     this.attackCd = 2.2;
     this.cloneCd = 6;
@@ -2490,18 +2521,18 @@ class DeepZeek extends Entity {
     // aos 50%: RELEASE OPEN-SOURCE — clones passam a lutar DO SEU LADO
     if (!this.openSourced && this.hp <= this.maxHp / 2) {
       this.openSourced = true;
-      spawnText(this.screenX, this.screenY - 200, '🐉 RELEASE OPEN-SOURCE! PESOS LIBERADOS!', '#88ffcc', 1.4);
+      spawnText(this.screenX, this.screenY - 200, F('deepzeekOpen') || '🐉 RELEASE OPEN-SOURCE! PESOS LIBERADOS!', '#88ffcc', 1.4);
       allies.push(new CloneAliado(this.x - 200, this.gy - 30));
       allies.push(new CloneAliado(this.x - 240, this.gy + 30));
       player.hp = Math.min(player.maxHp, player.hp + 15);
-      spawnText(player.screenX, player.screenY - 130, '+15 (pesos abertos curam a alma)', '#88ffcc');
+      spawnText(player.screenX, player.screenY - 130, F('deepzeekHeal') || '+15 (pesos abertos curam a alma)', '#88ffcc');
       shake = 0.3; sfx.special();
     }
 
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['Metade do orçamento. Dobro do resultado.', '*escaneia* — golpe catalogado.', 'Querem chá?', 'Seu itinerário eu já conhecia há 3 semanas.', 'Ineficiente. Mas corajoso.'];
+      const falas = F('deepzeek') || ['Metade do orçamento. Dobro do resultado.', '*escaneia* — golpe catalogado.', 'Querem chá?', 'Seu itinerário eu já conhecia há 3 semanas.', 'Ineficiente. Mas corajoso.'];
       spawnText(this.screenX, this.screenY - 180, falas[Math.floor(Math.random() * falas.length)], '#ff8888', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2513,7 +2544,7 @@ class DeepZeek extends Entity {
       const done = this.advanceAnim(9, hasAnim('deepzeek', 'attack_clone') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 180, '⚡ CLONADO. CUSTO: 1/10.', '#88ffcc', 1.2);
+        spawnText(this.screenX, this.screenY - 180, F('deepzeekClone') || '⚡ CLONADO. CUSTO: 1/10.', '#88ffcc', 1.2);
         enemies.push(new CloneTemu(camX + W + 80, this.gy + (Math.random() - 0.5) * 60));
       }
       if (done) { this.setState('idle'); this.cloneCd = 8; }
@@ -2537,7 +2568,7 @@ class DeepZeek extends Entity {
             dmg: 5, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 170, '🔥 SOPRO BINÁRIO!', '#ff8888', 1.2);
+        spawnText(this.screenX, this.screenY - 170, F('deepzeekBreath') || '🔥 SOPRO BINÁRIO!', '#ff8888', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2609,6 +2640,7 @@ class Gemeo extends Entity {
     this.speed = 95;
     this.scaleMul = 1.35;
     this.isBoss = true;
+    this.nameKey = 'gemeo';
     this.bossName = '🔮 O GÊMEO DE LITOGRAFIA — precisão de 3 nanômetros, paciência de zero 🔮';
     this.attackCd = 2;
     this.talkCd = 5;
@@ -2626,7 +2658,7 @@ class Gemeo extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 160, '✨ REALINHAMENTO ÓPTICO!', '#cc88ff', 1.3);
+      spawnText(this.screenX, this.screenY - 160, F('gemeoTele') || '✨ REALINHAMENTO ÓPTICO!', '#cc88ff', 1.3);
       this.x = player.x > camX + W / 2 ? camX + 120 : camX + W - 120;
       this.attackCd = 0.7;
       shake = 0.2; beep(1300, 0.15, 'sine');
@@ -2634,7 +2666,7 @@ class Gemeo extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = ['DEDOS. OLEOSOS.', 'UM ESPIRRO DESALINHA TUDO.', 'PRECISÃO É AMOR.', 'VOCÊS TREMEM DEMAIS.'];
+      const falas = F('gemeo') || ['DEDOS. OLEOSOS.', 'UM ESPIRRO DESALINHA TUDO.', 'PRECISÃO É AMOR.', 'VOCÊS TREMEM DEMAIS.'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#cc88ff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2655,7 +2687,7 @@ class Gemeo extends Entity {
           vy: (player.gy - this.gy) * 0.5,
           dmg: 10, t: 0,
         });
-        spawnText(this.screenX, this.screenY - 130, '💜 FEIXE UV!', '#cc88ff', 1.2);
+        spawnText(this.screenX, this.screenY - 130, F('gemeoBeam') || '💜 FEIXE UV!', '#cc88ff', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1, 2 - this.rageLevel * 0.25); }
       return;
@@ -2713,7 +2745,8 @@ function drawBossBar(boss) {
   ctx.fillStyle = '#000a'; ctx.fillRect(W / 2 - 220, 64, 440, 18);
   ctx.fillStyle = '#a30'; ctx.fillRect(W / 2 - 216, 67, 432 * (boss.hp / boss.maxHp), 12);
   ctx.font = '11px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'center';
-  ctx.fillText(boss.bossName, W / 2, 60);
+  const names = F('bossNames');
+  ctx.fillText((names && names[boss.nameKey]) || boss.bossName, W / 2, 60);
 }
 
 // ---- Fundo procedural: São Paulo (fallback) ----
@@ -3123,21 +3156,24 @@ let treino = 0, treinoQuarter = 0;
 
 function curupiraHelp() {
   // a cada 25% de treino, o CURUPIRA-bebê ajuda... do jeito dele
+  const helps = F('curupiraHelps') || [
+    '🤖 CURUPIRA-bebê fez café pra todo mundo!',
+    '🤖 CURUPIRA-bebê soltou um golpe MEIO ALUCINADO!',
+    '🤖 CURUPIRA-bebê: "recarreguei seu contexto!"',
+    '🤖 CURUPIRA-bebê confundiu os inimigos com uma charada!',
+  ];
   const roll = Math.floor(Math.random() * 4);
+  spawnText(180, 320, helps[roll], '#66ff88', 1.3);
   if (roll === 0) {
-    spawnText(180, 320, '🤖 CURUPIRA-bebê fez café pra todo mundo!', '#66ff88', 1.3);
     drops.push({ x: player.x - 50, gy: player.gy, type: 'cafe', t: 0 });
     drops.push({ x: player.x + 50, gy: player.gy, type: 'guarana', t: 0 });
   } else if (roll === 1) {
-    spawnText(180, 320, '🤖 CURUPIRA-bebê soltou um golpe MEIO ALUCINADO!', '#66ff88', 1.3);
     for (const e of enemies) if (!e.dead) e.takeHit(25, 1, true);
     shake = 0.3;
   } else if (roll === 2) {
-    spawnText(180, 320, '🤖 CURUPIRA-bebê: "recarreguei seu contexto!"', '#66ff88', 1.3);
     player.hp = Math.min(player.maxHp, player.hp + 20);
     player.special = player.maxSpecial;
   } else {
-    spawnText(180, 320, '🤖 CURUPIRA-bebê confundiu os inimigos com uma charada!', '#66ff88', 1.3);
     for (const e of enemies) if (!e.dead) e.attackCd = (e.attackCd || 0) + 3;
   }
   sfx.pickup();
@@ -3162,7 +3198,7 @@ function drawCurupiraMachine() {
     ctx.fillText('🤖', mx, my - 30);
   }
   ctx.font = '10px Courier New'; ctx.fillStyle = '#66ff88'; ctx.textAlign = 'center';
-  ctx.fillText('CURUPIRA-1 em treino', mx, my + 20);
+  ctx.fillText(t('curupiraTraining'), mx, my + 20);
 }
 
 function drawDeepZeekCamarote() {
@@ -3183,7 +3219,7 @@ function drawDeepZeekCamarote() {
   ctx.fillText('🥟', cx + 45, cy + 10 + Math.sin(time * 3) * 3);
   if (Math.floor(time / 6) % 3 === 0 && (time % 6) < 3) {
     ctx.font = '9px Courier New'; ctx.fillStyle = '#88ffcc';
-    ctx.fillText('*aprova em silêncio*', cx, cy - 60);
+    ctx.fillText(F('aprovaSilencio') || '*aprova em silêncio*', cx, cy - 60);
   }
 }
 
@@ -3202,7 +3238,7 @@ function drawTrainBar() {
   ctx.fillStyle = grad;
   rr(bx, by, bw * prog, 10, 5); ctx.fill();
   ctx.font = 'bold 10px Courier New'; ctx.fillStyle = '#aaffbb'; ctx.textAlign = 'center';
-  ctx.fillText(`🧠 TREINO DO CURUPIRA-1: ${Math.floor(prog * 100)}%`, W / 2, by - 12);
+  ctx.fillText(`${t('trainBar')}: ${Math.floor(prog * 100)}%`, W / 2, by - 12);
 }
 
 // ---- MAPA-MÚNDI: escolha livre de missão (o Brasil tranca até o fim) ----
@@ -3257,10 +3293,10 @@ function drawWorldMap() {
   ctx.textAlign = 'center';
   ctx.font = 'bold 24px Courier New'; ctx.fillStyle = '#ffd23f';
   ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 5;
-  ctx.strokeText('🌍 ESCOLHA SUA MISSÃO', W / 2, 46);
-  ctx.fillText('🌍 ESCOLHA SUA MISSÃO', W / 2, 46);
+  ctx.strokeText(t('worldTitle'), W / 2, 46);
+  ctx.fillText(t('worldTitle'), W / 2, 46);
   ctx.font = '12px Courier New'; ctx.fillStyle = '#88ccff';
-  ctx.fillText(`🔘 Moedas de Silício: ${siliconCoins.size}/3`, W / 2, 68);
+  ctx.fillText(`${t('coinsLabel')}: ${siliconCoins.size}/3`, W / 2, 68);
 
   const brasil = WORLD_SPOTS.find(s => s.final);
   // rotas tracejadas: tudo leva ao Brasil
@@ -3315,8 +3351,9 @@ function drawWorldMap() {
       ctx.restore();
     }
     if (sel) {
+      const trSpot = LTX().spots && LTX().spots[i];
       ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#fff';
-      ctx.fillText(s.name, sx, sy - 30);
+      ctx.fillText((trSpot && trSpot.name) || s.name, sx, sy - 30);
     }
   }
   // painel de informação da missão selecionada
@@ -3331,27 +3368,28 @@ function drawWorldMap() {
   ctx.restore();
   ctx.strokeStyle = locked ? '#666' : done ? '#66ff88' : '#ffd23f'; ctx.lineWidth = 2;
   rr(px2, py2, pw, 74, 14); ctx.stroke();
+  const trSel = LTX().spots && LTX().spots[worldSel];
   ctx.font = 'bold 14px Courier New'; ctx.textAlign = 'left';
   ctx.fillStyle = locked ? '#888' : '#ffd23f';
-  ctx.fillText(`${s.flag} ${PHASES[s.phase].title}`, px2 + 18, py2 + 24);
+  ctx.fillText(`${s.flag} ${phT(PHASES[s.phase])}`, px2 + 18, py2 + 24);
   ctx.font = '12px Courier New'; ctx.fillStyle = '#ccc';
-  ctx.fillText(`Chefão: ${s.boss}  ·  Peça do plano: ${s.peca}`, px2 + 18, py2 + 44);
+  ctx.fillText(`${t('bossLabel')}: ${(trSel && trSel.boss) || s.boss}  ·  ${t('pieceLabel')}: ${(trSel && trSel.peca) || s.peca}`, px2 + 18, py2 + 44);
   ctx.font = 'bold 12px Courier New';
   if (locked) {
     ctx.fillStyle = worldLockedMsg > 0 ? '#ff5544' : '#888';
-    ctx.fillText('🔒 Complete as 5 missões pra liberar o TREINO no Brasil!', px2 + 18, py2 + 63);
+    ctx.fillText(t('lockedMsg'), px2 + 18, py2 + 63);
   } else if (done && PHASES[s.phase] && PHASES[s.phase].coin && !siliconCoins.has(s.phase)) {
     ctx.fillStyle = '#88ccff';
-    ctx.fillText('✔ CONCLUÍDA · 🔘 uma Moeda de Silício ainda brilha aqui... [ESPAÇO]', px2 + 18, py2 + 63);
+    ctx.fillText(t('coinPending'), px2 + 18, py2 + 63);
   } else if (done) {
     ctx.fillStyle = '#66ff88';
-    ctx.fillText('✔ MISSÃO CONCLUÍDA', px2 + 18, py2 + 63);
+    ctx.fillText(t('doneMission'), px2 + 18, py2 + 63);
   } else {
     ctx.fillStyle = '#ffd23f';
-    ctx.fillText('▶ DISPONÍVEL — aperte ESPAÇO!', px2 + 18, py2 + 63);
+    ctx.fillText(t('available'), px2 + 18, py2 + 63);
   }
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
-  ctx.fillText('← → escolher destino · ESPAÇO embarcar · T ver o plano', W / 2, H - 8);
+  ctx.fillText(t('worldHint'), W / 2, H - 8);
 
   // navegação: ordem GEOGRÁFICA (por longitude) e só missões ainda não feitas
   const selectable = WORLD_SPOTS
@@ -3373,6 +3411,20 @@ function drawWorldMap() {
     if (left)  { worldSel = selectable[(pos + selectable.length - 1) % selectable.length]; worldMoveLock = true; beep(440, 0.05); }
     if (right) { worldSel = selectable[(pos + 1) % selectable.length]; worldMoveLock = true; beep(440, 0.05); }
   }
+}
+
+// acessores traduzidos das fases (PT inline é o fallback)
+function phOv(phase) { return (LTX().phases && LTX().phases[phase.id]) || null; }
+function phT(phase) { const o = phOv(phase); return (o && o.title) || phase.title; }
+function phP(phase) { const o = phOv(phase); return (o && o.place) || phase.place; }
+function dlg(kind) {
+  const o = phOv(currentPhase);
+  const map = { intro: 'intro', bossDialog: 'boss', victory: 'victory' };
+  return (o && o[map[kind]]) || currentPhase[kind];
+}
+function slideText(slides, i) {
+  const arr = slides === STORY_SLIDES ? LTX().story : LTX().ending;
+  return (arr && arr[i]) || slides[i].text;
 }
 
 let phaseIndex = 0;
@@ -3516,11 +3568,11 @@ function drawStory(slides) {
     ctx.font = '110px serif'; ctx.textAlign = 'center';
     ctx.fillText(s.emoji, W / 2, H / 2 - 20);
     ctx.font = '11px Courier New'; ctx.fillStyle = '#555';
-    ctx.fillText('[imagem em geração no Codex]', W / 2, H / 2 + 40);
+    ctx.fillText(t('genImg'), W / 2, H / 2 + 40);
   }
   // legenda com efeito máquina de escrever
   storyChars += dt * 45;
-  const shown = s.text.slice(0, Math.floor(storyChars));
+  const shown = slideText(slides, storyIndex).slice(0, Math.floor(storyChars));
   const boxW = Math.min(W * 0.8, 820), bx = W / 2 - boxW / 2, by = H - 128;
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
@@ -3538,7 +3590,7 @@ function drawStory(slides) {
     ctx.beginPath(); ctx.arc(W / 2 - (slides.length - 1) * 9 + i * 18, H - 16, 4, 0, 7); ctx.fill();
   }
   ctx.font = '10px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
-  ctx.fillText('[Espaço] avançar · [ESC] pular', W - 20, H - 12);
+  ctx.fillText(t('storyHint'), W - 20, H - 12);
 }
 
 // ---- Estado ----
@@ -3556,7 +3608,7 @@ function drawHUD() {
   ctx.fillStyle = player.special >= player.maxSpecial ? '#ffd23f' : '#8844cc';
   ctx.fillRect(24, 46, 180 * (player.special / player.maxSpecial), 5);
   if (player.special >= player.maxSpecial) {
-    ctx.fillStyle = '#ffd23f'; ctx.fillText('L = ESPECIAL!', 210, 52);
+    ctx.fillStyle = '#ffd23f'; ctx.fillText(t('specialReady'), 210, 52);
   }
   // ícones das conquistas ativas
   ctx.font = '12px serif'; ctx.textAlign = 'left';
@@ -3575,7 +3627,7 @@ function drawHUD() {
     ctx.fillText(`COMBO x${player.combo}`, W - 20, 48);
   }
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
-  ctx.fillText(`${currentPhase.title} · ${currentPhase.place}`, W / 2, 22);
+  ctx.fillText(`${phT(currentPhase)} · ${phP(currentPhase)}`, W / 2, 22);
   if (!currentPhase.finalPhase && currentLock === null && camX < currentPhase.stageLen - W && enemies.every(e => e.dead || e.removeMe)) {
     const blinkOn = Math.floor(time * 2) % 2 === 0;
     if (blinkOn && !goBlinkWas) {
@@ -3696,7 +3748,7 @@ function drawDialogBox(lines) {
   }
   // nome em "pílula" arredondada
   ctx.font = 'bold 12px Courier New';
-  const label = isSystem ? '— SISTEMA —' : speaker;
+  const label = isSystem ? t('system') : speaker;
   const pillW = ctx.measureText(label).width + 20;
   const pillX = isSystem ? bx + boxW / 2 - pillW / 2 : isVillain ? bx + boxW - P - 24 - pillW : textX;
   ctx.fillStyle = borderColor;
@@ -3707,7 +3759,7 @@ function drawDialogBox(lines) {
   ctx.font = '13px Courier New'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
   wrapText(text, textX, top + 50, textW, 17);
   ctx.font = '10px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
-  ctx.fillText('[Espaço] continuar · [ESC] pular', bx + boxW - 16, top + boxH - 9);
+  ctx.fillText(t('dialogHint'), bx + boxW - 16, top + boxH - 9);
 }
 function wrapText(text, x, y, maxW, lh) {
   const words = text.split(' ');
@@ -3756,6 +3808,28 @@ function drawTitle() {
   // versão: etiqueta discreta no canto (pra não cobrir o pôster)
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText('DEMO v0.9', W - 14, 20);
+  // dropdown de idioma (clicável), embaixo da versão
+  titleLangBoxes = [];
+  const lw2 = 148, lx2 = W - 14 - lw2, lyBase = 28;
+  ctx.fillStyle = 'rgba(10,10,22,0.85)';
+  rr(lx2, lyBase, lw2, 24, 8); ctx.fill();
+  ctx.strokeStyle = titleLangOpen ? '#ffd23f' : '#555'; ctx.lineWidth = 1.5;
+  rr(lx2, lyBase, lw2, 24, 8); ctx.stroke();
+  ctx.font = 'bold 11px Courier New'; ctx.fillStyle = '#cfcfe6'; ctx.textAlign = 'center';
+  ctx.fillText(`🌐 ${LTX().name} ${titleLangOpen ? '▴' : '▾'}`, lx2 + lw2 / 2, lyBase + 16);
+  titleLangBoxes.push({ x: lx2, y: lyBase, w: lw2, h: 24, lang: null });
+  if (titleLangOpen) {
+    LANG_ORDER.forEach((lg, i) => {
+      const oy = lyBase + 28 + i * 26;
+      ctx.fillStyle = lg === settings.lang ? 'rgba(255,210,63,0.18)' : 'rgba(10,10,22,0.9)';
+      rr(lx2, oy, lw2, 24, 8); ctx.fill();
+      ctx.strokeStyle = '#444'; ctx.lineWidth = 1;
+      rr(lx2, oy, lw2, 24, 8); ctx.stroke();
+      ctx.fillStyle = lg === settings.lang ? '#ffd23f' : '#b8b8cc';
+      ctx.fillText(LANGS[lg].name, lx2 + lw2 / 2, oy + 16);
+      titleLangBoxes.push({ x: lx2, y: oy, w: lw2, h: 24, lang: lg });
+    });
+  }
   ctx.textAlign = 'center';
   // o ESQUADRÃO no centro (só quando não tem o pôster do Codex)
   if (!titleBg.ready) {
@@ -3793,15 +3867,15 @@ function drawTitle() {
   }
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 18px Courier New'; ctx.fillStyle = '#ffd23f';
-    ctx.fillText('— aperte ESPAÇO —', W / 2, 488);
+    ctx.fillText(t('pressSpace'), W / 2, 488);
   }
   // rodapé: crédito da comunidade + disclaimer, tudo na faixa escura
   ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0, H - 44, W, 44);
   ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#ffd23f';
-  ctx.fillText('uma produção da comunidade Inteligência Mil Grau', W / 2, H - 30);
+  ctx.fillText(t('credit'), W / 2, H - 30);
   ctx.font = '11px Courier New'; ctx.fillStyle = '#9a9ab0';
-  ctx.fillText('⚠ Peça de humor: semelhanças com pessoas, empresas ou bilionários reais são coincidência (ou alucinação do modelo).', W / 2, H - 16);
-  ctx.fillText('Nenhum estagiário foi efetivado durante a produção.', W / 2, H - 4);
+  ctx.fillText(t('disc1'), W / 2, H - 16);
+  ctx.fillText(t('disc2'), W / 2, H - 4);
 }
 
 let selectMoveLock = false;
@@ -3812,8 +3886,8 @@ function drawSelect() {
   ctx.textAlign = 'center';
   ctx.font = 'bold 28px Courier New'; ctx.fillStyle = '#ffd23f';
   ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 4;
-  ctx.strokeText('ESCOLHA SEU HERÓI', W / 2, 70);
-  ctx.fillText('ESCOLHA SEU HERÓI', W / 2, 70);
+  ctx.strokeText(t('chooseHero'), W / 2, 70);
+  ctx.fillText(t('chooseHero'), W / 2, 70);
 
   const N = HERO_ORDER.length;
   const slotW = Math.min(230, (W - 80) / N);
@@ -3843,14 +3917,14 @@ function drawSelect() {
     ctx.fillStyle = isSel ? hero.specialColor : '#999'; ctx.textAlign = 'center';
     ctx.fillText(hero.name, cx, 330);
     ctx.font = '10px Courier New'; ctx.fillStyle = '#aaa';
-    wrapTextCentered(hero.desc, cx, 348, slotW - 30, 12);
+    wrapTextCentered(t('heroDesc')[hero.key] || hero.desc, cx, 348, slotW - 30, 12);
     // barrinhas VEL/VIDA
     const bx = cx - 40;
     ctx.textAlign = 'left'; ctx.font = '9px Courier New'; ctx.fillStyle = '#888';
-    ctx.fillText('VEL', bx - 22, 376);
+    ctx.fillText(t('vel'), bx - 22, 376);
     ctx.fillStyle = '#333'; ctx.fillRect(bx, 369, 60, 6);
     ctx.fillStyle = '#4bf'; ctx.fillRect(bx, 369, 60 * (hero.speed / 240), 6);
-    ctx.fillStyle = '#888'; ctx.fillText('VIDA', bx - 22, 388);
+    ctx.fillStyle = '#888'; ctx.fillText(t('vida'), bx - 22, 388);
     ctx.fillStyle = '#333'; ctx.fillRect(bx, 381, 60, 6);
     ctx.fillStyle = '#3e3'; ctx.fillRect(bx, 381, 60 * (hero.hp / 140), 6);
   }
@@ -3869,10 +3943,10 @@ function drawSelect() {
   }
   ctx.textAlign = 'center';
   ctx.font = '12px Courier New'; ctx.fillStyle = '#66ff88';
-  ctx.fillText('🦜 LORO ESTOCÁSTICO voa com você: repete golpes E mergulha nos inimigos quando você ataca do alto!', W / 2, 478);
+  ctx.fillText(t('loroNote'), W / 2, 478);
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 15px Courier New'; ctx.fillStyle = '#ffd23f';
-    ctx.fillText('← → escolher   ·   ESPAÇO confirmar', W / 2, 505);
+    ctx.fillText(t('selectHint'), W / 2, 505);
   }
   // input
   const N2 = HERO_ORDER.length;
@@ -3897,13 +3971,19 @@ function wrapTextCentered(text, cx, y, maxW, lh) {
 
 // ---- MENU DE OPÇÕES (tecla P) ----
 const menuItems = [
-  { label: 'DIFICULDADE', type: 'choice', key: 'difficulty' },
-  { label: 'MÚSICA', type: 'toggle', key: 'musicOn' },
-  { label: 'VOLUME DA MÚSICA', type: 'slider', key: 'musicVol' },
-  { label: 'EFEITOS SONOROS', type: 'toggle', key: 'sfxOn' },
-  { label: 'VOLUME DOS EFEITOS', type: 'slider', key: 'sfxVol' },
-  { label: 'FECHAR', type: 'close' },
+  { k: 'mLang', type: 'lang' },
+  { k: 'mDiff', type: 'choice', key: 'difficulty' },
+  { k: 'mMusic', type: 'toggle', key: 'musicOn' },
+  { k: 'mMusicVol', type: 'slider', key: 'musicVol' },
+  { k: 'mSfx', type: 'toggle', key: 'sfxOn' },
+  { k: 'mSfxVol', type: 'slider', key: 'sfxVol' },
+  { k: 'mClose', type: 'close' },
 ];
+function cycleLang(dir) {
+  const i = LANG_ORDER.indexOf(settings.lang);
+  settings.lang = LANG_ORDER[(i + dir + LANG_ORDER.length) % LANG_ORDER.length];
+  saveSettings();
+}
 function cycleDifficulty(dir) {
   const i = DIFF_LEVELS.indexOf(settings.difficulty);
   settings.difficulty = DIFF_LEVELS[(i + dir + DIFF_LEVELS.length) % DIFF_LEVELS.length];
@@ -3920,7 +4000,7 @@ function drawMenu() {
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 3; ctx.strokeRect(px, py, pw, ph);
   ctx.textAlign = 'center';
   ctx.font = 'bold 22px Courier New'; ctx.fillStyle = '#ffd23f';
-  ctx.fillText('🎛 OPÇÕES', W / 2, py + 42);
+  ctx.fillText(t('optTitle'), W / 2, py + 42);
 
   const rowY = py + 90, rowH = 44;
   for (let i = 0; i < menuItems.length; i++) {
@@ -3934,17 +4014,21 @@ function drawMenu() {
     }
     ctx.font = `${sel ? 'bold ' : ''}13px Courier New`;
     ctx.fillStyle = sel ? '#fff' : '#999'; ctx.textAlign = 'left';
-    ctx.fillText(item.label, px + 44, y);
-    if (item.type === 'choice') {
+    ctx.fillText(t(item.k), px + 44, y);
+    if (item.type === 'lang') {
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#88ccff';
+      ctx.fillText(`◄ ${LTX().name} ►`, px + pw - 30, y);
+    } else if (item.type === 'choice') {
       const d = diffCfg();
       ctx.textAlign = 'right';
       ctx.fillStyle = d.color;
-      ctx.fillText(`◄ ${d.label} ►`, px + pw - 30, y);
+      ctx.fillText(`◄ ${t('diffNames')[settings.difficulty]} ►`, px + pw - 30, y);
     } else if (item.type === 'toggle') {
       const on = settings[item.key];
       ctx.textAlign = 'right';
       ctx.fillStyle = on ? '#3e3' : '#e33';
-      ctx.fillText(on ? 'LIGADO' : 'DESLIGADO', px + pw - 30, y);
+      ctx.fillText(on ? t('on') : t('off'), px + pw - 30, y);
     } else if (item.type === 'slider') {
       const v = settings[item.key];
       const bx = px + pw - 200, bw = 130;
@@ -3957,7 +4041,7 @@ function drawMenu() {
   }
   ctx.textAlign = 'center';
   ctx.font = '12px Courier New'; ctx.fillStyle = '#8888aa';
-  ctx.fillText('↑↓ navegar · ←→ ajustar · ESPAÇO alternar · O ou ESC fechar', W / 2, py + ph - 20);
+  ctx.fillText(t('menuHint'), W / 2, py + ph - 20);
 
   // navegação
   const up = keys['arrowup'] || keys['w'], down = keys['arrowdown'] || keys['s'];
@@ -3985,12 +4069,18 @@ function drawMenu() {
       menuMoveLock = true;
       beep(600, 0.07);
     }
+    if ((left || right) && item.type === 'lang') {
+      cycleLang(right ? 1 : -1);
+      menuMoveLock = true;
+      beep(700, 0.07);
+    }
   }
   if (enterPressed) {
     const item = menuItems[menuIndex];
     if (item.type === 'close') { gameState = menuReturnState; beep(550, 0.07); }
     else if (item.type === 'toggle') { settings[item.key] = !settings[item.key]; saveSettings(); beep(settings[item.key] ? 784 : 330, 0.07); }
     else if (item.type === 'choice') { cycleDifficulty(1); beep(600, 0.07); }
+    else if (item.type === 'lang') { cycleLang(1); beep(700, 0.07); }
   }
   if (escPressed) gameState = menuReturnState;
 }
@@ -3999,12 +4089,12 @@ function drawGameOver() {
   ctx.fillStyle = '#000c'; ctx.fillRect(0, 0, W, H);
   ctx.textAlign = 'center';
   ctx.font = 'bold 44px Courier New'; ctx.fillStyle = '#e33';
-  ctx.fillText('GAME OVER', W / 2, 220);
+  ctx.fillText(t('gameOver'), W / 2, 220);
   ctx.font = '15px Courier New'; ctx.fillStyle = '#fff';
-  ctx.fillText('"Todo grande modelo já divergiu no treino. Tenta de novo."', W / 2, 270);
+  ctx.fillText(t('goQuote'), W / 2, 270);
   ctx.fillText(`SCORE: ${player.score}`, W / 2, 310);
   ctx.font = 'bold 16px Courier New'; ctx.fillStyle = '#ffd23f';
-  if (Math.floor(time * 2) % 2 === 0) ctx.fillText('— ESPAÇO pra reiniciar —', W / 2, 370);
+  if (Math.floor(time * 2) % 2 === 0) ctx.fillText(t('goRestart'), W / 2, 370);
 }
 
 const SPLASH_TOTAL = 4.5; // segundos do letreiro da fase
@@ -4020,15 +4110,16 @@ function drawPhaseSplash() {
   ctx.globalAlpha = Math.max(0, Math.min(1, a)); // clamp: sem pisca no finzinho
   const top = 58;
   // a caixa se ajusta ao texto (títulos longos encolhem a fonte se preciso)
+  const sTitle = phT(currentPhase), sPlace = phP(currentPhase);
   let titleFont = 28;
   ctx.font = `bold ${titleFont}px Courier New`;
-  while (titleFont > 16 && ctx.measureText(currentPhase.title).width > W - 120) {
+  while (titleFont > 16 && ctx.measureText(sTitle).width > W - 120) {
     titleFont -= 2;
     ctx.font = `bold ${titleFont}px Courier New`;
   }
-  const wTitle = ctx.measureText(currentPhase.title).width;
+  const wTitle = ctx.measureText(sTitle).width;
   ctx.font = '15px Courier New';
-  const wPlace = ctx.measureText(currentPhase.place).width;
+  const wPlace = ctx.measureText(sPlace).width;
   const boxW = Math.min(W - 40, Math.max(wTitle, wPlace) + 70);
   ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
   ctx.fillStyle = 'rgba(8,8,18,0.85)';
@@ -4037,9 +4128,9 @@ function drawPhaseSplash() {
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 2;
   rr(W / 2 - boxW / 2, top, boxW, 84, 14); ctx.stroke();
   ctx.font = `bold ${titleFont}px Courier New`; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'center';
-  ctx.fillText(currentPhase.title, W / 2, top + 38);
+  ctx.fillText(sTitle, W / 2, top + 38);
   ctx.font = '15px Courier New'; ctx.fillStyle = '#fff';
-  ctx.fillText(currentPhase.place, W / 2, top + 66);
+  ctx.fillText(sPlace, W / 2, top + 66);
   ctx.restore();
 }
 let phaseSplashT = 0;
@@ -4098,8 +4189,8 @@ function frame(ts) {
     drawStory(STORY_SLIDES);
     if (escPressed) { gameState = 'select'; beep(550, 0.08); }
     else if (enterPressed) {
-      const s = STORY_SLIDES[storyIndex];
-      if (storyChars < s.text.length) storyChars = s.text.length; // 1º toque completa o texto
+      const txt = slideText(STORY_SLIDES, storyIndex);
+      if (storyChars < txt.length) storyChars = txt.length; // 1º toque completa o texto
       else {
         storyIndex++;
         storyChars = 0;
@@ -4113,8 +4204,8 @@ function frame(ts) {
     const goTitle = () => { loadPhase(0, false); gameState = 'title'; };
     if (escPressed) goTitle();
     else if (enterPressed) {
-      const s = ENDING_SLIDES[storyIndex];
-      if (storyChars < s.text.length) storyChars = s.text.length;
+      const txt = slideText(ENDING_SLIDES, storyIndex);
+      if (storyChars < txt.length) storyChars = txt.length;
       else {
         storyIndex++;
         storyChars = 0;
@@ -4142,12 +4233,12 @@ function frame(ts) {
     player.draw();
     companion.update(false);
     companion.draw();
-    drawDialogBox(currentPhase.intro);
+    drawDialogBox(dlg('intro'));
     if (escPressed) { gameState = 'play'; dialogIndex = 0; phaseSplashT = SPLASH_TOTAL; beep(550, 0.08); }
     else if (enterPressed) {
       dialogIndex++;
       beep(440, 0.05);
-      if (dialogIndex >= currentPhase.intro.length) { gameState = 'play'; dialogIndex = 0; phaseSplashT = SPLASH_TOTAL; }
+      if (dialogIndex >= dlg('intro').length) { gameState = 'play'; dialogIndex = 0; phaseSplashT = SPLASH_TOTAL; }
     }
   }
   else if (gameState === 'play') {
@@ -4170,7 +4261,7 @@ function frame(ts) {
       if (q > treinoQuarter && q < 4) { treinoQuarter = q; curupiraHelp(); }
       if (treino >= TRAIN_TIME && !awaken) {
         awaken = true;
-        spawnText(W / 2, H / 2 - 60, '⚡ CURUPIRA-1 ONLINE ⚡', '#66ff88', 2);
+        spawnText(W / 2, H / 2 - 60, F('curupiraOnline') || '⚡ CURUPIRA-1 ONLINE ⚡', '#66ff88', 2);
         for (const e of enemies) if (!e.dead) e.takeHit(999, 1, true); // o despertar varre o lab
         projectiles = []; popups = [];
         shake = 0.6; playFanfare(); sfx.special();
@@ -4228,12 +4319,12 @@ function frame(ts) {
     for (const ent of all) ent.draw();
     companion.update(false);
     companion.draw();
-    drawDialogBox(currentPhase.bossDialog);
+    drawDialogBox(dlg('bossDialog'));
     if (escPressed) { gameState = 'play'; dialogIndex = 0; }
     else if (enterPressed) {
       dialogIndex++;
       beep(440, 0.05);
-      if (dialogIndex >= currentPhase.bossDialog.length) { gameState = 'play'; dialogIndex = 0; }
+      if (dialogIndex >= dlg('bossDialog').length) { gameState = 'play'; dialogIndex = 0; }
     }
   }
   else if (gameState === 'victory') {
@@ -4275,7 +4366,7 @@ function frame(ts) {
       ctx.fillStyle = `rgba(255, 210, 63, ${0.3 + Math.sin(time * 4) * 0.2})`;
       ctx.beginPath(); ctx.arc(iconX, iconY - 10, 30, 0, 7); ctx.fill();
     }
-    drawDialogBox(currentPhase.victory);
+    drawDialogBox(dlg('victory'));
     const finishVictory = () => {
       const before = { ...conquests };
       currentPhase.onVictory();
@@ -4290,7 +4381,7 @@ function frame(ts) {
     else if (enterPressed) {
       dialogIndex++;
       beep(440, 0.05);
-      if (dialogIndex >= currentPhase.victory.length) finishVictory();
+      if (dialogIndex >= dlg('victory').length) finishVictory();
     }
   }
   else if (gameState === 'map') {
