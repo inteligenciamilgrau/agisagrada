@@ -113,7 +113,7 @@ addEventListener('keydown', e => {
     if (k === 'enter' || k === ' ') enterPressed = true;
     if (k === 'j') attackPressed = true;
     if (k === 'm') { settings.musicOn = !settings.musicOn; saveSettings(); }
-    if (k === 'p') pPressed = true;
+    if (k === 'o') pPressed = true; // O de Opções
     if (k === 't') tPressed = true;
     if (k === 'f') {
       if (document.fullscreenElement) document.exitFullscreen();
@@ -133,7 +133,15 @@ document.addEventListener('fullscreenchange', releaseAllKeys);
 const settings = {
   musicOn: true, musicVol: 0.7,
   sfxOn: true, sfxVol: 0.7,
+  difficulty: 'facil', // facil (padrão) | medio | dificil
 };
+const DIFF_LEVELS = ['facil', 'medio', 'dificil'];
+const DIFF_INFO = {
+  facil:   { label: 'FÁCIL',   take: 1,    deal: 1,    color: '#3e3' },
+  medio:   { label: 'MÉDIO',   take: 1.35, deal: 0.75, color: '#fa3' },
+  dificil: { label: 'DIFÍCIL', take: 1.8,  deal: 0.6,  color: '#e33' },
+};
+const diffCfg = () => DIFF_INFO[settings.difficulty] || DIFF_INFO.facil;
 try {
   const saved = JSON.parse(localStorage.getItem('agi-sagrada-audio') || '{}');
   Object.assign(settings, saved);
@@ -723,6 +731,7 @@ function drawMap() {
   }
 }
 let saciTimer = 9; // Saci-Bot rouba armas quando os Roboticistas o montarem
+let saciRevengeCd = 0; // e REVIDA quando o herói apanha (guarda-costas!)
 
 // ---- Textos flutuantes ----
 const floatTexts = [];
@@ -1057,8 +1066,44 @@ class Companion {
     this.talkCd = 6;
     this.echoCd = 0;
     this.echoFlash = 0;
+    this.diveTarget = null;
+    this.diveCd = 0;
+  }
+  // MERGULHO: quando o herói ataca do alto, o Loro caça o inimigo mais próximo!
+  diveAttack() {
+    if (this.diveCd > 0 || this.diveTarget) return;
+    const alvos = enemies.filter(e => !e.dead);
+    if (!alvos.length) return;
+    this.diveTarget = alvos.reduce((a, b) =>
+      Math.abs(a.x - player.x) < Math.abs(b.x - player.x) ? a : b);
+    this.diveCd = 2;
+    spawnText(this.x - camX, this.gy - this.flyH - 30, '🦜 MERGULHO!', '#66ff88', 1.1);
+    beep(1100, 0.08, 'triangle');
   }
   update(canTalk) {
+    this.diveCd = Math.max(0, this.diveCd - dt);
+    // em mergulho: voa direto no alvo
+    if (this.diveTarget) {
+      const alvo = this.diveTarget;
+      if (alvo.dead || alvo.removeMe) { this.diveTarget = null; }
+      else {
+        const tdx = alvo.x - this.x, tdy = alvo.gy - this.gy;
+        this.x += Math.sign(tdx) * Math.min(Math.abs(tdx), 620 * dt);
+        this.gy += Math.sign(tdy) * Math.min(Math.abs(tdy), 400 * dt);
+        this.facing = Math.sign(tdx) || this.facing;
+        this.flyH = Math.max(alvo.flyH !== undefined ? alvo.flyH : 40, this.flyH - 320 * dt);
+        if (Math.abs(tdx) < 42 && Math.abs(tdy) < 26) {
+          const dmg = 6 + Math.floor(Math.random() * 8);
+          alvo.takeHit(dmg, this.facing, false);
+          spawnText(alvo.screenX, alvo.screenY - 100, `🦜 BICADA! (${dmg})`, '#66ff88', 1.1);
+          this.echoFlash = 0.4;
+          sfx.hit();
+          this.diveTarget = null;
+        }
+        this.advanceFrames();
+        return;
+      }
+    }
     // voa atrás e acima do herói, com folga elástica
     const tx = player.x - player.facing * 58;
     const ty = player.gy - 6;
@@ -1068,11 +1113,7 @@ class Companion {
     this.flyH = 95 + Math.sin(time * 3) * 8;
     this.echoCd -= dt;
     this.echoFlash = Math.max(0, this.echoFlash - dt);
-    // animação de hover
-    this.frameTime += dt;
-    const frames = getAnim('loro', 'hover');
-    const n = frames ? frames.length : 4;
-    while (this.frameTime > 1 / 8) { this.frameTime -= 1 / 8; this.frame = (this.frame + 1) % n; }
+    this.advanceFrames();
     // comentários de papagaio estocástico
     if (canTalk) {
       this.talkCd -= dt;
@@ -1095,11 +1136,18 @@ class Companion {
     spawnText(target.screenX, target.screenY - 130, zoeira, '#66ff88', 1.1);
     beep(990, 0.06, 'triangle');
   }
+  advanceFrames() {
+    this.echoFlash = Math.max(0, this.echoFlash - dt);
+    this.frameTime += dt;
+    const frames = getAnim('loro', this.diveTarget ? 'attack' : 'hover') || getAnim('loro', 'hover');
+    const n = frames ? frames.length : 4;
+    while (this.frameTime > 1 / 8) { this.frameTime -= 1 / 8; this.frame = (this.frame + 1) % n; }
+  }
   draw() {
     const sx = this.x - camX, sy = this.gy - this.flyH;
-    const frames = getAnim('loro', 'hover');
+    const frames = getAnim('loro', this.diveTarget ? 'attack' : 'hover') || getAnim('loro', 'hover');
     if (frames) {
-      const img = frames[this.frame];
+      const img = frames[this.frame % frames.length];
       const s = SCALE * 0.72;
       ctx.save();
       const flip = (this.facing === 1) !== SPRITES_FACE_RIGHT;
@@ -1216,7 +1264,10 @@ class Player extends Entity {
       attackPressed = false;
       this.attackHitDone = false;
       if (this.jumpH === 0) this.setState('attack');
-      else { this.setState('airattack'); beep(500, 0.06, 'triangle'); }
+      else {
+        this.setState('airattack'); beep(500, 0.06, 'triangle'); // voadora!
+        companion.diveAttack(); // e o Loro mergulha no inimigo mais próximo!
+      }
       return;
     }
     if (keys['k'] && this.jumpH === 0 && this.state !== 'jump') {
@@ -1244,7 +1295,8 @@ class Player extends Entity {
       const sameLane = Math.abs(e.gy - this.gy) < depth + 14;
       if (inFront && sameLane) {
         // Dataeiros: crítico de "contexto local" (+15%)
-        const finalDmg = conquests.dados ? Math.round(dmg * 1.15) : dmg;
+        let finalDmg = conquests.dados ? Math.round(dmg * 1.15) : dmg;
+        finalDmg = Math.max(1, Math.round(finalDmg * diffCfg().deal)); // dificuldade
         e.takeHit(finalDmg, this.facing, false);
         // Chave de Itaipu: especial recarrega 2x mais rápido! ⚡
         this.special = Math.min(this.maxSpecial, this.special + (conquests.itaipu ? 18 : 9));
@@ -1259,12 +1311,27 @@ class Player extends Entity {
   }
   takeHit(dmg, dir) {
     if (this.invuln > 0 || this.state === 'special') return;
+    dmg = Math.round(dmg * diffCfg().take); // dificuldade: dano recebido
     this.hp -= dmg;
     this.hitFlash = 0.15; this.invuln = 0.8;
     this.setState('hurt');
     this.x += dir * 24;
     sfx.hurt(); shake = Math.max(shake, 0.15);
     spawnText(this.screenX, this.screenY - 120, `-${dmg}`, '#ff5555');
+    // SACI-BOT guarda-costas: teleporta no agressor e revida na hora!
+    if (conquests.blueprints && saciRevengeCd <= 0) {
+      const alvos = enemies.filter(e => !e.dead);
+      if (alvos.length) {
+        const alvo = alvos.reduce((a, b) =>
+          Math.abs(a.x - this.x) < Math.abs(b.x - this.x) ? a : b);
+        saciRevengeCd = 6;
+        const rdmg = 8 + Math.floor(Math.random() * 6);
+        alvo.takeHit(rdmg, Math.sign(alvo.x - this.x) || 1, false);
+        alvo.attackCd = (alvo.attackCd || 0) + 2.5;
+        spawnText(alvo.screenX, alvo.screenY - 120, `🌪 SACI-BOT REVIDOU! (${rdmg})`, '#ff5533', 1.2);
+        beep(1200, 0.1, 'triangle');
+      }
+    }
     if (this.hp <= 0) { this.hp = 0; gameState = 'gameover'; }
   }
   draw() {
@@ -3671,7 +3738,7 @@ function drawSelect() {
   }
   ctx.textAlign = 'center';
   ctx.font = '12px Courier New'; ctx.fillStyle = '#66ff88';
-  ctx.fillText('🦜 LORO ESTOCÁSTICO, a LLM de bolso, voa com QUALQUER herói — e às vezes repete seus golpes!', W / 2, 478);
+  ctx.fillText('🦜 LORO ESTOCÁSTICO voa com você: repete golpes E mergulha nos inimigos quando você ataca do alto!', W / 2, 478);
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 15px Courier New'; ctx.fillStyle = '#ffd23f';
     ctx.fillText('← → escolher   ·   ESPAÇO confirmar', W / 2, 505);
@@ -3699,12 +3766,18 @@ function wrapTextCentered(text, cx, y, maxW, lh) {
 
 // ---- MENU DE OPÇÕES (tecla P) ----
 const menuItems = [
+  { label: 'DIFICULDADE', type: 'choice', key: 'difficulty' },
   { label: 'MÚSICA', type: 'toggle', key: 'musicOn' },
   { label: 'VOLUME DA MÚSICA', type: 'slider', key: 'musicVol' },
   { label: 'EFEITOS SONOROS', type: 'toggle', key: 'sfxOn' },
   { label: 'VOLUME DOS EFEITOS', type: 'slider', key: 'sfxVol' },
   { label: 'FECHAR', type: 'close' },
 ];
+function cycleDifficulty(dir) {
+  const i = DIFF_LEVELS.indexOf(settings.difficulty);
+  settings.difficulty = DIFF_LEVELS[(i + dir + DIFF_LEVELS.length) % DIFF_LEVELS.length];
+  saveSettings();
+}
 let menuIndex = 0, menuReturnState = 'title', menuMoveLock = false;
 
 function drawMenu() {
@@ -3716,7 +3789,7 @@ function drawMenu() {
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 3; ctx.strokeRect(px, py, pw, ph);
   ctx.textAlign = 'center';
   ctx.font = 'bold 22px Courier New'; ctx.fillStyle = '#ffd23f';
-  ctx.fillText('🎛 OPÇÕES DE ÁUDIO', W / 2, py + 42);
+  ctx.fillText('🎛 OPÇÕES', W / 2, py + 42);
 
   const rowY = py + 90, rowH = 44;
   for (let i = 0; i < menuItems.length; i++) {
@@ -3731,7 +3804,12 @@ function drawMenu() {
     ctx.font = `${sel ? 'bold ' : ''}13px Courier New`;
     ctx.fillStyle = sel ? '#fff' : '#999'; ctx.textAlign = 'left';
     ctx.fillText(item.label, px + 44, y);
-    if (item.type === 'toggle') {
+    if (item.type === 'choice') {
+      const d = diffCfg();
+      ctx.textAlign = 'right';
+      ctx.fillStyle = d.color;
+      ctx.fillText(`◄ ${d.label} ►`, px + pw - 30, y);
+    } else if (item.type === 'toggle') {
       const on = settings[item.key];
       ctx.textAlign = 'right';
       ctx.fillStyle = on ? '#3e3' : '#e33';
@@ -3748,7 +3826,7 @@ function drawMenu() {
   }
   ctx.textAlign = 'center';
   ctx.font = '12px Courier New'; ctx.fillStyle = '#8888aa';
-  ctx.fillText('↑↓ navegar · ←→ ajustar · ESPAÇO alternar · P ou ESC fechar', W / 2, py + ph - 20);
+  ctx.fillText('↑↓ navegar · ←→ ajustar · ESPAÇO alternar · O ou ESC fechar', W / 2, py + ph - 20);
 
   // navegação
   const up = keys['arrowup'] || keys['w'], down = keys['arrowdown'] || keys['s'];
@@ -3771,11 +3849,17 @@ function drawMenu() {
       saveSettings();
       beep(settings[item.key] ? 784 : 330, 0.07);
     }
+    if ((left || right) && item.type === 'choice') {
+      cycleDifficulty(right ? 1 : -1);
+      menuMoveLock = true;
+      beep(600, 0.07);
+    }
   }
   if (enterPressed) {
     const item = menuItems[menuIndex];
     if (item.type === 'close') { gameState = menuReturnState; beep(550, 0.07); }
     else if (item.type === 'toggle') { settings[item.key] = !settings[item.key]; saveSettings(); beep(settings[item.key] ? 784 : 330, 0.07); }
+    else if (item.type === 'choice') { cycleDifficulty(1); beep(600, 0.07); }
   }
   if (escPressed) gameState = menuReturnState;
 }
@@ -3954,6 +4038,7 @@ function frame(ts) {
       updateFloatTexts();
       for (const a of allies) a.update();
       allies = allies.filter(a => !a.removeMe);
+      saciRevengeCd = Math.max(0, saciRevengeCd - dt);
       // 🌪 SACI-BOT (conquista dos Roboticistas): rouba a arma de um inimigo
       if (conquests.blueprints) {
         saciTimer -= dt;
