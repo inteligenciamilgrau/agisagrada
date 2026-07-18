@@ -13,21 +13,10 @@
     width: 100vw; height: 100vh;
     image-rendering: pixelated; image-rendering: crisp-edges;
   }
-  #hint {
-    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
-    font-family: 'Courier New', monospace; font-size: 12px; color: #aaa;
-    background: #000a; padding: 4px 14px; border-radius: 12px;
-    pointer-events: none; transition: opacity 1s; white-space: nowrap;
-  }
 </style>
 </head>
 <body>
   <canvas id="game"></canvas>
-  <div id="hint"><b>←→↑↓/WASD</b> mover · <b>J</b> atacar · <b>K</b> pular · <b>L</b> especial · <b>Espaço</b> diálogo · <b>T</b> mapa do plano · <b>F</b> tela cheia · <b>P</b> opções · <b>M</b> música</div>
   <script src="game.js"></script>
-  <script>
-    // esconde a dica depois de 12s
-    setTimeout(() => { document.getElementById('hint').style.opacity = '0'; }, 12000);
-  </script>
 </body>
 </html>
