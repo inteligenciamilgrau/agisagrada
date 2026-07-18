@@ -49,9 +49,10 @@ juntando as peças pra treinar a primeira AGI brasileira: o **CURUPIRA-1**. 🇧
 ## 🛠 Como foi feito
 
 - **Engine**: HTML5 Canvas + JavaScript puro, sem dependências
-- **Roteiro e código**: [Claude Code](https://claude.com/claude-code)
+- **Roteiro**: Bob & [Claude Code](https://claude.com/claude-code)
+- **Código**: [Claude Code](https://claude.com/claude-code) — com direção, testes e correções do Bob
 - **Pixel art**: gerada com [agent-sprite-forge](https://github.com/0x0funky/agent-sprite-forge) no Codex
-- **Direção criativa**: a comunidade Inteligência Mil Grau
+- **Direção criativa**: Bob e a comunidade Inteligência Mil Grau
 
 Pra rodar localmente é só abrir o `index.html` no navegador.
 
