@@ -1,7 +1,7 @@
 Use case: illustration-story
 Asset type: final game cinematic still
 Reference: sprites/loro/hover/hover-1.png is the exact neon-green parrot identity
-Primary request: jubilant celebration inside the warm garage laboratory; a diverse crowd of researchers and community members cheers and cries with joy amid confetti, while the neon-green spiral-eyed parrot faints dramatically in midair
+Primary request: jubilant celebration inside the warm garage laboratory; a diverse crowd of researchers and community members cheers and cries with joy amid confetti, while the neon-green spiral-eyed parrot faints dramatically in midair, tilted nearly upside down with limp wings and claws
 Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis story panel
 Composition/framing: exact wide 16:9 landscape, lively ensemble scene with the parrot clearly readable above the crowd
 Constraints: preserve parrot identity; no text, letters, logos, watermark, UI, or panel borders
