@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "name": "estagiario",
+  "processing": {
+    "cell_size": 160,
+    "fit_scale": 0.76,
+    "trim_border": 4,
+    "edge_clean_depth": 3,
+    "align": "feet",
+    "shared_scale": false,
+    "scale_strategy": "preserve",
+    "component_mode": "largest",
+    "component_padding": 0,
+    "min_component_area": 3,
+    "edge_touch_margin": 0
+  },
+  "output_origin": [
+    80.0,
+    141
+  ],
+  "reference": {
+    "target": "npc",
+    "mode": "sheet",
+    "rows": 2,
+    "cols": 2,
+    "body_scale_mean": 0.4787386099850982,
+    "body_scale_cv": 0.00831992730863524,
+    "anchor_y_mean": 0.8994345718901453
+  },
+  "qc": {
+    "max_body_scale_drift": 0.1
+  }
+}

@@ -1,0 +1,8 @@
+Use case: logo-brand
+Asset type: game title logo
+Primary request: a Hollywood blockbuster adventure title logo containing exactly the Portuguese title "BOB EM BUSCA DA AGI SAGRADA"
+Style/medium: massive 3D golden beveled adventure-film lettering, warm metallic shine, weathered ancient-relic texture, subtle circuit-board engravings inside the letter faces, dramatic rim light
+Composition/framing: wide landscape on a perfectly solid black background; "BOB EM BUSCA DA" smaller on the top line, "AGI SAGRADA" very large below, gentle upward arc, centered with generous margins
+Text (verbatim): "BOB EM BUSCA DA AGI SAGRADA"
+Spelling lock: B-O-B / E-M / B-U-S-C-A / D-A / A-G-I / S-A-G-R-A-D-A
+Constraints: render the exact title once, all caps, no accent changes, no extra words, no other text, no watermark, no unrelated symbols

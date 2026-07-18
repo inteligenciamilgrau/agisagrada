@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: game intro cinematic still
+Primary request: a small warm garage laboratory in Brazil at night, a diverse group of silhouetted people gathered around one glowing green-and-yellow computer screen, hopeful cozy lighting, Brazilian flag on the wall
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
+Composition/framing: single wide landscape interior, intimate ensemble silhouette, screen as focal point
+Lighting/mood: warm amber workshop light plus hopeful green glow
+Constraints: no readable screen content, no text, no letters, no logos, no watermark, no UI, no panel borders

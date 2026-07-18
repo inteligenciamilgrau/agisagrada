@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: game intro cinematic still
+Primary request: heroic low-angle shot of an original Brazilian adventurer with a fedora, round glasses, leather jacket and small backpack standing on a Sao Paulo rooftop at night, holding a glowing golden tablet; a neon-green parrot flies beside him; moonlight and wind in the jacket
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
+Composition/framing: single wide landscape image, adventurer and parrot as clear heroic silhouettes, city skyline behind
+Lighting/mood: blue moonlight, warm gold tablet glow, bold hopeful adventure
+Constraints: original character, no readable tablet glyphs, no text, no letters, no logos, no watermark, no UI, no panel borders

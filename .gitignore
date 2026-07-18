@@ -1,0 +1,18 @@
+# Configuração local do Claude Code (contém paths da máquina)
+.claude/
+
+# Artefatos do agent-sprite-forge — contêm paths absolutos locais
+# (o jogo só usa os frames <acao>-N.png / sheet-N.png e os bg_*.png)
+sprites/**/pipeline-meta.json
+sprites/**/prompt-used.txt
+sprites/**/raw-sheet.png
+sprites/**/raw-sheet-clean.png
+sprites/**/sheet-transparent.png
+sprites/**/animation.gif
+sprites/**/references/
+sprites/*/character-scale-profile.json
+
+# Lixo de sistema operacional
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: game intro cinematic still
+Primary request: seen from outside at night, a menacing swarm of small dark drones with glowing red camera eyes approaches one warmly lit studio window; dark blue night and red glow reflections create tension
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
+Composition/framing: single wide landscape exterior, swarm in foreground and studio window as focal target
+Lighting/mood: tense cold blue night, sharp red eye glows, warm vulnerable window
+Constraints: no people clearly visible, no readable signs, no text, no letters, no logos, no watermark, no UI, no panel borders

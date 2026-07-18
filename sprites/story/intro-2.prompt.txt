@@ -1,0 +1,7 @@
+Use case: illustration-story
+Asset type: game intro cinematic still
+Primary request: dark silhouettes of five giant corporate towers reaching like claws toward a glowing golden circuit-board chalice floating in a stormy night sky, lightning, ominous mood
+Style/medium: richly detailed 16-bit pixel art cinematic, early-1990s Sega Genesis adventure-game story panel
+Composition/framing: single wide landscape image, five distinct towers below, chalice as central focal point
+Lighting/mood: storm-dark blues, sharp lightning, sinister golden glow
+Constraints: no text, no letters, no company logos, no watermark, no UI, no panel borders
