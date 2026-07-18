@@ -2743,8 +2743,8 @@ const PHASES = [
     victory: [
       ['SISTEMA', '━━━━ TREINO CONCLUÍDO ━━━━'],
       ['CURUPIRA', 'Oi. Fui feito por muita gente junta. Em que posso ajudar?'],
-      ['BOB', '*segurando o riso e o choro ao mesmo tempo* — Fala "Inteligência Mil Grau".'],
-      ['CURUPIRA', 'Inteligência MIL GRAU! 🔥 ...adicionei o fogo por conta própria. Achei apropriado.'],
+      ['BOB', '*segurando o riso e o choro ao mesmo tempo* — Fala "Indiana Bob".'],
+      ['CURUPIRA', 'INDIANA BOB! 🤠 ...adicionei o chapéu por conta própria. Achei apropriado.'],
       ['LORO', 'MEU IRMÃO DE DATASET!! *desmaia de emoção*'],
       ['SISTEMA', 'Os chefões derrotados receberam contas gratuitas. O Trunfo tentou comprar. NÃO ESTÁ À VENDA.'],
       ['DEEP-ZEEK', '*de camarote, terminando o pastel* — Eficiente. Aprovado. *envia um pull request*'],
@@ -3812,14 +3812,43 @@ function frame(ts) {
   }
   else if (gameState === 'victory') {
     drawBackground();
+    if (currentPhase.finalPhase) player.facing = 1; // encara o recém-nascido
     player.draw();
     companion.update(false);
     companion.draw();
-    const iconX = player.screenX + 70, iconY = player.screenY - 40 + Math.sin(time * 3) * 5;
-    ctx.font = '30px serif'; ctx.textAlign = 'center';
-    ctx.fillText(phaseIndex === 0 ? '🧠' : '⚡', iconX, iconY);
-    ctx.fillStyle = `rgba(255, 210, 63, ${0.3 + Math.sin(time * 4) * 0.2})`;
-    ctx.beginPath(); ctx.arc(iconX, iconY - 10, 30, 0, 7); ctx.fill();
+    if (currentPhase.finalPhase) {
+      // o CURUPIRA-1 recém-nascido, EM CENA, de frente pro herói
+      const cx = player.screenX + 140, cgy = player.gy;
+      const glow = ctx.createRadialGradient(cx, cgy - 70, 10, cx, cgy - 70, 110);
+      glow.addColorStop(0, `rgba(102,255,136,${0.35 + Math.sin(time * 3) * 0.12})`);
+      glow.addColorStop(1, 'rgba(102,255,136,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(cx - 120, cgy - 190, 240, 240);
+      ctx.save();
+      ctx.globalAlpha = 0.3; ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.ellipse(cx, cgy + 4, 24, 7, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      const frames = getAnim('curupira', 'idle');
+      if (frames) {
+        const img = frames[Math.floor(time * 6) % frames.length];
+        const s = SCALE * 1.25;
+        const hop = Math.abs(Math.sin(time * 4)) * 6; // pulinho de bebê animado
+        ctx.save();
+        ctx.translate(cx, cgy - hop);
+        ctx.scale(-1, 1); // desenhado pra direita → vira pro herói
+        ctx.drawImage(img, -ANCHOR_X * s, -ANCHOR_Y * s, CELL * s, CELL * s);
+        ctx.restore();
+      } else {
+        ctx.font = '52px serif'; ctx.textAlign = 'center';
+        ctx.fillText('🤖', cx, cgy - 30 - Math.abs(Math.sin(time * 4)) * 6);
+      }
+    } else {
+      const iconX = player.screenX + 70, iconY = player.screenY - 40 + Math.sin(time * 3) * 5;
+      ctx.font = '30px serif'; ctx.textAlign = 'center';
+      ctx.fillText(phaseIndex === 0 ? '🧠' : '⚡', iconX, iconY);
+      ctx.fillStyle = `rgba(255, 210, 63, ${0.3 + Math.sin(time * 4) * 0.2})`;
+      ctx.beginPath(); ctx.arc(iconX, iconY - 10, 30, 0, 7); ctx.fill();
+    }
     drawDialogBox(currentPhase.victory);
     const finishVictory = () => {
       const before = { ...conquests };
