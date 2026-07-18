@@ -3344,10 +3344,10 @@ function drawTitle() {
     ctx.strokeText('AGI SAGRADA', W / 2, 162);
     ctx.fillText('AGI SAGRADA', W / 2, 162);
   }
-  ctx.font = '16px Courier New'; ctx.fillStyle = '#fff';
-  ctx.fillText('DEMO v0.9 — JOGO COMPLETO: 7 fases, da origem ao CURUPIRA-1', W / 2, 268);
-  ctx.font = '13px Courier New'; ctx.fillStyle = '#8888aa';
-  ctx.fillText('uma produção da comunidade Inteligência Mil Grau', W / 2, 290);
+  // versão: etiqueta discreta no canto (pra não cobrir o pôster)
+  ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
+  ctx.fillText('DEMO v0.9', W - 14, 20);
+  ctx.textAlign = 'center';
   // o ESQUADRÃO no centro (só quando não tem o pôster do Codex)
   if (!titleBg.ready) {
     const glow = ctx.createRadialGradient(W / 2, 390, 20, W / 2, 390, 220);
@@ -3384,13 +3384,15 @@ function drawTitle() {
   }
   if (Math.floor(time * 2) % 2 === 0) {
     ctx.font = 'bold 18px Courier New'; ctx.fillStyle = '#ffd23f';
-    ctx.fillText('— aperte ESPAÇO —', W / 2, 505);
+    ctx.fillText('— aperte ESPAÇO —', W / 2, 488);
   }
-  // disclaimer de zueira responsável
-  ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(0, H - 30, W, 30);
-  ctx.font = '12px Courier New'; ctx.fillStyle = '#b8b8cc';
-  ctx.fillText('⚠ Peça de humor: qualquer semelhança com pessoas, empresas ou bilionários reais é mera coincidência', W / 2, H - 17);
-  ctx.fillText('(ou alucinação do modelo). Nenhum estagiário foi efetivado durante a produção.', W / 2, H - 5);
+  // rodapé: crédito da comunidade + disclaimer, tudo na faixa escura
+  ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0, H - 44, W, 44);
+  ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#ffd23f';
+  ctx.fillText('uma produção da comunidade Inteligência Mil Grau', W / 2, H - 30);
+  ctx.font = '11px Courier New'; ctx.fillStyle = '#9a9ab0';
+  ctx.fillText('⚠ Peça de humor: semelhanças com pessoas, empresas ou bilionários reais são coincidência (ou alucinação do modelo).', W / 2, H - 16);
+  ctx.fillText('Nenhum estagiário foi efetivado durante a produção.', W / 2, H - 4);
 }
 
 let selectMoveLock = false;
