@@ -1217,6 +1217,13 @@ class Player extends Entity {
     }
 
     if (this.state === 'attack') {
+      // dá pra cancelar o golpe num PULO (e emendar voadora no ar!)
+      if (keys['k'] && this.jumpH === 0) {
+        this.vy = 380; this.jumpH = 0.001;
+        this.setState('jump');
+        beep(330, 0.08, 'triangle');
+        return;
+      }
       const done = this.advanceAnim(14, 6, false);
       if (this.frame >= 2 && this.frame <= 4 && !this.attackHitDone) {
         if (this.tryHit(78, 14, this.baseDmg())) this.attackHitDone = true;
