@@ -3174,6 +3174,8 @@ function drawWorldMap() {
   ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 5;
   ctx.strokeText('🌍 ESCOLHA SUA MISSÃO', W / 2, 46);
   ctx.fillText('🌍 ESCOLHA SUA MISSÃO', W / 2, 46);
+  ctx.font = '12px Courier New'; ctx.fillStyle = '#88ccff';
+  ctx.fillText(`🔘 Moedas de Silício: ${siliconCoins.size}/3`, W / 2, 68);
 
   const brasil = WORLD_SPOTS.find(s => s.final);
   // rotas tracejadas: tudo leva ao Brasil
@@ -3219,6 +3221,14 @@ function drawWorldMap() {
     ctx.lineWidth = 2; ctx.stroke();
     ctx.font = '16px serif'; ctx.textAlign = 'center';
     ctx.fillText(locked ? '🔒' : done ? '✔' : s.flag, sx, sy + 6);
+    // moeda perdida nessa missão? badge piscando no pino
+    if (PHASES[s.phase] && PHASES[s.phase].coin && !siliconCoins.has(s.phase)) {
+      ctx.save();
+      ctx.globalAlpha = 0.6 + Math.sin(time * 4) * 0.4;
+      ctx.font = '12px serif';
+      ctx.fillText('🔘', sx + 16, sy - 12);
+      ctx.restore();
+    }
     if (sel) {
       ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#fff';
       ctx.fillText(s.name, sx, sy - 30);
@@ -3245,6 +3255,9 @@ function drawWorldMap() {
   if (locked) {
     ctx.fillStyle = worldLockedMsg > 0 ? '#ff5544' : '#888';
     ctx.fillText('🔒 Complete as 5 missões pra liberar o TREINO no Brasil!', px2 + 18, py2 + 63);
+  } else if (done && PHASES[s.phase] && PHASES[s.phase].coin && !siliconCoins.has(s.phase)) {
+    ctx.fillStyle = '#88ccff';
+    ctx.fillText('✔ CONCLUÍDA · 🔘 uma Moeda de Silício ainda brilha aqui... [ESPAÇO]', px2 + 18, py2 + 63);
   } else if (done) {
     ctx.fillStyle = '#66ff88';
     ctx.fillText('✔ MISSÃO CONCLUÍDA', px2 + 18, py2 + 63);
@@ -3258,8 +3271,14 @@ function drawWorldMap() {
   // navegação: ordem GEOGRÁFICA (por longitude) e só missões ainda não feitas
   const selectable = WORLD_SPOTS
     .map((s, i) => i)
-    .filter(i => WORLD_SPOTS[i].final || !phasesDone.has(WORLD_SPOTS[i].phase))
-    .filter(i => !(WORLD_SPOTS[i].secret && !secretUnlocked()))
+    .filter(i => {
+      const s = WORLD_SPOTS[i];
+      if (s.secret && !secretUnlocked()) return false;
+      if (s.final) return true;
+      if (!phasesDone.has(s.phase)) return true;
+      // concluída MAS com Moeda de Silício perdida: pode voltar pra caçar!
+      return PHASES[s.phase].coin && !siliconCoins.has(s.phase);
+    })
     .sort((a, b) => WORLD_SPOTS[a].x - WORLD_SPOTS[b].x);
   if (selectable.length && !selectable.includes(worldSel)) worldSel = selectable[0];
   const left = keys['arrowleft'] || keys['a'], right = keys['arrowright'] || keys['d'];
@@ -4172,7 +4191,8 @@ function frame(ts) {
     drawWorldMap();
     if (enterPressed) {
       const spot = WORLD_SPOTS[worldSel];
-      if (phasesDone.has(spot.phase) && !spot.final) {
+      const coinPending = PHASES[spot.phase] && PHASES[spot.phase].coin && !siliconCoins.has(spot.phase);
+      if (phasesDone.has(spot.phase) && !spot.final && !coinPending) {
         beep(150, 0.15, 'sawtooth'); // já concluída, não repete
       } else if (spot.final && !worldAllDone()) {
         worldLockedMsg = 2;
