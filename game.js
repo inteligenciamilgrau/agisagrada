@@ -1,15 +1,15 @@
-// ============================================================
-// BOB EM BUSCA DA AGI SAGRADA — demo v0.2
-// Fase 0: "O Chamado" (São Paulo)  ·  Fase 1: "A Canetada" (Washington)
-// Beat 'em up estilo Streets of Rage — comunidade Inteligência Mil Grau
+﻿// ============================================================
+// BOB EM BUSCA DA AGI SAGRADA â€” demo v0.2
+// Fase 0: "O Chamado" (SÃ£o Paulo)  Â·  Fase 1: "A Canetada" (Washington)
+// Beat 'em up estilo Streets of Rage â€” comunidade InteligÃªncia Mil Grau
 // Sprites: agent-sprite-forge (Codex) com fallback pra placeholders.
 // ============================================================
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-// Resolução interna: altura fixa (mantém a escala do jogo), largura acompanha
-// a proporção da janela — o jogo preenche a tela toda, sem distorcer.
+// ResoluÃ§Ã£o interna: altura fixa (mantÃ©m a escala do jogo), largura acompanha
+// a proporÃ§Ã£o da janela â€” o jogo preenche a tela toda, sem distorcer.
 const H = 540;
 let W = 960;
 function resize() {
@@ -22,12 +22,12 @@ function resize() {
 resize();
 addEventListener('resize', resize);
 
-// ---- Configuração dos sprites (formato agent-sprite-forge) ----
-// células 128x128, pés ancorados em (64,116) — vem do pipeline-meta.json
+// ---- ConfiguraÃ§Ã£o dos sprites (formato agent-sprite-forge) ----
+// cÃ©lulas 128x128, pÃ©s ancorados em (64,116) â€” vem do pipeline-meta.json
 const CELL = 128, ANCHOR_X = 64, ANCHOR_Y = 116;
 const SPRITES_FACE_RIGHT = true;
 
-// faceRight: pra que lado o sprite foi DESENHADO (heróis → direita, chefões → esquerda)
+// faceRight: pra que lado o sprite foi DESENHADO (herÃ³is â†’ direita, chefÃµes â†’ esquerda)
 const SPRITE_DEFS = {
   bob:       { base: 'sprites/bob',       faceRight: true,  actions: { idle: 4, walk: 6, attack: 6, special: 6 } },
   fefe:      { base: 'sprites/fefe',      faceRight: true,  actions: { idle: 4, walk: 6, attack: 6, special: 6 } },
@@ -62,7 +62,7 @@ const BG_FILES = {
 const assets = { anims: {}, bgs: {} };
 
 function loadAnim(charKey, action, count, base) {
-  // o sprite-forge exporta ora como "acao-1.png", ora como "sheet-1.png" —
+  // o sprite-forge exporta ora como "acao-1.png", ora como "sheet-1.png" â€”
   // tenta o primeiro e cai pro segundo automaticamente
   const frames = [];
   let loaded = 0, failed = false;
@@ -108,12 +108,12 @@ addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   // ESC fora do guard: ao sair do fullscreen o navegador engole o keyup
   if (k === 'escape') { escPressed = true; return; }
-  startMusic(); // navegador só libera áudio após gesto do usuário
+  startMusic(); // navegador sÃ³ libera Ã¡udio apÃ³s gesto do usuÃ¡rio
   if (!keys[k]) {
     if (k === 'enter' || k === ' ') enterPressed = true;
     if (k === 'j') attackPressed = true;
     if (k === 'm') { settings.musicOn = !settings.musicOn; saveSettings(); }
-    if (k === 'o') pPressed = true; // O de Opções
+    if (k === 'o') pPressed = true; // O de OpÃ§Ãµes
     if (k === 't') tPressed = true;
     if (k === 'f') {
       if (document.fullscreenElement) document.exitFullscreen();
@@ -129,27 +129,27 @@ addEventListener('blur', releaseAllKeys);
 document.addEventListener('visibilitychange', releaseAllKeys);
 document.addEventListener('fullscreenchange', releaseAllKeys);
 
-// ---- Configurações de áudio (persistem no navegador) ----
+// ---- ConfiguraÃ§Ãµes de Ã¡udio (persistem no navegador) ----
 const settings = {
   musicOn: true, musicVol: 0.7,
   sfxOn: true, sfxVol: 0.7,
-  difficulty: 'facil', // facil (padrão) | medio | dificil
-  lang: 'pt', // pt (padrão) | en | es
+  difficulty: 'facil', // facil (padrÃ£o) | medio | dificil
+  lang: 'pt', // pt (padrÃ£o) | en | es
 };
-// ---- i18n (traduções em lang.js; PT inline é o fallback canônico) ----
+// ---- i18n (traduÃ§Ãµes em lang.js; PT inline Ã© o fallback canÃ´nico) ----
 const LANG_ORDER = ['pt', 'en', 'es'];
 const LTX = () => LANGS[settings.lang] || LANGS.pt;
 const t = k => {
   const v = LTX().ui && LTX().ui[k];
   return v !== undefined ? v : LANGS.pt.ui[k];
 };
-const F = k => (LTX().falas && LTX().falas[k]) || null; // null → usa o PT inline
+const TR = k => (LTX().falas && LTX().falas[k]) || null; // null â†’ usa o PT inline
 const fmt = (s, n) => s.replace('{n}', n);
 const DIFF_LEVELS = ['facil', 'medio', 'dificil'];
 const DIFF_INFO = {
-  facil:   { label: 'FÁCIL',   take: 1,    deal: 1,    color: '#3e3' },
-  medio:   { label: 'MÉDIO',   take: 1.35, deal: 0.75, color: '#fa3' },
-  dificil: { label: 'DIFÍCIL', take: 1.8,  deal: 0.6,  color: '#e33' },
+  facil:   { label: 'FÃCIL',   take: 1,    deal: 1,    color: '#3e3' },
+  medio:   { label: 'MÃ‰DIO',   take: 1.35, deal: 0.75, color: '#fa3' },
+  dificil: { label: 'DIFÃCIL', take: 1.8,  deal: 0.6,  color: '#e33' },
 };
 const diffCfg = () => DIFF_INFO[settings.difficulty] || DIFF_INFO.facil;
 try {
@@ -159,9 +159,9 @@ try {
 function saveSettings() {
   try { localStorage.setItem('agi-sagrada-audio', JSON.stringify(settings)); } catch (_) {}
 }
-const MV = () => settings.musicVol; // volume da música
+const MV = () => settings.musicVol; // volume da mÃºsica
 
-// ---- Áudio retrô (WebAudio, sem arquivos) ----
+// ---- Ãudio retrÃ´ (WebAudio, sem arquivos) ----
 let audioCtx = null;
 function beep(freq, dur = 0.08, type = 'square', vol = 0.12) {
   if (!settings.sfxOn || settings.sfxVol <= 0) return;
@@ -175,7 +175,7 @@ function beep(freq, dur = 0.08, type = 'square', vol = 0.12) {
     o.start(); o.stop(audioCtx.currentTime + dur);
   } catch (_) {}
 }
-// ---- SURF MUSIC 🏄 (chiptune sintetizado — bateria + riff tremolo) ----
+// ---- SURF MUSIC ðŸ„ (chiptune sintetizado â€” bateria + riff tremolo) ----
 const music = { on: true, started: false, stepIdx: 0, nextStep: 0 };
 const MUSIC_BPM = 168, MUSIC_STEP = 60 / MUSIC_BPM / 4; // semicolcheias
 
@@ -281,7 +281,7 @@ function brassNote(t, m, vol = 0.075, dur = 0.4) {
   });
 }
 function padNote(t, m, dur, vol = 0.028) {
-  // colchão de suspense: dois saws destunados com filtro
+  // colchÃ£o de suspense: dois saws destunados com filtro
   const f = nfreq(m);
   [f * 0.997, f * 1.004].forEach(ff => {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain(), fl = audioCtx.createBiquadFilter();
@@ -326,7 +326,7 @@ function playDrums(style, s16, barIdx, t) {
       if (s16 === 4 || s16 === 12) drumSnare(t);
       drumHat(t, s16 === 14);
       break;
-    case 'tension': // pulso de suspense: coração acelerado
+    case 'tension': // pulso de suspense: coraÃ§Ã£o acelerado
       if (s16 === 0 || s16 === 7) drumKick(t);
       if (s16 === 12) drumSnare(t);
       if (s16 % 2 === 0) drumHat(t, s16 === 10);
@@ -346,7 +346,7 @@ function playDrums(style, s16, barIdx, t) {
       if (s16 === 8) drumSnare(t);
       if (s16 % 4 === 2) drumHat(t, false);
       break;
-    case 'epic': // ação total: chimbal em semicolcheias direto
+    case 'epic': // aÃ§Ã£o total: chimbal em semicolcheias direto
       if (s16 === 0 || s16 === 6 || s16 === 8) drumKick(t);
       if (s16 === 4 || s16 === 12) drumSnare(t);
       drumHat(t, s16 === 14);
@@ -401,7 +401,7 @@ function trackStep(trk, gIdx, t, stepDur) {
     if (a.inst === 'keys') keysNote(t, tone, a.vol || 0.05, stepDur * a.rate * 1.1);
     else pluckNote(t, tone, a.vol || 0.05, stepDur * a.rate * 0.95);
   }
-  // melodia explícita por cima (metais)
+  // melodia explÃ­cita por cima (metais)
   if (trk.tune) {
     const tn = trk.tune[idx % trk.tune.length];
     if (tn !== null && tn !== undefined) brassNote(t, tn, 0.08, stepDur * 3.4);
@@ -409,64 +409,64 @@ function trackStep(trk, gIdx, t, stepDur) {
 }
 
 // ===== AS TRILHAS (parte A = 8 compassos, parte B = 8 compassos) =====
-// raízes MIDI: C3=48 D=50 E=52 F=53 G=55 A=57 Bb=58 B=59
+// raÃ­zes MIDI: C3=48 D=50 E=52 F=53 G=55 A=57 Bb=58 B=59
 const TRACKS = {
   saopaulo:  { bpm: 168, custom: true }, // o tema surf original (Fase 0)!
   washington:{ bpm: 128, drums: 'marchdrive', bassPat: 'drive', stabs: [0, 4, 8, 12], stabInst: 'piano',
     arp: { rate: 4, pattern: 'up', octaves: 1, inst: 'keys', vol: 0.04 },
-    // A: marcha pomposa em dó · B: vira menor, conspiração no gabinete
+    // A: marcha pomposa em dÃ³ Â· B: vira menor, conspiraÃ§Ã£o no gabinete
     bars: [Mj(48),Mj(53),Mj(48),Mj(55), Mj(48),Mj(53),D7c(55),Mj(48),
            Mi(57),Mi(57),Mj(53),Mj(53), D7c(50),D7c(50),Mj(55),D7c(55)] },
   fabrica:   { bpm: 150, drums: 'techno', bassPat: 'drive', stabs: [0, 10], stabInst: 'keys',
     arp: { rate: 2, pattern: 'up', octaves: 2, inst: 'pluck', vol: 0.045 },
-    // A: martelo industrial em mi · B: a esteira acelera subindo
+    // A: martelo industrial em mi Â· B: a esteira acelera subindo
     bars: [Pw(52),Pw(52),Pw(52),Pw(52), Pw(48),Pw(48),Pw(50),Pw(50),
            Pw(52),Pw(52),Pw(55),Pw(55), Pw(57),Pw(57),Pw(59),Pw(59)] },
   vale:      { bpm: 128, drums: 'popdrive', bassPat: 'drive', stabs: [0, 6, 8, 14], stabInst: 'keys', pad: true,
     arp: { rate: 2, pattern: 'updown', octaves: 1, inst: 'keys', vol: 0.04 },
-    // A: synthpop corporativo sorridente (acordes com 7ª) · B: a máscara escorrega
+    // A: synthpop corporativo sorridente (acordes com 7Âª) Â· B: a mÃ¡scara escorrega
     bars: [M7c(48),m7c(57),M7c(53),D7c(55), M7c(48),m7c(57),M7c(53),D7c(55),
            m7c(52),m7c(57),m7c(50),D7c(55), m7c(52),m7c(57),M7c(53),D7c(55)] },
   biblioteca:{ bpm: 104, drums: 'tension', bassPat: 'eighths', pad: true,
     arp: { rate: 2, pattern: 'down', octaves: 1, inst: 'keys', vol: 0.05 },
-    // A: órgão descendo na catedral em ré menor · B: o aspirador se aproxima
+    // A: Ã³rgÃ£o descendo na catedral em rÃ© menor Â· B: o aspirador se aproxima
     bars: [Mi(50),Mi(50),Mi(55),Mi(55), Mj(57),Mj(57),Mi(50),Mi(50),
            Mj(58),Mi(55),{ r: 52, ch: [0, 3, 6] },D7c(57), Mi(50),Mi(55),D7c(57),Mi(50)] },
   muralha:   { bpm: 122, drums: 'surfrock', bassPat: 'eighths', stabs: [0, 8], stabInst: 'piano',
     arp: { rate: 2, pattern: 'updown', octaves: 1, inst: 'pluck', vol: 0.05 },
-    // A: dedilhado pentatônico sereno · B: o dragão circula
+    // A: dedilhado pentatÃ´nico sereno Â· B: o dragÃ£o circula
     bars: [Mi(57),Mi(57),Mj(53),Mj(53), Mj(55),Mj(55),Mi(52),Mi(52),
            Mj(48),Mj(55),Mi(57),Mi(52), Mj(53),Mj(55),Mi(57),Mi(57)] },
   final:     { bpm: 152, drums: 'epic', bassPat: 'drive', stabs: [0, 8], stabInst: 'piano',
     arp: { rate: 2, pattern: 'up', octaves: 2, inst: 'pluck', vol: 0.05 },
-    // A: corrida heroica Am-F-C-G · B: a onda final aperta
+    // A: corrida heroica Am-F-C-G Â· B: a onda final aperta
     bars: [Mi(57),Mj(53),Mj(48),Mj(55), Mi(57),Mj(53),Mj(48),Mj(55),
            Mi(50),Mj(58),Mj(53),Mj(48), Mi(50),Mj(58),Mj(52),D7c(52)] },
   boss:      (() => {
-    // A MÚSICA DO MAL — marcha imperial: sol menor, metais pesados,
+    // A MÃšSICA DO MAL â€” marcha imperial: sol menor, metais pesados,
     // ritmo DUN DUN DUN / DUN-da-duuun. Parte B: o rasante da fortaleza (bII).
     const _ = null;
-    const b1 = [67,_,_,_, 67,_,_,_, 67,_,_,_, _,_,_,_];      // três marteladas
+    const b1 = [67,_,_,_, 67,_,_,_, 67,_,_,_, _,_,_,_];      // trÃªs marteladas
     const b2 = [63,_,_,_,_,_, 60,_, 55,_,_,_,_,_,_,_];        // Eb pontuada, C curta, G grave
     const b4 = [63,_,_,_,_,_, 60,_, 62,_,_,_,_,_,_,_];        // ...termina suspensa no V
-    const b5 = [62,_,_,_, 62,_,_,_, 62,_,_,_, _,_,_,_];       // resposta no ré
+    const b5 = [62,_,_,_, 62,_,_,_, 62,_,_,_, _,_,_,_];       // resposta no rÃ©
     const b6 = [63,_,_,_,_,_, 60,_, 57,_,_,_,_,_,_,_];
     return {
       bpm: 138, drums: 'march', bassPat: 'eighths', stabs: [0, 8], stabInst: 'piano', pad: true,
       arp: { rate: 4, pattern: 'down', octaves: 1, inst: 'keys', vol: 0.035 },
-      bars: [Mi(55),Mj(51),Mi(55),D7c(50), Mi(55),Mj(51),Mi(55),Mi(55),      // A: Gm · Eb · Gm · D7
-             Mi(55),Mj(56),Mi(55),Mj(56), Mi(55),Mj(56),D7c(50),D7c(50)],    // B: Gm ↔ Ab (rasante!)
+      bars: [Mi(55),Mj(51),Mi(55),D7c(50), Mi(55),Mj(51),Mi(55),Mi(55),      // A: Gm Â· Eb Â· Gm Â· D7
+             Mi(55),Mj(56),Mi(55),Mj(56), Mi(55),Mj(56),D7c(50),D7c(50)],    // B: Gm â†” Ab (rasante!)
       tune: [...b1, ...b2, ...b1, ...b4, ...b5, ...b6, ...b1, ...b2,
              ...Array(128).fill(null)], // na parte B os metais calam e o medo fica
     };
   })(),
   menu:      { bpm: 84, drums: 'lofi', bassPat: 'half', stabs: [0, 7], stabInst: 'keys', pad: true,
-    // lofi de planejamento: café, mapa e acordes com 7ª
+    // lofi de planejamento: cafÃ©, mapa e acordes com 7Âª
     bars: [M7c(53),m7c(52),m7c(50),M7c(48), M7c(53),m7c(52),m7c(50),M7c(48),
            M7c(58),m7c(57),m7c(55),D7c(48), M7c(58),m7c(57),m7c(55),D7c(55)] },
   abertura:  { bpm: 72, drums: 'suspense', bassPat: 'half', pad: true,
     arp: { rate: 4, pattern: 'up', octaves: 1, inst: 'keys', vol: 0.05 },
-    // lenda antiga: piano lento sobre colchão, com o V maior de suspense
+    // lenda antiga: piano lento sobre colchÃ£o, com o V maior de suspense
     bars: [Mi(57),Mi(57),Mj(53),Mj(53), Mj(48),Mj(48),Mj(52),Mj(52),
            Mi(57),Mj(53),Mj(48),Mj(52), Mi(57),Mj(53),Mj(52),Mj(52)] },
   vitoria:   { bpm: 138, drums: 'marchdrive', bassPat: 'rootFifth', stabs: [0, 4, 8, 12], stabInst: 'piano',
@@ -476,7 +476,7 @@ const TRACKS = {
            Mj(53),Mj(55),Mi(57),Mj(52), Mj(53),Mj(55),Mj(48),Mj(48)] },
   gameover:  { bpm: 66, drums: 'none', bassPat: 'half', pad: true,
     arp: { rate: 4, pattern: 'down', octaves: 1, inst: 'keys', vol: 0.05 },
-    // lamento breve (todo grande modelo já divergiu no treino)
+    // lamento breve (todo grande modelo jÃ¡ divergiu no treino)
     bars: [Mi(57),Mi(57),Mj(53),Mj(52), Mi(57),Mi(50),Mj(52),Mi(57)] },
 };
 const PHASE_MUSIC = { 0: 'saopaulo', 1: 'washington', 2: 'fabrica', 3: 'vale', 4: 'biblioteca', 5: 'muralha', 6: 'final', 7: 'biblioteca' };
@@ -489,7 +489,7 @@ function setTrack(name) {
   if (audioCtx) music.nextStep = Math.max(music.nextStep, audioCtx.currentTime + 0.08);
 }
 
-// fanfarra de chefão derrotado (one-shot por cima da trilha)
+// fanfarra de chefÃ£o derrotado (one-shot por cima da trilha)
 function playFanfare() {
   try {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -501,12 +501,12 @@ function playFanfare() {
   } catch (_) {}
 }
 
-// ============ A MÚSICA-TEMA (surf em Mi frígio) ============
-// Estrutura: PARTE 1 (2x) → PARTE 2 misirlou (2x) → PARTE 3 cadência
-// andaluza (iv menor → III → II → I, 2 tempos cada) → volta ao começo.
+// ============ A MÃšSICA-TEMA (surf em Mi frÃ­gio) ============
+// Estrutura: PARTE 1 (2x) â†’ PARTE 2 misirlou (2x) â†’ PARTE 3 cadÃªncia
+// andaluza (iv menor â†’ III â†’ II â†’ I, 2 tempos cada) â†’ volta ao comeÃ§o.
 const E = 52, F = 53, G = 55, GS = 56, A = 57, B = 59, C = 60, D = 62, E5 = 64;
 
-// PARTE 1 — o riff original (sobe pro topo e desce correndo)
+// PARTE 1 â€” o riff original (sobe pro topo e desce correndo)
 const LEAD1 = [
   E,E,E,E, E,E,F,E,  GS,GS,GS,GS, GS,GS,A,GS,
   B,B,B,B, C,B,A,GS, A,A,A,A, GS,A,GS,F,
@@ -520,7 +520,7 @@ const BASS1 = [
   A-24,null,null,null, B-24,null,null,null, E-24,null,null,null, B-24,null,null,null,
 ];
 
-// PARTE 2 — misirlou raiz: 2 tempos no I (Mi), 2 tempos um semitom acima (Fá)
+// PARTE 2 â€” misirlou raiz: 2 tempos no I (Mi), 2 tempos um semitom acima (FÃ¡)
 const LEAD2 = [
   E,E,E,E, E,E,F,E,   F,F,F,F, F,F,E,F,
   E,E,GS,GS, B,B,A,GS, F,F,A,A, C,C,A,F,
@@ -528,25 +528,25 @@ const LEAD2 = [
   E,GS,B,E5, D,C,B,A,  GS,A,GS,F, E,F,E,null,
 ];
 
-// PARTE 3 — cadência andaluza: Am (iv) → G (III) → F (II) → E (I)
-// 1ª passada: 2 tempos por acorde. NA VOLTA: dobra — 4 tempos por acorde!
+// PARTE 3 â€” cadÃªncia andaluza: Am (iv) â†’ G (III) â†’ F (II) â†’ E (I)
+// 1Âª passada: 2 tempos por acorde. NA VOLTA: dobra â€” 4 tempos por acorde!
 const LEAD3A = [
-  A,A,A,A, C,C,B,A,    // lá menor
+  A,A,A,A, C,C,B,A,    // lÃ¡ menor
   G,G,G,G, B,B,A,G,    // sol maior
-  F,F,F,F, A,A,G,F,    // fá maior
+  F,F,F,F, A,A,G,F,    // fÃ¡ maior
   E,E,E,E, GS,GS,F,E,  // mi
 ];
-const LEAD3B = [ // versão dobrada: 16 semicolcheias por acorde, mais expressiva
-  A,A,A,A, C,C,B,A,   A,A,A,A, E5,E5,C,A,    // lá menor esticado, arpejo subindo
+const LEAD3B = [ // versÃ£o dobrada: 16 semicolcheias por acorde, mais expressiva
+  A,A,A,A, C,C,B,A,   A,A,A,A, E5,E5,C,A,    // lÃ¡ menor esticado, arpejo subindo
   G,G,G,G, B,B,A,G,   G,G,G,G, D,D,B,G,      // sol maior
-  F,F,F,F, A,A,G,F,   F,F,F,F, C,C,A,F,      // fá maior
-  E,E,E,E, GS,GS,F,E, E,GS,B,E5, GS,F,E,null, // mi — resolvão final!
+  F,F,F,F, A,A,G,F,   F,F,F,F, C,C,A,F,      // fÃ¡ maior
+  E,E,E,E, GS,GS,F,E, E,GS,B,E5, GS,F,E,null, // mi â€” resolvÃ£o final!
 ];
 const CAD_ROOTS = [A-24, G-24, F-24, E-24];
 
 const P1_LEN = LEAD1.length * 2;              // 2x
 const P2_LEN = LEAD2.length * 2;              // 2x
-const P3_LEN = LEAD3A.length + LEAD3B.length; // cadência + volta dobrada
+const P3_LEN = LEAD3A.length + LEAD3B.length; // cadÃªncia + volta dobrada
 const SONG_LEN = P1_LEN + P2_LEN + P3_LEN;
 
 function musicStep(gIdx, t) {
@@ -565,15 +565,15 @@ function musicStep(gIdx, t) {
   } else if (idx < P1_LEN + P2_LEN) {
     const i = (idx - P1_LEN) % LEAD2.length;
     lead = LEAD2[i];
-    if (i % 2 === 0) bass = (i % 16) < 8 ? E - 24 : F - 24; // pump Mi→Fá
+    if (i % 2 === 0) bass = (i % 16) < 8 ? E - 24 : F - 24; // pump Miâ†’FÃ¡
   } else {
     const i = idx - P1_LEN - P2_LEN;
     if (i < LEAD3A.length) {
-      // 1ª passada: 2 tempos por acorde
+      // 1Âª passada: 2 tempos por acorde
       lead = LEAD3A[i];
       if (i % 2 === 0) bass = CAD_ROOTS[Math.floor(i / 8)];
     } else {
-      // NA VOLTA: dobrada — 4 tempos por acorde
+      // NA VOLTA: dobrada â€” 4 tempos por acorde
       const j = i - LEAD3A.length;
       lead = LEAD3B[j];
       if (j % 2 === 0) bass = CAD_ROOTS[Math.floor(j / 16)];
@@ -624,30 +624,30 @@ let camX = 0;
 let shake = 0;
 let time = 0, dt = 0, lastTs = 0;
 
-// conquistas das Guildas (persistem entre fases na mesma sessão)
+// conquistas das Guildas (persistem entre fases na mesma sessÃ£o)
 const conquests = {
   checkpoint: false, itaipu: false, investimento: false, pesquisadores: false,
   dados: false, eficiencia: false, predio: false, treino: false,
-  blueprints: false, playbook: false, litografia: false, // bônus (não são peças do plano)
+  blueprints: false, playbook: false, litografia: false, // bÃ´nus (nÃ£o sÃ£o peÃ§as do plano)
 };
-// Moedas de Silício escondidas (3 destravam a Ilha Formosa!)
+// Moedas de SilÃ­cio escondidas (3 destravam a Ilha Formosa!)
 const siliconCoins = new Set();
 
-// ---- O PLANO DA AGI SAGRADA (o mapa que amarra a história) ----
-// cada fase conquista uma PEÇA do laboratório; o treino só é possível no final
+// ---- O PLANO DA AGI SAGRADA (o mapa que amarra a histÃ³ria) ----
+// cada fase conquista uma PEÃ‡A do laboratÃ³rio; o treino sÃ³ Ã© possÃ­vel no final
 const PLAN_ITEMS = [
-  { key: 'checkpoint',    icon: '🧠', label: 'O MODELO',      sub: 'CURUPIRA-beta resgatado (F0)' },
-  { key: 'itaipu',        icon: '⚡', label: 'ENERGIA',       sub: 'a Chave de Itaipu (F1)' },
-  { key: 'investimento',  icon: '💰', label: 'INVESTIMENTO',  sub: 'a aposta perdida do Ilon (F2)' },
-  { key: 'pesquisadores', icon: '🧑‍🔬', label: 'PESQUISADORES', sub: 'os demitidos do Vale (F3)' },
-  { key: 'dados',         icon: '📚', label: 'DADOS',         sub: 'libertados do aspirador (F4)' },
-  { key: 'eficiencia',    icon: '🔲', label: 'CHIPS',         sub: 'o tesouro do dragão (F5)' },
-  { key: 'predio',        icon: '🏗️', label: 'O GALPÃO',      sub: 'mutirão da comunidade' },
-  { key: 'treino',        icon: '🔥', label: 'O TREINO',      sub: 'segurar os chefões e treinar' },
+  { key: 'checkpoint',    icon: 'ðŸ§ ', label: 'O MODELO',      sub: 'CURUPIRA-beta resgatado (F0)' },
+  { key: 'itaipu',        icon: 'âš¡', label: 'ENERGIA',       sub: 'a Chave de Itaipu (F1)' },
+  { key: 'investimento',  icon: 'ðŸ’°', label: 'INVESTIMENTO',  sub: 'a aposta perdida do Ilon (F2)' },
+  { key: 'pesquisadores', icon: 'ðŸ§‘â€ðŸ”¬', label: 'PESQUISADORES', sub: 'os demitidos do Vale (F3)' },
+  { key: 'dados',         icon: 'ðŸ“š', label: 'DADOS',         sub: 'libertados do aspirador (F4)' },
+  { key: 'eficiencia',    icon: 'ðŸ”²', label: 'CHIPS',         sub: 'o tesouro do dragÃ£o (F5)' },
+  { key: 'predio',        icon: 'ðŸ—ï¸', label: 'O GALPÃƒO',      sub: 'mutirÃ£o da comunidade' },
+  { key: 'treino',        icon: 'ðŸ”¥', label: 'O TREINO',      sub: 'segurar os chefÃµes e treinar' },
 ];
-let mapNext = null;      // próxima fase ao sair do mapa ('play' = só consultando)
+let mapNext = null;      // prÃ³xima fase ao sair do mapa ('play' = sÃ³ consultando)
 let mapT = 0;            // tempo de tela pro pulso do item novo
-let lastAcquired = [];   // peças ganhas agora (pra destacar)
+let lastAcquired = [];   // peÃ§as ganhas agora (pra destacar)
 
 // fundo do quadro do plano (gerado pelo Codex)
 const planoImg = new Image();
@@ -657,13 +657,13 @@ planoImg.src = 'sprites/plano_bg.png';
 function drawMap() {
   mapT += dt;
   if (planoImg.ready) {
-    // arte do quadro de planejamento (Codex) + véu escuro pras cartas lerem bem
+    // arte do quadro de planejamento (Codex) + vÃ©u escuro pras cartas lerem bem
     const scale = Math.max(W / planoImg.width, H / planoImg.height);
     const iw = planoImg.width * scale, ih = planoImg.height * scale;
     ctx.drawImage(planoImg, (W - iw) / 2, (H - ih) / 2, iw, ih);
     ctx.fillStyle = 'rgba(4,4,12,0.55)'; ctx.fillRect(0, 0, W, H);
   } else {
-    // fundo: quadro de planejamento no escuro (esboço)
+    // fundo: quadro de planejamento no escuro (esboÃ§o)
     const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, '#0a0a1e'); grad.addColorStop(1, '#050510');
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
@@ -764,11 +764,11 @@ function drawFloatTexts() {
   }
 }
 
-// ---- Projéteis (canetadas do Trunfo etc.) ----
+// ---- ProjÃ©teis (canetadas do Trunfo etc.) ----
 let projectiles = [];
 function updateProjectiles() {
   for (const p of projectiles) {
-    // parágrafo do ensaio: cai do céu no ponto marcado
+    // parÃ¡grafo do ensaio: cai do cÃ©u no ponto marcado
     if (p.type === 'paragrafo') {
       p.t += dt;
       p.h -= 260 * dt;
@@ -814,7 +814,7 @@ function drawProjectiles() {
   for (const p of projectiles) {
     const sx = p.x - camX, sy = p.gy - p.h;
     if (p.type === 'tweet') {
-      // tuitada: retângulo luminoso de 280 caracteres de dano
+      // tuitada: retÃ¢ngulo luminoso de 280 caracteres de dano
       ctx.save();
       ctx.translate(sx, sy);
       ctx.fillStyle = '#113344dd'; ctx.fillRect(-20, -12, 40, 24);
@@ -829,7 +829,7 @@ function drawProjectiles() {
       ctx.translate(sx, sy);
       ctx.rotate(p.t * 8 * Math.sign(p.vx));
       ctx.font = '24px serif'; ctx.textAlign = 'center';
-      ctx.fillText('📦', 0, 8);
+      ctx.fillText('ðŸ“¦', 0, 8);
       ctx.restore();
       continue;
     }
@@ -846,7 +846,7 @@ function drawProjectiles() {
       continue;
     }
     if (p.type === 'binary') {
-      // dígitos incandescentes do sopro do dragão
+      // dÃ­gitos incandescentes do sopro do dragÃ£o
       ctx.save();
       ctx.translate(sx, sy);
       ctx.font = 'bold 16px Courier New'; ctx.textAlign = 'center';
@@ -857,13 +857,13 @@ function drawProjectiles() {
       continue;
     }
     if (p.type === 'paragrafo') {
-      // sombra-alvo no chão
+      // sombra-alvo no chÃ£o
       ctx.save();
       ctx.globalAlpha = 0.35;
       ctx.fillStyle = '#000';
       ctx.beginPath(); ctx.ellipse(p.x - camX, p.gy, 30, 8, 0, 0, 7); ctx.fill();
       ctx.restore();
-      // a página caindo, girando
+      // a pÃ¡gina caindo, girando
       ctx.save();
       ctx.translate(sx, sy);
       ctx.rotate(Math.sin(p.t * 6) * 0.3);
@@ -877,7 +877,7 @@ function drawProjectiles() {
     ctx.save();
     ctx.translate(sx, sy);
     if (frames) {
-      // sprite real do aviãozinho de papel (voa pra esquerda de fábrica)
+      // sprite real do aviÃ£ozinho de papel (voa pra esquerda de fÃ¡brica)
       if (p.vx > 0) ctx.scale(-1, 1);
       const img = frames[Math.floor(p.t * 12) % frames.length];
       const s = SCALE * 0.55;
@@ -892,10 +892,10 @@ function drawProjectiles() {
   }
 }
 
-// ---- Drops (café/guaraná) ----
+// ---- Drops (cafÃ©/guaranÃ¡) ----
 const drops = [];
 function maybeDrop(x, gy) {
-  // Playbook dos SaaSseiros: o dinheiro compra café pra todo mundo (drops 2x)
+  // Playbook dos SaaSseiros: o dinheiro compra cafÃ© pra todo mundo (drops 2x)
   const chance = conquests.playbook ? 0.55 : 0.28;
   if (Math.random() < chance) drops.push({ x, gy, type: Math.random() < 0.7 ? 'cafe' : 'guarana', t: 0 });
 }
@@ -905,7 +905,7 @@ function updateDrops() {
     if (Math.abs(player.x - d.x) < 34 && Math.abs(player.gy - d.gy) < 20 && player.jumpH === 0) {
       const heal = d.type === 'cafe' ? 15 : 35;
       player.hp = Math.min(player.maxHp, player.hp + heal);
-      spawnText(d.x - camX, d.gy - 60, d.type === 'cafe' ? '☕ +15' : '🧉 +35', '#7fff7f');
+      spawnText(d.x - camX, d.gy - 60, d.type === 'cafe' ? 'â˜• +15' : 'ðŸ§‰ +35', '#7fff7f');
       sfx.pickup();
       d.remove = true;
     }
@@ -916,11 +916,11 @@ function drawDrops() {
   for (const d of drops) {
     const sx = d.x - camX, sy = d.gy - 10 + Math.sin(d.t * 4) * 3;
     ctx.font = '20px serif'; ctx.textAlign = 'center';
-    ctx.fillText(d.type === 'cafe' ? '☕' : '🧉', sx, sy);
+    ctx.fillText(d.type === 'cafe' ? 'â˜•' : 'ðŸ§‰', sx, sy);
   }
 }
 
-// ---- Moeda de Silício da fase (escondida — 3 destravam a Ilha Formosa) ----
+// ---- Moeda de SilÃ­cio da fase (escondida â€” 3 destravam a Ilha Formosa) ----
 function updateDrawCoin() {
   const c = currentPhase.coin;
   if (!c || siliconCoins.has(currentPhase.id)) return;
@@ -1010,7 +1010,7 @@ class Entity {
   }
 }
 
-// ---- Placeholders (até o Codex entregar) ----
+// ---- Placeholders (atÃ© o Codex entregar) ----
 function drawPlaceholderHumanoid(sx, sy, opts) {
   const { body = '#666', head = '#e0b088', accent = '#333', label = '', facing = 1, t = 0, mul = 1 } = opts;
   const bob = Math.sin(t * 6) * 2;
@@ -1041,22 +1041,22 @@ function drawPlaceholderDrone(sx, sy, t) {
   ctx.restore();
 }
 
-// ---- Heróis jogáveis ----
+// ---- HerÃ³is jogÃ¡veis ----
 const HEROES = {
   bob: {
-    key: 'bob', name: '"INDIANA" BOB', desc: 'equilibrado — o líder',
+    key: 'bob', name: '"INDIANA" BOB', desc: 'equilibrado â€” o lÃ­der',
     hp: 100, speed: 190, dmg: 8,
     idle: 'idle', walk: 'walk',
     specialText: 'PROMPT ENGENHEIRADO!', specialColor: '#ffd23f', specialDmg: 40,
   },
   fefe: {
-    key: 'fefe', name: 'FÊ-FÊ LI, A VIDENTE', desc: 'técnica — dano alto, mais frágil',
+    key: 'fefe', name: 'FÃŠ-FÃŠ LI, A VIDENTE', desc: 'tÃ©cnica â€” dano alto, mais frÃ¡gil',
     hp: 82, speed: 210, dmg: 11,
     idle: 'idle', walk: 'walk',
     specialText: 'IMAGENET!', specialColor: '#55ccff', specialDmg: 48,
   },
   escudeiro: {
-    key: 'escudeiro', name: 'ESCUDEIRO MIL GRAU', desc: 'tanque — lento, resistente',
+    key: 'escudeiro', name: 'ESCUDEIRO MIL GRAU', desc: 'tanque â€” lento, resistente',
     hp: 135, speed: 150, dmg: 12,
     idle: 'idle', walk: 'walk',
     specialText: 'RAID DO CHAT!', specialColor: '#bb66ff', specialDmg: 36,
@@ -1065,7 +1065,7 @@ const HEROES = {
 const HERO_ORDER = ['bob', 'fefe', 'escudeiro'];
 let selectedHero = 0;
 
-// ---- LORO ESTOCÁSTICO — companion (a LLM que voa com qualquer herói) ----
+// ---- LORO ESTOCÃSTICO â€” companion (a LLM que voa com qualquer herÃ³i) ----
 class Companion {
   constructor() {
     this.x = 60; this.gy = 450;
@@ -1078,14 +1078,14 @@ class Companion {
     this.diveTarget = null;
     this.diveCd = 0;
   }
-  // MERGULHO: quando o herói ataca do alto, o Loro caça o inimigo mais próximo!
-  // Sem cooldown: mesmo voltando do último ataque, ele emenda o próximo mergulho.
+  // MERGULHO: quando o herÃ³i ataca do alto, o Loro caÃ§a o inimigo mais prÃ³ximo!
+  // Sem cooldown: mesmo voltando do Ãºltimo ataque, ele emenda o prÃ³ximo mergulho.
   diveAttack() {
     const alvos = enemies.filter(e => !e.dead);
     if (!alvos.length) return;
     this.diveTarget = alvos.reduce((a, b) =>
       Math.abs(a.x - player.x) < Math.abs(b.x - player.x) ? a : b);
-    spawnText(this.x - camX, this.gy - this.flyH - 30, F('loroDive') || '🦜 MERGULHO!', '#66ff88', 1.1);
+    spawnText(this.x - camX, this.gy - this.flyH - 30, TR('loroDive') || 'ðŸ¦œ MERGULHO!', '#66ff88', 1.1);
     beep(1100, 0.08, 'triangle');
   }
   update(canTalk) {
@@ -1103,7 +1103,7 @@ class Companion {
         if (Math.abs(tdx) < 42 && Math.abs(tdy) < 26) {
           const dmg = 2 + Math.floor(Math.random() * 4); // bicada: 2 a 5
           alvo.takeHit(dmg, this.facing, false);
-          spawnText(alvo.screenX, alvo.screenY - 100, fmt(F('loroBite') || '🦜 BICADA! ({n})', dmg), '#66ff88', 1.1);
+          spawnText(alvo.screenX, alvo.screenY - 100, fmt(TR('loroBite') || 'ðŸ¦œ BICADA! ({n})', dmg), '#66ff88', 1.1);
           this.echoFlash = 0.4;
           sfx.hit();
           this.diveTarget = null;
@@ -1112,7 +1112,7 @@ class Companion {
         return;
       }
     }
-    // voa atrás e acima do herói, com folga elástica
+    // voa atrÃ¡s e acima do herÃ³i, com folga elÃ¡stica
     const tx = player.x - player.facing * 58;
     const ty = player.gy - 6;
     this.x += (tx - this.x) * Math.min(1, dt * 3.5);
@@ -1122,25 +1122,25 @@ class Companion {
     this.echoCd -= dt;
     this.echoFlash = Math.max(0, this.echoFlash - dt);
     this.advanceFrames();
-    // comentários de papagaio estocástico
+    // comentÃ¡rios de papagaio estocÃ¡stico
     if (canTalk) {
       this.talkCd -= dt;
       if (this.talkCd <= 0) {
         this.talkCd = 10 + Math.random() * 8;
-        const falas = F('loro') || ['tokens! tokens!', 'isso foi gerado ou aconteceu?', 'contexto cheio! contexto cheio!',
-                       'AGI é logo ali! eu vi no meu treino!', '*repete o último prompt*', 'stochastic! stochastic!'];
-        spawnText(this.x - camX, this.gy - this.flyH - 30, '🦜 ' + falas[Math.floor(Math.random() * falas.length)], '#66ff88', 1);
+        const falas = TR('loro') || ['tokens! tokens!', 'isso foi gerado ou aconteceu?', 'contexto cheio! contexto cheio!',
+                       'AGI Ã© logo ali! eu vi no meu treino!', '*repete o Ãºltimo prompt*', 'stochastic! stochastic!'];
+        spawnText(this.x - camX, this.gy - this.flyH - 30, 'ðŸ¦œ ' + falas[Math.floor(Math.random() * falas.length)], '#66ff88', 1);
       }
     }
   }
-  // chance de repetir o golpe do herói — papagaio estocástico!
+  // chance de repetir o golpe do herÃ³i â€” papagaio estocÃ¡stico!
   onPlayerHit(target) {
     if (this.echoCd > 0 || target.dead || Math.random() > 0.22) return;
     this.echoCd = 3;
     this.echoFlash = 0.4;
-    const dmg = 1 + Math.floor(Math.random() * 20); // estocástico de verdade
+    const dmg = 1 + Math.floor(Math.random() * 20); // estocÃ¡stico de verdade
     target.takeHit(dmg, player.facing, false);
-    const eco = F('loroEcho') || ['🦜 alucinou! ({n})', '🦜 repetiu! ({n})', '🦜 REPETIU CRITADO! ({n})'];
+    const eco = TR('loroEcho') || ['ðŸ¦œ alucinou! ({n})', 'ðŸ¦œ repetiu! ({n})', 'ðŸ¦œ REPETIU CRITADO! ({n})'];
     const zoeira = fmt(dmg <= 3 ? eco[0] : dmg >= 16 ? eco[2] : eco[1], dmg);
     spawnText(target.screenX, target.screenY - 130, zoeira, '#66ff88', 1.1);
     beep(990, 0.06, 'triangle');
@@ -1167,14 +1167,14 @@ class Companion {
       ctx.restore();
     } else {
       ctx.font = '22px serif'; ctx.textAlign = 'center';
-      ctx.fillText('🦜', sx, sy);
+      ctx.fillText('ðŸ¦œ', sx, sy);
     }
   }
 }
 let companion = new Companion();
 
-// ---- SACI-BOT — companion terrestre (após a conquista dos Roboticistas) ----
-// Espelho do Loro: quando o herói ataca NO CHÃO, o Saci avança no inimigo mais próximo!
+// ---- SACI-BOT â€” companion terrestre (apÃ³s a conquista dos Roboticistas) ----
+// Espelho do Loro: quando o herÃ³i ataca NO CHÃƒO, o Saci avanÃ§a no inimigo mais prÃ³ximo!
 class SaciBot {
   constructor() {
     this.x = 0; this.gy = 460;
@@ -1198,7 +1198,7 @@ class SaciBot {
       const alvo = this.target;
       if (alvo.dead || alvo.removeMe) { this.target = null; }
       else {
-        // redemoinho: avança rasteiro no alvo
+        // redemoinho: avanÃ§a rasteiro no alvo
         const tdx = alvo.x - this.x, tdy = alvo.gy - this.gy;
         this.x += Math.sign(tdx) * Math.min(Math.abs(tdx), 560 * dt);
         this.gy += Math.sign(tdy) * Math.min(Math.abs(tdy), 380 * dt);
@@ -1207,14 +1207,14 @@ class SaciBot {
         if (Math.abs(tdx) < 44 && Math.abs(tdy) < 24) {
           const dmg = 2 + Math.floor(Math.random() * 4); // pancada: 2 a 5
           alvo.takeHit(dmg, this.facing, false);
-          spawnText(alvo.screenX, alvo.screenY - 90, fmt(F('saciHit') || '🌪 PANCADA! ({n})', dmg), '#ff5533', 1.1);
+          spawnText(alvo.screenX, alvo.screenY - 90, fmt(TR('saciHit') || 'ðŸŒª PANCADA! ({n})', dmg), '#ff5533', 1.1);
           this.hitFlash = 0.4;
           sfx.hit();
           this.target = null;
         }
       }
     } else {
-      // segue o herói pelo chão, do lado oposto ao Loro
+      // segue o herÃ³i pelo chÃ£o, do lado oposto ao Loro
       const tx = player.x - player.facing * 36;
       const ty = player.gy + 16;
       this.x += (tx - this.x) * Math.min(1, dt * 4);
@@ -1248,9 +1248,9 @@ class SaciBot {
     } else {
       // placeholder: redemoinho com gorro
       ctx.font = '24px serif'; ctx.textAlign = 'center';
-      ctx.fillText('🌪', sx, sy - 8 - Math.abs(Math.sin(time * 6)) * 5);
+      ctx.fillText('ðŸŒª', sx, sy - 8 - Math.abs(Math.sin(time * 6)) * 5);
       ctx.font = '10px serif';
-      ctx.fillText('🔴', sx, sy - 32 - Math.abs(Math.sin(time * 6)) * 5);
+      ctx.fillText('ðŸ”´', sx, sy - 32 - Math.abs(Math.sin(time * 6)) * 5);
     }
   }
 }
@@ -1271,7 +1271,7 @@ class Player extends Entity {
     this.combo = 0; this.comboTime = 0;
   }
   baseDmg() {
-    if (this.hero.chaos) return 1 + Math.floor(Math.random() * 20); // estocástico!
+    if (this.hero.chaos) return 1 + Math.floor(Math.random() * 20); // estocÃ¡stico!
     return this.hero.dmg + Math.floor(Math.random() * 4);
   }
   update() {
@@ -1280,7 +1280,7 @@ class Player extends Entity {
     this.comboTime -= dt;
     if (this.comboTime <= 0) this.combo = 0;
 
-    // pulo (física)
+    // pulo (fÃ­sica)
     if (this.jumpH > 0 || this.vy > 0) {
       this.jumpH += this.vy * dt;
       this.vy -= 900 * dt;
@@ -1290,7 +1290,7 @@ class Player extends Entity {
       }
     }
 
-    // ataque aéreo (mantém o momentum no ar)
+    // ataque aÃ©reo (mantÃ©m o momentum no ar)
     if (this.state === 'airattack') {
       let adx = 0, ady = 0;
       if (keys['arrowleft'] || keys['a']) adx = -1;
@@ -1310,14 +1310,14 @@ class Player extends Entity {
     }
 
     if (this.state === 'attack') {
-      // dá pra cancelar o golpe num PULO (e emendar voadora no ar!)
+      // dÃ¡ pra cancelar o golpe num PULO (e emendar voadora no ar!)
       if (keys['k'] && this.jumpH === 0) {
         this.vy = 380; this.jumpH = 0.001;
         this.setState('jump');
         beep(330, 0.08, 'triangle');
         return;
       }
-      // golpe andando: patina na direção segurada enquanto a animação roda
+      // golpe andando: patina na direÃ§Ã£o segurada enquanto a animaÃ§Ã£o roda
       let adx = 0, ady = 0;
       if (keys['arrowleft'] || keys['a']) adx = -1;
       if (keys['arrowright'] || keys['d']) adx = 1;
@@ -1343,8 +1343,8 @@ class Player extends Entity {
           e.takeHit(this.hero.specialDmg, this.facing, true);
           this.score += 50;
         }
-        projectiles = []; // o especial limpa os projéteis do ar!
-        popups = [];      // ...e fecha todos os pop-ups (sonho de qualquer usuário)
+        projectiles = []; // o especial limpa os projÃ©teis do ar!
+        popups = [];      // ...e fecha todos os pop-ups (sonho de qualquer usuÃ¡rio)
         const spTxt = (LTX().heroes && LTX().heroes[this.char]) || this.hero.specialText;
         spawnText(this.screenX, this.screenY - 130, spTxt, this.hero.specialColor, 1.4);
       }
@@ -1369,16 +1369,16 @@ class Player extends Entity {
     this.x = Math.max(camX + 40, Math.min(camX + W - 40, Math.min(this.x, currentPhase.stageLen - 40)));
     this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
 
-    // ações
+    // aÃ§Ãµes
     if (attackPressed) {
       attackPressed = false;
       this.attackHitDone = false;
       if (this.jumpH === 0) {
         this.setState('attack');
-        saci.attack(); // golpe no chão: o SACI-BOT avança junto!
+        saci.attack(); // golpe no chÃ£o: o SACI-BOT avanÃ§a junto!
       } else {
         this.setState('airattack'); beep(500, 0.06, 'triangle'); // voadora!
-        companion.diveAttack(); // e o Loro mergulha no inimigo mais próximo!
+        companion.diveAttack(); // e o Loro mergulha no inimigo mais prÃ³ximo!
       }
       return;
     }
@@ -1394,7 +1394,7 @@ class Player extends Entity {
     const moving = dx !== 0 || dy !== 0;
     if (moving && this.state !== 'walk') this.setState('walk');
     if (!moving && this.state !== 'idle') this.setState('idle');
-    // conta os frames do próprio asset (o hover do Loro tem 4, walk dos outros tem 6)
+    // conta os frames do prÃ³prio asset (o hover do Loro tem 4, walk dos outros tem 6)
     const animName = this.state === 'walk' ? this.hero.walk : this.hero.idle;
     const count = (getAnim(this.char, animName) || []).length || (this.state === 'walk' ? 6 : 4);
     this.advanceAnim(this.state === 'walk' ? 10 : 6, count);
@@ -1406,11 +1406,11 @@ class Player extends Entity {
       const inFront = (e.x - this.x) * this.facing > -10 && Math.abs(e.x - this.x) < range;
       const sameLane = Math.abs(e.gy - this.gy) < depth + 14;
       if (inFront && sameLane) {
-        // Dataeiros: crítico de "contexto local" (+15%)
+        // Dataeiros: crÃ­tico de "contexto local" (+15%)
         let finalDmg = conquests.dados ? Math.round(dmg * 1.15) : dmg;
         finalDmg = Math.max(1, Math.round(finalDmg * diffCfg().deal)); // dificuldade
         e.takeHit(finalDmg, this.facing, false);
-        // Chave de Itaipu: especial recarrega 2x mais rápido! ⚡
+        // Chave de Itaipu: especial recarrega 2x mais rÃ¡pido! âš¡
         this.special = Math.min(this.maxSpecial, this.special + (conquests.itaipu ? 18 : 9));
         this.combo++; this.comboTime = 1.2;
         this.score += 10 * this.combo;
@@ -1454,7 +1454,7 @@ class Lobista extends Entity {
     this.label = 'LOBISTA [gerando...]';
     this.colors = { body: '#556', head: '#e8c098', accent: '#111' };
     this.scoreValue = 100;
-    this.phase = Math.random() * 10; // fase fixa da animação placeholder (anti-tremedeira)
+    this.phase = Math.random() * 10; // fase fixa da animaÃ§Ã£o placeholder (anti-tremedeira)
   }
   update() {
     this.hitFlash = Math.max(0, this.hitFlash - dt);
@@ -1512,7 +1512,7 @@ class Lobista extends Entity {
     if (!this.dead) this.drawShadow();
     ctx.save();
     if (this.dead && !hasAnim(this.spriteKey, 'death')) ctx.globalAlpha = Math.max(0, 1 - (this.deadTimer || 0) * 1.6);
-    // sem animação de morte? desvanece usando o próprio sprite (ex: clones do herói)
+    // sem animaÃ§Ã£o de morte? desvanece usando o prÃ³prio sprite (ex: clones do herÃ³i)
     const action = this.dead
       ? (hasAnim(this.spriteKey, 'death') ? 'death' : 'walk')
       : (this.state === 'attack' ? 'attack' : 'walk');
@@ -1542,7 +1542,7 @@ class Advogado extends Lobista {
   }
 }
 
-// Robô Optimus: capanga em série da Gigafábrica (Fase 2)
+// RobÃ´ Optimus: capanga em sÃ©rie da GigafÃ¡brica (Fase 2)
 class OptimusBot extends Lobista {
   constructor(x, gy) {
     super(x, gy);
@@ -1557,7 +1557,7 @@ class OptimusBot extends Lobista {
   demitir() { // o Ilon corta custos NA LUTA
     if (this.dead) return;
     this.dead = true; this.frame = 0; this.frameTime = 0;
-    spawnText(this.screenX, this.screenY - 100, F('demitido') || '📉 DEMITIDO!', '#ff8866', 1.1);
+    spawnText(this.screenX, this.screenY - 100, TR('demitido') || 'ðŸ“‰ DEMITIDO!', '#ff8866', 1.1);
     sfx.enemyDie();
   }
 }
@@ -1576,7 +1576,7 @@ class GerenteProduto extends Lobista {
   }
 }
 
-// Crawler-aranha: peste bibliotecária da Fase 4
+// Crawler-aranha: peste bibliotecÃ¡ria da Fase 4
 class Crawler extends Lobista {
   constructor(x, gy) {
     super(x, gy);
@@ -1590,7 +1590,7 @@ class Crawler extends Lobista {
   }
 }
 
-// Clone Temu: o Deep-Zeek clona VOCÊ por 1/10 do preço (Fase 5)
+// Clone Temu: o Deep-Zeek clona VOCÃŠ por 1/10 do preÃ§o (Fase 5)
 class CloneTemu extends Lobista {
   constructor(x, gy) {
     super(x, gy);
@@ -1598,7 +1598,7 @@ class CloneTemu extends Lobista {
     this.speed = 140;
     this.dmg = 9;
     this.spriteKey = player.char; // usa o SEU sprite!
-    this.label = F('cloneTemuLabel') || 'VOCÊ (versão temu)';
+    this.label = TR('cloneTemuLabel') || 'VOCÃŠ (versÃ£o temu)';
     this.scoreValue = 180;
   }
   draw() {
@@ -1654,7 +1654,7 @@ class CloneAliado extends Entity {
     this.drawSprite(this.char, map[this.state] || 'idle', () => {});
     ctx.restore();
     ctx.font = '8px Courier New'; ctx.fillStyle = '#88ffcc'; ctx.textAlign = 'center';
-    ctx.fillText(F('cloneAllyLabel') || 'clone open-source', this.screenX, this.screenY - 100);
+    ctx.fillText(TR('cloneAllyLabel') || 'clone open-source', this.screenX, this.screenY - 100);
   }
 }
 
@@ -1688,7 +1688,7 @@ function updateDrawPopups() {
     ctx.restore();
   }
 }
-// cliques no canvas: fecha pop-ups no X e opera o dropdown de idioma do título
+// cliques no canvas: fecha pop-ups no X e opera o dropdown de idioma do tÃ­tulo
 let titleLangOpen = false;
 let titleLangBoxes = [];
 canvas.addEventListener('click', e => {
@@ -1714,7 +1714,7 @@ canvas.addEventListener('click', e => {
   }
 });
 
-// ---- Impactos (explosão de pop-ups do sprite do Samuca) ----
+// ---- Impactos (explosÃ£o de pop-ups do sprite do Samuca) ----
 let impacts = [];
 function addImpact(x, gy) { impacts.push({ x, gy, t: 0 }); }
 function updateDrawImpacts() {
@@ -1744,7 +1744,7 @@ class Drone extends Entity {
     this.speed = 120;
     this.attackCd = 1 + Math.random();
     this.flyH = 70;
-    this.phase = Math.random() * 10; // fase fixa da flutuação (senão treme ao se mover)
+    this.phase = Math.random() * 10; // fase fixa da flutuaÃ§Ã£o (senÃ£o treme ao se mover)
   }
   update() {
     this.hitFlash = Math.max(0, this.hitFlash - dt);
@@ -1804,7 +1804,7 @@ class Drone extends Entity {
   }
 }
 
-// ---- Mini-chefe Fase 0: O Estagiário Terceirizado ----
+// ---- Mini-chefe Fase 0: O EstagiÃ¡rio Terceirizado ----
 class Estagiario extends Lobista {
   constructor(x, gy) {
     super(x, gy);
@@ -1818,7 +1818,7 @@ class Estagiario extends Lobista {
     this.scoreValue = 800;
     this.isBoss = true;
     this.nameKey = 'estagiario';
-    this.bossName = '⚠ O ESTAGIÁRIO TERCEIRIZADO — "consultoria gringa" ⚠';
+    this.bossName = 'âš  O ESTAGIÃRIO TERCEIRIZADO â€” "consultoria gringa" âš ';
   }
   update() {
     if (!this.dead) {
@@ -1826,16 +1826,16 @@ class Estagiario extends Lobista {
       this.talkCd -= dt;
       if (this.talkCd <= 0) {
         this.talkCd = 4 + Math.random() * 3;
-        const falas = F('estagiario') || ['tô só cumprindo OKR!', 'isso não tava no escopo!', 'vou escalar pro meu gestor!', 'era pra ser só um estágio!'];
+        const falas = TR('estagiario') || ['tÃ´ sÃ³ cumprindo OKR!', 'isso nÃ£o tava no escopo!', 'vou escalar pro meu gestor!', 'era pra ser sÃ³ um estÃ¡gio!'];
         spawnText(this.screenX, this.screenY - 130, falas[Math.floor(Math.random() * falas.length)], '#aaddff', 1.1);
       }
-      // invocação com animação própria (levanta o tablet!)
+      // invocaÃ§Ã£o com animaÃ§Ã£o prÃ³pria (levanta o tablet!)
       if (this.state === 'summon') {
         this.hitFlash = Math.max(0, this.hitFlash - dt);
         const done = this.advanceAnim(9, hasAnim('estagiario', 'summon') ? 6 : 4, false);
         if (this.frame === 3 && !this.summonDone) {
           this.summonDone = true;
-          spawnText(this.screenX, this.screenY - 150, F('estagiarioSummon') || 'DRONES, FAZEM ALGUMA COISA!', '#ffaa55', 1.2);
+          spawnText(this.screenX, this.screenY - 150, TR('estagiarioSummon') || 'DRONES, FAZEM ALGUMA COISA!', '#ffaa55', 1.2);
           enemies.push(new Drone(this.x - 80, this.gy - 20));
           enemies.push(new Drone(this.x + 80, this.gy + 20));
         }
@@ -1866,14 +1866,14 @@ class Estagiario extends Lobista {
       : 'walk';
     this.drawSprite('estagiario', action, (sx, sy) => {
       drawPlaceholderHumanoid(sx, sy, { body: '#3a5a8a', head: '#e8c098', accent: '#ff8800', facing: this.facing, t: time, mul: 1.35 });
-      ctx.fillStyle = '#fff'; ctx.fillRect(sx - 8, sy - 76, 14, 9); // crachá
+      ctx.fillStyle = '#fff'; ctx.fillRect(sx - 8, sy - 76, 14, 9); // crachÃ¡
     });
     ctx.restore();
     if (!this.dead) drawBossBar(this);
   }
 }
 
-// ---- CHEFÃO Fase 1: DONALD TRUNFO ----
+// ---- CHEFÃƒO Fase 1: DONALD TRUNFO ----
 class Trunfo extends Entity {
   constructor(x, gy) {
     super(x, gy);
@@ -1882,10 +1882,10 @@ class Trunfo extends Entity {
     this.scaleMul = 1.45;
     this.isBoss = true;
     this.nameKey = 'trunfo';
-    this.bossName = '👑 DONALD TRUNFO — o maior entendedor de AGI do mundo (ele diz) 👑';
+    this.bossName = 'ðŸ‘‘ DONALD TRUNFO â€” o maior entendedor de AGI do mundo (ele diz) ðŸ‘‘';
     this.attackCd = 2;
     this.talkCd = 4;
-    this.rageLevel = 0; // sobe a cada 25% de vida perdida: MUDA DE OPINIÃO
+    this.rageLevel = 0; // sobe a cada 25% de vida perdida: MUDA DE OPINIÃƒO
     this.meleeCd = 0;
   }
   update() {
@@ -1895,16 +1895,16 @@ class Trunfo extends Entity {
       if (this.deadTimer > 1.2) this.removeMe = true;
       return;
     }
-    // mudança de opinião a cada 25% de vida
+    // mudanÃ§a de opiniÃ£o a cada 25% de vida
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      const flips = F('trunfoFlips') || [
-        'REGULAMENTAÇÃO É CRIME!',
-        'EU SEMPRE AMEI A REGULAMENTAÇÃO!',
-        'A AGI É MINHA! SEMPRE FOI!',
+      const flips = TR('trunfoFlips') || [
+        'REGULAMENTAÃ‡ÃƒO Ã‰ CRIME!',
+        'EU SEMPRE AMEI A REGULAMENTAÃ‡ÃƒO!',
+        'A AGI Ã‰ MINHA! SEMPRE FOI!',
       ];
-      const flipPrefix = F('trunfoFlipPrefix') || '💢 MUDEI DE OPINIÃO: ';
+      const flipPrefix = TR('trunfoFlipPrefix') || 'ðŸ’¢ MUDEI DE OPINIÃƒO: ';
       spawnText(this.screenX, this.screenY - 170, flipPrefix + flips[Math.min(this.rageLevel - 1, 2)], '#ff6644', 1.3);
       shake = 0.3; sfx.boss();
       this.attackCd = 0.8; // fica mais agressivo
@@ -1913,7 +1913,7 @@ class Trunfo extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('trunfo') || ['FAKE NEWS!', 'TARIFA NELES!', 'Ninguém sabe mais de AGI que eu!', 'Vou construir um MURO de firewall!', 'Isso é caça às bruxas!'];
+      const falas = TR('trunfo') || ['FAKE NEWS!', 'TARIFA NELES!', 'NinguÃ©m sabe mais de AGI que eu!', 'Vou construir um MURO de firewall!', 'Isso Ã© caÃ§a Ã s bruxas!'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#ffaa55', 1.1);
     }
 
@@ -1928,7 +1928,7 @@ class Trunfo extends Entity {
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
         sfx.throw();
-        const volley = 2 + this.rageLevel; // fica pior conforme muda de opinião
+        const volley = 2 + this.rageLevel; // fica pior conforme muda de opiniÃ£o
         for (let i = 0; i < volley; i++) {
           projectiles.push({
             x: this.x + this.facing * 30,
@@ -1939,13 +1939,13 @@ class Trunfo extends Entity {
             dmg: 7, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, F('canetada') || '✍ CANETADA!', '#ffd23f', 1.2);
+        spawnText(this.screenX, this.screenY - 130, TR('canetada') || 'âœ CANETADA!', '#ffd23f', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.6 - this.rageLevel * 0.4); }
       return;
     }
     if (this.state === 'swipe') {
-      // canetada corpo-a-corpo (a caneta é GRANDE)
+      // canetada corpo-a-corpo (a caneta Ã© GRANDE)
       const done = this.advanceAnim(12, hasAnim('trunfo', 'attack_rage') ? 6 : 4, false);
       if (this.frame === 2 && !this.hitDone) {
         this.hitDone = true;
@@ -1957,12 +1957,12 @@ class Trunfo extends Entity {
       return;
     }
     if (this.state === 'hurtstate') {
-      // cambaleia (boné torto!) depois de um golpe forte
+      // cambaleia (bonÃ© torto!) depois de um golpe forte
       if (this.advanceAnim(10, hasAnim('trunfo', 'hurt') ? 4 : 2, false)) this.setState('idle');
       return;
     }
 
-    // movimento: mantém distância média pra canetar
+    // movimento: mantÃ©m distÃ¢ncia mÃ©dia pra canetar
     const dist = Math.abs(dx);
     if (dist < 120 && this.meleeCd <= 0) {
       this.setState('swipe'); this.hitDone = false;
@@ -1978,7 +1978,7 @@ class Trunfo extends Entity {
     this.x = Math.max(camX + 60, Math.min(camX + W - 60, this.x));
     if (Math.abs(dy) > 10) this.gy += Math.sign(dy) * this.speed * 0.5 * dt;
     this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
-    // anda com pompa quando está longe da posição desejada
+    // anda com pompa quando estÃ¡ longe da posiÃ§Ã£o desejada
     if (Math.abs(dist - wantDist) > 40 && hasAnim('trunfo', 'walk')) {
       this.setStateIf('walk');
       this.advanceAnim(8, 6);
@@ -1990,7 +1990,7 @@ class Trunfo extends Entity {
   takeHit(dmg, dir, isSpecial) {
     this.hp -= dmg;
     this.hitFlash = 0.12;
-    this.x += dir * (isSpecial ? 24 : 6); // pesado: quase não recua
+    this.x += dir * (isSpecial ? 24 : 6); // pesado: quase nÃ£o recua
     spawnText(this.screenX, this.screenY - 150, `${dmg}`, '#ffd23f');
     if (this.hp <= 0 && !this.dead) {
       this.dead = true;
@@ -1999,7 +1999,7 @@ class Trunfo extends Entity {
       player.score += 2000;
       bossDefeated = true;
     } else if (isSpecial && !this.dead && this.state !== 'sign' && this.state !== 'swipe') {
-      this.setState('hurtstate'); // golpe especial faz até ele cambalear
+      this.setState('hurtstate'); // golpe especial faz atÃ© ele cambalear
     }
   }
   draw() {
@@ -2018,7 +2018,7 @@ class Trunfo extends Entity {
   }
 }
 
-// ---- CHEFÃO Fase 2: ILON MOSCA ----
+// ---- CHEFÃƒO Fase 2: ILON MOSCA ----
 class Ilon extends Entity {
   constructor(x, gy) {
     super(x, gy);
@@ -2027,7 +2027,7 @@ class Ilon extends Entity {
     this.scaleMul = 1.45;
     this.isBoss = true;
     this.nameKey = 'ilon';
-    this.bossName = '🚀 ILON MOSCA — CEO de 14 empresas e do seu futuro desemprego 🚀';
+    this.bossName = 'ðŸš€ ILON MOSCA â€” CEO de 14 empresas e do seu futuro desemprego ðŸš€';
     this.attackCd = 2.2;
     this.summonCd = 4;
     this.talkCd = 5;
@@ -2043,11 +2043,11 @@ class Ilon extends Entity {
       if (this.deadTimer > 1.2) this.removeMe = true;
       return;
     }
-    // corte de custos a cada 25% de vida: DEMITE os próprios robôs
+    // corte de custos a cada 25% de vida: DEMITE os prÃ³prios robÃ´s
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 170, F('ilonCorte') || '📉 CORTE DE CUSTOS! TODO MUNDO DEMITIDO!', '#ff6644', 1.3);
+      spawnText(this.screenX, this.screenY - 170, TR('ilonCorte') || 'ðŸ“‰ CORTE DE CUSTOS! TODO MUNDO DEMITIDO!', '#ff6644', 1.3);
       for (const e of enemies) if (e instanceof OptimusBot) e.demitir();
       shake = 0.3; sfx.boss();
       this.attackCd = 0.6;
@@ -2055,7 +2055,7 @@ class Ilon extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('ilon') || ['Trabalhe 80 horas ou saia!', 'Isso é só o protótipo do meu plano!', 'Vou tuitar sobre essa luta!', 'Renda básica pra você. O resto pra mim.', 'Comprei essa fase. Agora é minha.'];
+      const falas = TR('ilon') || ['Trabalhe 80 horas ou saia!', 'Isso Ã© sÃ³ o protÃ³tipo do meu plano!', 'Vou tuitar sobre essa luta!', 'Renda bÃ¡sica pra vocÃª. O resto pra mim.', 'Comprei essa fase. Agora Ã© minha.'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#88ddff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2080,7 +2080,7 @@ class Ilon extends Entity {
             dmg: 6, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, F('ilonTweet') || '📱 TUITADA!', '#88ddff', 1.2);
+        spawnText(this.screenX, this.screenY - 130, TR('ilonTweet') || 'ðŸ“± TUITADA!', '#88ddff', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.1, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2089,7 +2089,7 @@ class Ilon extends Entity {
       const done = this.advanceAnim(10, hasAnim('ilon', 'attack_command') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 150, F('ilonRobots') || 'ROBÔS: PRODUTIVIDADE MÁXIMA!', '#ffaa55', 1.2);
+        spawnText(this.screenX, this.screenY - 150, TR('ilonRobots') || 'ROBÃ”S: PRODUTIVIDADE MÃXIMA!', '#ffaa55', 1.2);
         enemies.push(new OptimusBot(camX + W + 80, this.gy - 30));
         enemies.push(new OptimusBot(camX - 80, this.gy + 20));
       }
@@ -2109,7 +2109,7 @@ class Ilon extends Entity {
       this.setState('tweet'); this.hitDone = false;
       return;
     }
-    // gosta de pairar mantendo distância (deixa os robôs apanharem por ele)
+    // gosta de pairar mantendo distÃ¢ncia (deixa os robÃ´s apanharem por ele)
     const wantDist = 280;
     const dist = Math.abs(dx);
     const dir = dist > wantDist ? Math.sign(dx) : -Math.sign(dx);
@@ -2154,7 +2154,7 @@ class Ilon extends Entity {
   }
 }
 
-// ---- CHEFÃO Fase 3: SAMUCA ALTÍSSIMO ----
+// ---- CHEFÃƒO Fase 3: SAMUCA ALTÃSSIMO ----
 const LANCAMENTOS = ['TURBO-4o-mini-max', 'AGI-quase-1', 'o1-mium PRO', 'Sorvete-Que-Some', 'Assinatura Ultra Plus+'];
 class Samuca extends Entity {
   constructor(x, gy) {
@@ -2164,7 +2164,7 @@ class Samuca extends Entity {
     this.scaleMul = 1.45;
     this.isBoss = true;
     this.nameKey = 'samuca';
-    this.bossName = '💸 SAMUCA ALTÍSSIMO — lucro máximo, fins lucrativos nenhum* 💸';
+    this.bossName = 'ðŸ’¸ SAMUCA ALTÃSSIMO â€” lucro mÃ¡ximo, fins lucrativos nenhum* ðŸ’¸';
     this.attackCd = 2;
     this.launchCd = 8;
     this.talkCd = 5;
@@ -2184,7 +2184,7 @@ class Samuca extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('samuca') || ['Feedback é bem-vindo!', 'Isso é uma experiência antecipada!', 'Assina aqui, aqui e aqui.', 'AGI ano que vem. Confia.', 'Sua derrota é beneficial for humanity*'];
+      const falas = TR('samuca') || ['Feedback Ã© bem-vindo!', 'Isso Ã© uma experiÃªncia antecipada!', 'Assina aqui, aqui e aqui.', 'AGI ano que vem. Confia.', 'Sua derrota Ã© beneficial for humanity*'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#aaffcc', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2210,7 +2210,7 @@ class Samuca extends Entity {
             dmg: 9, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 130, F('samucaBox') || '📦 PRODUTO NOVO!', '#aaffcc', 1.2);
+        spawnText(this.screenX, this.screenY - 130, TR('samucaBox') || 'ðŸ“¦ PRODUTO NOVO!', '#aaffcc', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2221,13 +2221,13 @@ class Samuca extends Entity {
         this.hitDone = true;
         // 30% de chance da demo FALHAR no palco
         if (Math.random() < 0.3) {
-          spawnText(this.screenX, this.screenY - 170, F('samucaFail') || '💥 A DEMO TRAVOU NA FRENTE DE TODO MUNDO!', '#ff6644', 1.3);
+          spawnText(this.screenX, this.screenY - 170, TR('samucaFail') || 'ðŸ’¥ A DEMO TRAVOU NA FRENTE DE TODO MUNDO!', '#ff6644', 1.3);
           this.stunned = 2.5;
           sfx.hurt();
         } else {
           const nome = LANCAMENTOS[Math.floor(Math.random() * LANCAMENTOS.length)];
-          spawnText(this.screenX, this.screenY - 170, fmt(F('samucaLaunch') || '🚀 LANÇAMENTO: {n}!', nome), '#ffd23f', 1.3);
-          const buffs = F('samucaBuffs') || ['+velocidade de entrega!', 'agora vem em DOBRO!', 'o hype CURA!'];
+          spawnText(this.screenX, this.screenY - 170, fmt(TR('samucaLaunch') || 'ðŸš€ LANÃ‡AMENTO: {n}!', nome), '#ffd23f', 1.3);
+          const buffs = TR('samucaBuffs') || ['+velocidade de entrega!', 'agora vem em DOBRO!', 'o hype CURA!'];
           const buff = Math.floor(Math.random() * 3);
           if (buff === 0) { this.speed += 20; spawnText(this.screenX, this.screenY - 140, buffs[0], '#aaffcc'); }
           if (buff === 1) { this.doubleBox = true; spawnText(this.screenX, this.screenY - 140, buffs[1], '#aaffcc'); }
@@ -2266,7 +2266,7 @@ class Samuca extends Entity {
     }
   }
   takeHit(dmg, dir, isSpecial) {
-    const bonus = this.stunned > 0 ? 1.5 : 1; // travado no palco = vulnerável!
+    const bonus = this.stunned > 0 ? 1.5 : 1; // travado no palco = vulnerÃ¡vel!
     const total = Math.round(dmg * bonus);
     this.hp -= total;
     this.hitFlash = 0.12;
@@ -2295,14 +2295,14 @@ class Samuca extends Entity {
       drawPlaceholderHumanoid(sx, sy, { body: '#888', head: '#e8c098', accent: '#aaffcc', label: 'SAMUCA', facing: this.facing, t: time, mul: 1.45 }));
     if (this.stunned > 0) {
       ctx.font = '18px serif'; ctx.textAlign = 'center';
-      ctx.fillText('💫', this.screenX, this.screenY - 150);
+      ctx.fillText('ðŸ’«', this.screenX, this.screenY - 150);
     }
     ctx.restore();
     if (!this.dead) drawBossBar(this);
   }
 }
 
-// ---- CHEFÃO Fase 4: DÁRIO AMÔ-DEI ----
+// ---- CHEFÃƒO Fase 4: DÃRIO AMÃ”-DEI ----
 class Dario extends Entity {
   constructor(x, gy) {
     super(x, gy);
@@ -2311,7 +2311,7 @@ class Dario extends Entity {
     this.scaleMul = 1.45;
     this.isBoss = true;
     this.nameKey = 'dario';
-    this.bossName = '😇 DÁRIO AMÔ-DEI — liberdade, segurança e os dados da sua mãe 😇';
+    this.bossName = 'ðŸ˜‡ DÃRIO AMÃ”-DEI â€” liberdade, seguranÃ§a e os dados da sua mÃ£e ðŸ˜‡';
     this.attackCd = 2.5;
     this.essayCd = 9;
     this.talkCd = 5;
@@ -2328,13 +2328,13 @@ class Dario extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 170, F('darioRage') || '😇 "Isso é pela segurança de TODOS."', '#ccccff', 1.2);
+      spawnText(this.screenX, this.screenY - 170, TR('darioRage') || 'ðŸ˜‡ "Isso Ã© pela seguranÃ§a de TODOS."', '#ccccff', 1.2);
       this.attackCd = 0.8;
     }
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('dario') || ['Seus dados já são meus.', 'Vou escrever 15 mil palavras sobre essa luta.', 'Minha mãe entendeu. Você vai entender.', 'É pra sua segurança. Confia.', 'Interessante... *anota tudo*'];
+      const falas = TR('dario') || ['Seus dados jÃ¡ sÃ£o meus.', 'Vou escrever 15 mil palavras sobre essa luta.', 'Minha mÃ£e entendeu. VocÃª vai entender.', 'Ã‰ pra sua seguranÃ§a. Confia.', 'Interessante... *anota tudo*'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#ccccff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2343,7 +2343,7 @@ class Dario extends Entity {
     this.essayCd -= dt;
 
     if (this.choked > 0) {
-      // engasgado com dado sintético: janela de ataque!
+      // engasgado com dado sintÃ©tico: janela de ataque!
       this.choked -= dt;
       this.setStateIf('hurtstate2');
       this.frame = 0;
@@ -2354,10 +2354,10 @@ class Dario extends Entity {
       this.vacuumT -= dt;
       this.advanceAnim(10, hasAnim('dario', 'attack_vacuum') ? 6 : 4, true);
       const range = 420;
-      // suga o herói
+      // suga o herÃ³i
       if (Math.abs(dx) < range && Math.abs(dy) < 60) {
         player.x += Math.sign(this.x - player.x) * 135 * dt;
-        player.special = Math.max(0, player.special - 10 * dt); // aspira até seu especial!
+        player.special = Math.max(0, player.special - 10 * dt); // aspira atÃ© seu especial!
         if (Math.abs(player.x - this.x) < 80 && !this.biteDone) {
           this.biteDone = true;
           player.takeHit(10, this.facing * -1);
@@ -2370,11 +2370,11 @@ class Dario extends Entity {
           if (Math.abs(d.x - this.x) < 40) {
             d.remove = true;
             this.hp = Math.min(this.maxHp, this.hp + 6);
-            spawnText(this.screenX, this.screenY - 130, F('darioNhac') || '*nhac* +6', '#ccccff');
+            spawnText(this.screenX, this.screenY - 130, TR('darioNhac') || '*nhac* +6', '#ccccff');
           }
         }
       }
-      // suga o LORO → engasga com dado sintético!
+      // suga o LORO â†’ engasga com dado sintÃ©tico!
       const ldx = this.x - companion.x;
       if (Math.abs(ldx) < range) {
         companion.x += Math.sign(ldx) * 220 * dt;
@@ -2383,8 +2383,8 @@ class Dario extends Entity {
           this.choked = 2.8;
           this.attackCd = 3;
           companion.x = player.x - 70; // Loro escapa cuspido
-          spawnText(this.screenX, this.screenY - 170, F('darioChoke') || '🤢 ENGASGOU COM DADO SINTÉTICO!', '#66ff88', 1.3);
-          spawnText(companion.x - camX, companion.gy - 130, F('loroChoke') || '🦜 me GEROU não, me ENGOLIU não!', '#66ff88', 1.1);
+          spawnText(this.screenX, this.screenY - 170, TR('darioChoke') || 'ðŸ¤¢ ENGASGOU COM DADO SINTÃ‰TICO!', '#66ff88', 1.3);
+          spawnText(companion.x - camX, companion.gy - 130, TR('loroChoke') || 'ðŸ¦œ me GEROU nÃ£o, me ENGOLIU nÃ£o!', '#66ff88', 1.1);
           sfx.hurt(); shake = 0.25;
           return;
         }
@@ -2396,14 +2396,14 @@ class Dario extends Entity {
       const done = this.advanceAnim(9, hasAnim('dario', 'attack_essay') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 170, F('darioEssay') || '📜 ENSAIO: "MÁQUINAS DA GRAÇA AMOROSA" (15.000 palavras)', '#ccccff', 1.2);
+        spawnText(this.screenX, this.screenY - 170, TR('darioEssay') || 'ðŸ“œ ENSAIO: "MÃQUINAS DA GRAÃ‡A AMOROSA" (15.000 palavras)', '#ccccff', 1.2);
         const n = 4 + this.rageLevel;
         for (let i = 0; i < n; i++) {
           projectiles.push({
             type: 'paragrafo',
             x: player.x + (Math.random() - 0.5) * 300,
             gy: Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, player.gy + (Math.random() - 0.5) * 100)),
-            h: 300 + i * 60, // caem em sequência
+            h: 300 + i * 60, // caem em sequÃªncia
             vx: 0, vy: 0, dmg: 8, t: 0,
           });
         }
@@ -2422,7 +2422,7 @@ class Dario extends Entity {
       this.setState('vacuum');
       this.vacuumT = 2.6 + this.rageLevel * 0.4;
       this.biteDone = false;
-      spawnText(this.screenX, this.screenY - 150, F('darioVacuum') || '🌀 MODO ASPIRADOR!', '#ccccff', 1.2);
+      spawnText(this.screenX, this.screenY - 150, TR('darioVacuum') || 'ðŸŒ€ MODO ASPIRADOR!', '#ccccff', 1.2);
       return;
     }
     const wantDist = 260;
@@ -2439,7 +2439,7 @@ class Dario extends Entity {
     }
   }
   takeHit(dmg, dir, isSpecial) {
-    const bonus = this.choked > 0 ? 1.5 : 1; // engasgado = vulnerável!
+    const bonus = this.choked > 0 ? 1.5 : 1; // engasgado = vulnerÃ¡vel!
     const total = Math.round(dmg * bonus);
     this.hp -= total;
     this.hitFlash = 0.12;
@@ -2465,13 +2465,13 @@ class Dario extends Entity {
                  : this.state === 'walk' && hasAnim('dario', 'walk') ? 'walk'
                  : 'idle';
     this.drawSprite('dario', action, (sx, sy) =>
-      drawPlaceholderHumanoid(sx, sy, { body: '#1d3a5a', head: '#e8c098', accent: '#ccccff', label: 'DÁRIO', facing: this.facing, t: time, mul: 1.45 }));
+      drawPlaceholderHumanoid(sx, sy, { body: '#1d3a5a', head: '#e8c098', accent: '#ccccff', label: 'DÃRIO', facing: this.facing, t: time, mul: 1.45 }));
     if (this.choked > 0) {
       ctx.font = '18px serif'; ctx.textAlign = 'center';
-      ctx.fillText('🤢', this.screenX, this.screenY - 150);
+      ctx.fillText('ðŸ¤¢', this.screenX, this.screenY - 150);
     }
     if (this.state === 'vacuum') {
-      // linhas de sucção
+      // linhas de sucÃ§Ã£o
       ctx.save();
       ctx.strokeStyle = '#ccccff55'; ctx.lineWidth = 2;
       for (let i = 0; i < 5; i++) {
@@ -2489,16 +2489,16 @@ class Dario extends Entity {
   }
 }
 
-// ---- CHEFÃO Fase 5: XI DEEP-ZEEK ----
+// ---- CHEFÃƒO Fase 5: XI DEEP-ZEEK ----
 class DeepZeek extends Entity {
   constructor(x, gy) {
     super(x, gy);
     this.hp = this.maxHp = 380;
     this.speed = 85;
-    this.scaleMul = 1.9; // dragão GRANDE
+    this.scaleMul = 1.9; // dragÃ£o GRANDE
     this.isBoss = true;
     this.nameKey = 'deepzeek';
-    this.bossName = '🐉 XI DEEP-ZEEK — treina por 1/10 do preço e não conta como 🐉';
+    this.bossName = 'ðŸ‰ XI DEEP-ZEEK â€” treina por 1/10 do preÃ§o e nÃ£o conta como ðŸ‰';
     this.attackCd = 2.2;
     this.cloneCd = 6;
     this.talkCd = 5;
@@ -2518,21 +2518,21 @@ class DeepZeek extends Entity {
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) this.rageLevel = lostQuarters;
 
-    // aos 50%: RELEASE OPEN-SOURCE — clones passam a lutar DO SEU LADO
+    // aos 50%: RELEASE OPEN-SOURCE â€” clones passam a lutar DO SEU LADO
     if (!this.openSourced && this.hp <= this.maxHp / 2) {
       this.openSourced = true;
-      spawnText(this.screenX, this.screenY - 200, F('deepzeekOpen') || '🐉 RELEASE OPEN-SOURCE! PESOS LIBERADOS!', '#88ffcc', 1.4);
+      spawnText(this.screenX, this.screenY - 200, TR('deepzeekOpen') || 'ðŸ‰ RELEASE OPEN-SOURCE! PESOS LIBERADOS!', '#88ffcc', 1.4);
       allies.push(new CloneAliado(this.x - 200, this.gy - 30));
       allies.push(new CloneAliado(this.x - 240, this.gy + 30));
       player.hp = Math.min(player.maxHp, player.hp + 15);
-      spawnText(player.screenX, player.screenY - 130, F('deepzeekHeal') || '+15 (pesos abertos curam a alma)', '#88ffcc');
+      spawnText(player.screenX, player.screenY - 130, TR('deepzeekHeal') || '+15 (pesos abertos curam a alma)', '#88ffcc');
       shake = 0.3; sfx.special();
     }
 
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('deepzeek') || ['Metade do orçamento. Dobro do resultado.', '*escaneia* — golpe catalogado.', 'Querem chá?', 'Seu itinerário eu já conhecia há 3 semanas.', 'Ineficiente. Mas corajoso.'];
+      const falas = TR('deepzeek') || ['Metade do orÃ§amento. Dobro do resultado.', '*escaneia* â€” golpe catalogado.', 'Querem chÃ¡?', 'Seu itinerÃ¡rio eu jÃ¡ conhecia hÃ¡ 3 semanas.', 'Ineficiente. Mas corajoso.'];
       spawnText(this.screenX, this.screenY - 180, falas[Math.floor(Math.random() * falas.length)], '#ff8888', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2544,7 +2544,7 @@ class DeepZeek extends Entity {
       const done = this.advanceAnim(9, hasAnim('deepzeek', 'attack_clone') ? 6 : 4, false);
       if (this.frame === 3 && !this.hitDone) {
         this.hitDone = true;
-        spawnText(this.screenX, this.screenY - 180, F('deepzeekClone') || '⚡ CLONADO. CUSTO: 1/10.', '#88ffcc', 1.2);
+        spawnText(this.screenX, this.screenY - 180, TR('deepzeekClone') || 'âš¡ CLONADO. CUSTO: 1/10.', '#88ffcc', 1.2);
         enemies.push(new CloneTemu(camX + W + 80, this.gy + (Math.random() - 0.5) * 60));
       }
       if (done) { this.setState('idle'); this.cloneCd = 8; }
@@ -2568,7 +2568,7 @@ class DeepZeek extends Entity {
             dmg: 5, t: 0,
           });
         }
-        spawnText(this.screenX, this.screenY - 170, F('deepzeekBreath') || '🔥 SOPRO BINÁRIO!', '#ff8888', 1.2);
+        spawnText(this.screenX, this.screenY - 170, TR('deepzeekBreath') || 'ðŸ”¥ SOPRO BINÃRIO!', '#ff8888', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1.2, 2.4 - this.rageLevel * 0.3); }
       return;
@@ -2602,7 +2602,7 @@ class DeepZeek extends Entity {
   takeHit(dmg, dir, isSpecial) {
     this.hp -= dmg;
     this.hitFlash = 0.12;
-    this.x += dir * (isSpecial ? 20 : 4); // dragão pesado
+    this.x += dir * (isSpecial ? 20 : 4); // dragÃ£o pesado
     spawnText(this.screenX, this.screenY - 180, `${dmg}`, '#ffd23f');
     if (this.hp <= 0 && !this.dead) {
       this.dead = true;
@@ -2625,14 +2625,14 @@ class DeepZeek extends Entity {
                  : 'idle';
     this.drawSprite('deepzeek', action, (sx, sy) => {
       ctx.font = '64px serif'; ctx.textAlign = 'center';
-      ctx.fillText('🐉', sx, sy - 40);
+      ctx.fillText('ðŸ‰', sx, sy - 40);
     });
     ctx.restore();
     if (!this.dead) drawBossBar(this);
   }
 }
 
-// ---- MINI-CHEFE da Ilha Formosa: O GÊMEO DE LITOGRAFIA ----
+// ---- MINI-CHEFE da Ilha Formosa: O GÃŠMEO DE LITOGRAFIA ----
 class Gemeo extends Entity {
   constructor(x, gy) {
     super(x, gy);
@@ -2641,7 +2641,7 @@ class Gemeo extends Entity {
     this.scaleMul = 1.35;
     this.isBoss = true;
     this.nameKey = 'gemeo';
-    this.bossName = '🔮 O GÊMEO DE LITOGRAFIA — precisão de 3 nanômetros, paciência de zero 🔮';
+    this.bossName = 'ðŸ”® O GÃŠMEO DE LITOGRAFIA â€” precisÃ£o de 3 nanÃ´metros, paciÃªncia de zero ðŸ”®';
     this.attackCd = 2;
     this.talkCd = 5;
     this.rageLevel = 0;
@@ -2654,11 +2654,11 @@ class Gemeo extends Entity {
       if (this.deadTimer > 1.2) this.removeMe = true;
       return;
     }
-    // holograma: a cada 25% de vida, teleporta pro outro lado do herói
+    // holograma: a cada 25% de vida, teleporta pro outro lado do herÃ³i
     const lostQuarters = Math.floor((1 - this.hp / this.maxHp) * 4);
     if (lostQuarters > this.rageLevel) {
       this.rageLevel = lostQuarters;
-      spawnText(this.screenX, this.screenY - 160, F('gemeoTele') || '✨ REALINHAMENTO ÓPTICO!', '#cc88ff', 1.3);
+      spawnText(this.screenX, this.screenY - 160, TR('gemeoTele') || 'âœ¨ REALINHAMENTO Ã“PTICO!', '#cc88ff', 1.3);
       this.x = player.x > camX + W / 2 ? camX + 120 : camX + W - 120;
       this.attackCd = 0.7;
       shake = 0.2; beep(1300, 0.15, 'sine');
@@ -2666,7 +2666,7 @@ class Gemeo extends Entity {
     this.talkCd -= dt;
     if (this.talkCd <= 0) {
       this.talkCd = 5 + Math.random() * 3;
-      const falas = F('gemeo') || ['DEDOS. OLEOSOS.', 'UM ESPIRRO DESALINHA TUDO.', 'PRECISÃO É AMOR.', 'VOCÊS TREMEM DEMAIS.'];
+      const falas = TR('gemeo') || ['DEDOS. OLEOSOS.', 'UM ESPIRRO DESALINHA TUDO.', 'PRECISÃƒO Ã‰ AMOR.', 'VOCÃŠS TREMEM DEMAIS.'];
       spawnText(this.screenX, this.screenY - 150, falas[Math.floor(Math.random() * falas.length)], '#cc88ff', 1.1);
     }
     const dx = player.x - this.x, dy = player.gy - this.gy;
@@ -2687,7 +2687,7 @@ class Gemeo extends Entity {
           vy: (player.gy - this.gy) * 0.5,
           dmg: 10, t: 0,
         });
-        spawnText(this.screenX, this.screenY - 130, F('gemeoBeam') || '💜 FEIXE UV!', '#cc88ff', 1.2);
+        spawnText(this.screenX, this.screenY - 130, TR('gemeoBeam') || 'ðŸ’œ FEIXE UV!', '#cc88ff', 1.2);
       }
       if (done) { this.setState('idle'); this.attackCd = Math.max(1, 2 - this.rageLevel * 0.25); }
       return;
@@ -2732,24 +2732,24 @@ class Gemeo extends Entity {
                  : 'idle';
     this.drawSprite('gemeo', action, (sx, sy) => {
       ctx.font = '52px serif'; ctx.textAlign = 'center';
-      ctx.fillText('🔮', sx, sy - 40);
+      ctx.fillText('ðŸ”®', sx, sy - 40);
     });
     ctx.restore();
     if (!this.dead) drawBossBar(this);
   }
 }
 
-// barra de chefe genérica no topo
+// barra de chefe genÃ©rica no topo
 function drawBossBar(boss) {
   if (gameState === 'bossdialog') return;
   ctx.fillStyle = '#000a'; ctx.fillRect(W / 2 - 220, 64, 440, 18);
   ctx.fillStyle = '#a30'; ctx.fillRect(W / 2 - 216, 67, 432 * (boss.hp / boss.maxHp), 12);
   ctx.font = '11px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'center';
-  const names = F('bossNames');
+  const names = TR('bossNames');
   ctx.fillText((names && names[boss.nameKey]) || boss.bossName, W / 2, 60);
 }
 
-// ---- Fundo procedural: São Paulo (fallback) ----
+// ---- Fundo procedural: SÃ£o Paulo (fallback) ----
 const bgBuildings = [];
 (function genBuildings() {
   let x = 0;
@@ -2813,36 +2813,36 @@ function drawBackground() {
 const PHASES = [
   {
     id: 0,
-    title: 'FASE 0 — O CHAMADO',
-    place: 'São Paulo, Brasil 🇧🇷',
+    title: 'FASE 0 â€” O CHAMADO',
+    place: 'SÃ£o Paulo, Brasil ðŸ‡§ðŸ‡·',
     bg: 'saopaulo',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Mais um vídeo no ar... "Será que a AGI vem em 2027?" Os membros vão amar.'],
-      ['???', '*CRASH!* — drones invadem o estúdio pela janela!'],
-      ['BOB', 'A GPU!! Levaram a GPU com o checkpoint do CURUPIRA-beta!! O LLM que a comunidade INTEIRA tá treinando!'],
-      ['LORO', 'roubaram os pesos! roubaram os pesos! *sons de papagaio em pânico*'],
+      ['BOB', 'Mais um vÃ­deo no ar... "SerÃ¡ que a AGI vem em 2027?" Os membros vÃ£o amar.'],
+      ['???', '*CRASH!* â€” drones invadem o estÃºdio pela janela!'],
+      ['BOB', 'A GPU!! Levaram a GPU com o checkpoint do CURUPIRA-beta!! O LLM que a comunidade INTEIRA tÃ¡ treinando!'],
+      ['LORO', 'roubaram os pesos! roubaram os pesos! *sons de papagaio em pÃ¢nico*'],
       ['BOB', 'Calma, Loro. Respira. ...Eles querem matar a nossa AGI antes dela nascer.'],
-      ['BOB', 'Grande erro. Ninguém mexe com a comunidade MIL GRAU.'],
-      ['BOB', '*pega o Prompt Mágico* — Hora de engenheirar uns prompts na mão dura.'],
+      ['BOB', 'Grande erro. NinguÃ©m mexe com a comunidade MIL GRAU.'],
+      ['BOB', '*pega o Prompt MÃ¡gico* â€” Hora de engenheirar uns prompts na mÃ£o dura.'],
     ],
     bossDialog: [
-      ['???', 'PARADO AÍ, INFLUENCERZINHO DE IA!'],
-      ['BOB', 'Quem é você?! E... por que esse crachá tem o logo de TRÊS consultorias ao mesmo tempo?'],
-      ['ESTAGIÁRIO', 'Sou o ESTAGIÁRIO TERCEIRIZADO! Braço armado das Big Techs! A contratação mais barata do trimestre!'],
-      ['ESTAGIÁRIO', 'Me mandaram exfiltrar seus pesos. Não é pessoal, Bob... é OKR.'],
-      ['BOB', 'Você tá roubando a AGI de uma comunidade INTEIRA... por uma bolsa-auxílio?'],
-      ['ESTAGIÁRIO', 'Eles prometeram EFETIVAÇÃO!! *aperta o botão de chamar drones*'],
-      ['LORO', 'efetivação! efetivação! KKKKK *risada de papagaio*'],
+      ['???', 'PARADO AÃ, INFLUENCERZINHO DE IA!'],
+      ['BOB', 'Quem Ã© vocÃª?! E... por que esse crachÃ¡ tem o logo de TRÃŠS consultorias ao mesmo tempo?'],
+      ['ESTAGIÃRIO', 'Sou o ESTAGIÃRIO TERCEIRIZADO! BraÃ§o armado das Big Techs! A contrataÃ§Ã£o mais barata do trimestre!'],
+      ['ESTAGIÃRIO', 'Me mandaram exfiltrar seus pesos. NÃ£o Ã© pessoal, Bob... Ã© OKR.'],
+      ['BOB', 'VocÃª tÃ¡ roubando a AGI de uma comunidade INTEIRA... por uma bolsa-auxÃ­lio?'],
+      ['ESTAGIÃRIO', 'Eles prometeram EFETIVAÃ‡ÃƒO!! *aperta o botÃ£o de chamar drones*'],
+      ['LORO', 'efetivaÃ§Ã£o! efetivaÃ§Ã£o! KKKKK *risada de papagaio*'],
     ],
     victory: [
-      ['ESTAGIÁRIO', 'Ai... pega lá sua GPU... eu nem consegui o acesso ao checkpoint mesmo...'],
+      ['ESTAGIÃRIO', 'Ai... pega lÃ¡ sua GPU... eu nem consegui o acesso ao checkpoint mesmo...'],
       ['BOB', 'OKR de quem? QUEM te mandou?!'],
-      ['ESTAGIÁRIO', 'N-não posso falar... assinei NDA... mas pergunta pro SEU modelo. Eles têm MEDO do que ele já aprendeu.'],
-      ['BOB', '*pluga a GPU e roda o CURUPIRA-beta* — Ele... desenhou um MAPA. Cinco fragmentos. Espalhados pelo mundo.'],
-      ['BOB', 'O caminho da AGI Sagrada não tava num arquivo. Tava NOS PESOS. E se depender de mim... ela vai falar PORTUGUÊS.'],
-      ['SISTEMA', '🎓 CONQUISTA: Guilda Prof. Milgrau — checkpoint do CURUPIRA-beta recuperado! O treino da comunidade continua!'],
-      ['SISTEMA', 'Primeiro fragmento localizado: ⚡ A CHAVE DE ITAIPU. Confiscada por decreto em... Washington, D.C.'],
+      ['ESTAGIÃRIO', 'N-nÃ£o posso falar... assinei NDA... mas pergunta pro SEU modelo. Eles tÃªm MEDO do que ele jÃ¡ aprendeu.'],
+      ['BOB', '*pluga a GPU e roda o CURUPIRA-beta* â€” Ele... desenhou um MAPA. Cinco fragmentos. Espalhados pelo mundo.'],
+      ['BOB', 'O caminho da AGI Sagrada nÃ£o tava num arquivo. Tava NOS PESOS. E se depender de mim... ela vai falar PORTUGUÃŠS.'],
+      ['SISTEMA', 'ðŸŽ“ CONQUISTA: Guilda Prof. Milgrau â€” checkpoint do CURUPIRA-beta recuperado! O treino da comunidade continua!'],
+      ['SISTEMA', 'Primeiro fragmento localizado: âš¡ A CHAVE DE ITAIPU. Confiscada por decreto em... Washington, D.C.'],
     ],
     onVictory: () => { conquests.checkpoint = true; },
     makeWaves: () => [
@@ -2854,35 +2854,35 @@ const PHASES = [
   },
   {
     id: 1,
-    title: 'FASE 1 — A CANETADA',
-    place: 'Washington, D.C. 🖋️',
+    title: 'FASE 1 â€” A CANETADA',
+    place: 'Washington, D.C. ðŸ–‹ï¸',
     bg: 'washington',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Washington, D.C. O CURUPIRA-beta rastreou a Chave de Itaipu até... um salão oval folheado a OURO?'],
+      ['BOB', 'Washington, D.C. O CURUPIRA-beta rastreou a Chave de Itaipu atÃ©... um salÃ£o oval folheado a OURO?'],
       ['LORO', 'brilha! brilha! *hipnotizado pelo dourado*'],
-      ['BOB', 'Foco, Loro. Até o tapete tem uma águia segurando um CHIP. A sutileza mora aqui.'],
-      ['BOB', 'A Chave de Itaipu foi confiscada numa canetada. "Tarifa de importação de elétrons", disseram.'],
-      ['???', '*alto-falantes* — ALARME! COMUNISTAS DA REGULAMENTAÇÃO detectados no perímetro!'],
-      ['BOB', 'É hoje que a energia limpa volta pro povo. SEGURA O LOBBY!'],
+      ['BOB', 'Foco, Loro. AtÃ© o tapete tem uma Ã¡guia segurando um CHIP. A sutileza mora aqui.'],
+      ['BOB', 'A Chave de Itaipu foi confiscada numa canetada. "Tarifa de importaÃ§Ã£o de elÃ©trons", disseram.'],
+      ['???', '*alto-falantes* â€” ALARME! COMUNISTAS DA REGULAMENTAÃ‡ÃƒO detectados no perÃ­metro!'],
+      ['BOB', 'Ã‰ hoje que a energia limpa volta pro povo. SEGURA O LOBBY!'],
     ],
     bossDialog: [
-      ['TRUNFO', 'Você deve ser o tal do Bob. FAKE NEWS! Eu sou o maior entendedor de AGI do mundo. Todo mundo diz isso.'],
-      ['TRUNFO', 'Gente grande, gente séria, vem a mim CHORANDO: "Senhor, nos ensine a inteligência artificial".'],
-      ['BOB', 'Devolve a Chave de Itaipu, Trunfo. Energia limpa não se confisca com canetada.'],
+      ['TRUNFO', 'VocÃª deve ser o tal do Bob. FAKE NEWS! Eu sou o maior entendedor de AGI do mundo. Todo mundo diz isso.'],
+      ['TRUNFO', 'Gente grande, gente sÃ©ria, vem a mim CHORANDO: "Senhor, nos ensine a inteligÃªncia artificial".'],
+      ['BOB', 'Devolve a Chave de Itaipu, Trunfo. Energia limpa nÃ£o se confisca com canetada.'],
       ['TRUNFO', 'Itaipu? ADOREI aquela represa. Enorme. Tremenda. Quase do tamanho do meu ego. Agora tem TARIFA!'],
-      ['TRUNFO', 'E anota aí: regulamentação é CRIME! ...exceto a MINHA regulamentação, que é PERFEITA.'],
-      ['LORO', 'flip-flop! flip-flop! *voa em círculos*'],
+      ['TRUNFO', 'E anota aÃ­: regulamentaÃ§Ã£o Ã© CRIME! ...exceto a MINHA regulamentaÃ§Ã£o, que Ã© PERFEITA.'],
+      ['LORO', 'flip-flop! flip-flop! *voa em cÃ­rculos*'],
       ['TRUNFO', 'CHEGA! Vou resolver isso do jeito que resolvo tudo: NA CANETADA!'],
     ],
     victory: [
-      ['TRUNFO', 'IMPOSSÍVEL! Eu NUNCA perco! Isso foi fraude... FRAUDE DE GAMEPLAY! Exijo recontagem dos hit points!'],
-      ['BOB', 'A contagem tá certa, Trunfo. Zero. Igual sua noção de energia renovável.'],
-      ['BOB', '*pega a Chave de Itaipu* — De volta pro povo. 14 gigawatts de treino limpo pro CURUPIRA.'],
-      ['SISTEMA', '⚡ CONQUISTA: Guilda Guardiões da Matriz — CHAVE DE ITAIPU recuperada! Especial recarrega 2x mais rápido!'],
-      ['SISTEMA', '⚖ Contraexemplo nº 1 coletado (Guilda Ordem & Progresso): "não decidir o futuro da IA por birra".'],
-      ['BOB', 'Peça 2 do plano: ENERGIA ✔. Mas GPU não roda de brisa: treinar uma AGI custa uma FORTUNA. Precisamos de grana.'],
-      ['BOB', 'E adivinha quem tem grana infinita e adora uma aposta? Texas. Bora provocar um bilionário.'],
+      ['TRUNFO', 'IMPOSSÃVEL! Eu NUNCA perco! Isso foi fraude... FRAUDE DE GAMEPLAY! Exijo recontagem dos hit points!'],
+      ['BOB', 'A contagem tÃ¡ certa, Trunfo. Zero. Igual sua noÃ§Ã£o de energia renovÃ¡vel.'],
+      ['BOB', '*pega a Chave de Itaipu* â€” De volta pro povo. 14 gigawatts de treino limpo pro CURUPIRA.'],
+      ['SISTEMA', 'âš¡ CONQUISTA: Guilda GuardiÃµes da Matriz â€” CHAVE DE ITAIPU recuperada! Especial recarrega 2x mais rÃ¡pido!'],
+      ['SISTEMA', 'âš– Contraexemplo nÂº 1 coletado (Guilda Ordem & Progresso): "nÃ£o decidir o futuro da IA por birra".'],
+      ['BOB', 'PeÃ§a 2 do plano: ENERGIA âœ”. Mas GPU nÃ£o roda de brisa: treinar uma AGI custa uma FORTUNA. Precisamos de grana.'],
+      ['BOB', 'E adivinha quem tem grana infinita e adora uma aposta? Texas. Bora provocar um bilionÃ¡rio.'],
     ],
     onVictory: () => { conquests.itaipu = true; },
     makeWaves: () => [
@@ -2894,37 +2894,37 @@ const PHASES = [
   },
   {
     id: 2,
-    title: 'FASE 2 — O EXÉRCITO DE LATA',
-    place: 'Gigafábrica, Texas 🤖',
+    title: 'FASE 2 â€” O EXÃ‰RCITO DE LATA',
+    place: 'GigafÃ¡brica, Texas ðŸ¤–',
     bg: 'fabrica',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Texas. A gigafábrica. O CURUPIRA rastreou o Fragmento das GPUs até aqui... junto com 10 mil robôs.'],
-      ['LORO', 'optimus! optimus! *imita robozinho de fábrica*'],
+      ['BOB', 'Texas. A gigafÃ¡brica. O CURUPIRA rastreou o Fragmento das GPUs atÃ© aqui... junto com 10 mil robÃ´s.'],
+      ['LORO', 'optimus! optimus! *imita robozinho de fÃ¡brica*'],
       ['BOB', 'Olha o letreiro: "TRABALHE 80 HORAS OU SAIA". O RH daqui deve ser uma britadeira.'],
-      ['BOB', 'O plano dele é simples: desempregar geral, pagar renda básica... e ficar com o resto. O resto = TUDO.'],
-      ['???', '*megafone* — ATENÇÃO: intrusos orgânicos detectados. Produtividade deles: LAMENTÁVEL.'],
-      ['BOB', 'Lamentável é roubar GPU de comunidade. BORA!'],
+      ['BOB', 'O plano dele Ã© simples: desempregar geral, pagar renda bÃ¡sica... e ficar com o resto. O resto = TUDO.'],
+      ['???', '*megafone* â€” ATENÃ‡ÃƒO: intrusos orgÃ¢nicos detectados. Produtividade deles: LAMENTÃVEL.'],
+      ['BOB', 'LamentÃ¡vel Ã© roubar GPU de comunidade. BORA!'],
     ],
     bossDialog: [
-      ['ILON', 'Bob! Grande fã do canal. Sério. Eu ia comprar ele semana passada, mas acabei comprando um país.'],
+      ['ILON', 'Bob! Grande fÃ£ do canal. SÃ©rio. Eu ia comprar ele semana passada, mas acabei comprando um paÃ­s.'],
       ['BOB', 'Devolve as GPUs, Ilon. A comunidade precisa delas pro CURUPIRA treinar.'],
-      ['ILON', 'GPUs? Estão treinando meu EXÉRCITO. Quando eu vencer, você ganha renda básica. Sem emprego, mas com renda. É matematicamente ótimo. De nada.'],
-      ['BOB', 'Então aposta comigo, apostador. Se EU vencer... você FINANCIA o nosso laboratório. Tudo. Assinado.'],
+      ['ILON', 'GPUs? EstÃ£o treinando meu EXÃ‰RCITO. Quando eu vencer, vocÃª ganha renda bÃ¡sica. Sem emprego, mas com renda. Ã‰ matematicamente Ã³timo. De nada.'],
+      ['BOB', 'EntÃ£o aposta comigo, apostador. Se EU vencer... vocÃª FINANCIA o nosso laboratÃ³rio. Tudo. Assinado.'],
       ['ILON', 'HAHAHA! ADORO! Aposto qualquer coisa, nunca perco. Fechado! Testemunhado pela live e pelos meus 14 advogados.'],
-      ['LORO', 'tá gravado! tá gravado! *tira print com a asa*'],
-      ['ILON', 'E de aquecimento, uma demonstração AO VIVO do Optimus. Eles quase nunca caem sozinhos. ROBÔS: ATACAR!'],
+      ['LORO', 'tÃ¡ gravado! tÃ¡ gravado! *tira print com a asa*'],
+      ['ILON', 'E de aquecimento, uma demonstraÃ§Ã£o AO VIVO do Optimus. Eles quase nunca caem sozinhos. ROBÃ”S: ATACAR!'],
     ],
     victory: [
-      ['ILON', 'Eu... perdi? EU PERDI?! Isso nunca aconteceu. Bem... uma aposta é uma aposta. *assina o cheque chorando em ASCII*'],
-      ['BOB', 'PATROCÍNIO GARANTIDO! E olha: ele fez questão de 1% do projeto. Sem direito a voto. Pra tristeza dele.'],
-      ['SISTEMA', '💰 CONQUISTA: INVESTIMENTO! O Ilon agora financia o Labs IMG (e tuíta que a ideia foi dele).'],
-      ['SISTEMA', '🤖 BÔNUS: Guilda dos Roboticistas montou o SACI-BOT com os blueprints do Optimus! Ele luta JUNTO: quando você bate no chão, ele avança no inimigo mais próximo!'],
-      ['SISTEMA', '⚖ Contraexemplo nº 2: "não demita quem te carrega".'],
-      ['BOB', 'Peça 3: GRANA ✔. Agora falta GENTE que saiba treinar modelo. E soube que o Vale do Silício anda demitindo os melhores...'],
+      ['ILON', 'Eu... perdi? EU PERDI?! Isso nunca aconteceu. Bem... uma aposta Ã© uma aposta. *assina o cheque chorando em ASCII*'],
+      ['BOB', 'PATROCÃNIO GARANTIDO! E olha: ele fez questÃ£o de 1% do projeto. Sem direito a voto. Pra tristeza dele.'],
+      ['SISTEMA', 'ðŸ’° CONQUISTA: INVESTIMENTO! O Ilon agora financia o Labs IMG (e tuÃ­ta que a ideia foi dele).'],
+      ['SISTEMA', 'ðŸ¤– BÃ”NUS: Guilda dos Roboticistas montou o SACI-BOT com os blueprints do Optimus! Ele luta JUNTO: quando vocÃª bate no chÃ£o, ele avanÃ§a no inimigo mais prÃ³ximo!'],
+      ['SISTEMA', 'âš– Contraexemplo nÂº 2: "nÃ£o demita quem te carrega".'],
+      ['BOB', 'PeÃ§a 3: GRANA âœ”. Agora falta GENTE que saiba treinar modelo. E soube que o Vale do SilÃ­cio anda demitindo os melhores...'],
     ],
     onVictory: () => { conquests.blueprints = true; conquests.investimento = true; },
-    coin: { x: 1980, gy: 500 }, // 🔘 moeda de silício escondida no fim da esteira
+    coin: { x: 1980, gy: 500 }, // ðŸ”˜ moeda de silÃ­cio escondida no fim da esteira
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new OptimusBot(640, 430), new OptimusBot(700, 470), new OptimusBot(760, 500)] },
       { camLock: 900,  spawned: false, make: () => [new OptimusBot(1540, 440), new OptimusBot(1600, 480), new Drone(1480, 430), new Drone(1660, 460)] },
@@ -2934,38 +2934,38 @@ const PHASES = [
   },
   {
     id: 3,
-    title: 'FASE 3 — O TEMPLO DO LUCRO SEM FINS LUCRATIVOS',
-    place: 'Vale do Silício 💸',
+    title: 'FASE 3 â€” O TEMPLO DO LUCRO SEM FINS LUCRATIVOS',
+    place: 'Vale do SilÃ­cio ðŸ’¸',
     bg: 'vale',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Vale do Silício. O campus onde "sem fins lucrativos" é o nome do iate.'],
+      ['BOB', 'Vale do SilÃ­cio. O campus onde "sem fins lucrativos" Ã© o nome do iate.'],
       ['LORO', 'asterisco! asterisco! *aponta pra parede com a asa*'],
-      ['BOB', 'É... "beneficial for humanity*". O asterisco leva pra 400 páginas de letra miúda no chão.'],
-      ['BOB', 'Missão dupla: pegar o Segredo do Scaling no cofre... e RECRUTAR. O Samuca demitiu metade dos pesquisadores por "eficiência operacional". Eles tão ali fora, com caixa de papelão e crachá cortado.'],
-      ['BOB', 'Cuidado com os PMs: atacam com roadmap e prometem entregar na Q4. NUNCA é na Q4.'],
-      ['???', '*recepção* — Bem-vindos! Assinem o NDA da entrada. E o termo de imagem. E a cláusula 47-B.'],
-      ['BOB', 'A gente NÃO vai assinar nada. Vamos, gente!'],
+      ['BOB', 'Ã‰... "beneficial for humanity*". O asterisco leva pra 400 pÃ¡ginas de letra miÃºda no chÃ£o.'],
+      ['BOB', 'MissÃ£o dupla: pegar o Segredo do Scaling no cofre... e RECRUTAR. O Samuca demitiu metade dos pesquisadores por "eficiÃªncia operacional". Eles tÃ£o ali fora, com caixa de papelÃ£o e crachÃ¡ cortado.'],
+      ['BOB', 'Cuidado com os PMs: atacam com roadmap e prometem entregar na Q4. NUNCA Ã© na Q4.'],
+      ['???', '*recepÃ§Ã£o* â€” Bem-vindos! Assinem o NDA da entrada. E o termo de imagem. E a clÃ¡usula 47-B.'],
+      ['BOB', 'A gente NÃƒO vai assinar nada. Vamos, gente!'],
     ],
     bossDialog: [
-      ['SAMUCA', 'Bob! Que honra. ADORO creators. Aliás: parceria de lançamento? Assina aqui, aqui e aqui.'],
+      ['SAMUCA', 'Bob! Que honra. ADORO creators. AliÃ¡s: parceria de lanÃ§amento? Assina aqui, aqui e aqui.'],
       ['BOB', 'Vim pelo Segredo do Scaling, Samuca. O que era da humanidade volta pra humanidade.'],
-      ['SAMUCA', '"Humanidade" é marca registrada nossa, cuidado com o processo. E o Segredo virou produto: beta fechado. Pra sempre.'],
+      ['SAMUCA', '"Humanidade" Ã© marca registrada nossa, cuidado com o processo. E o Segredo virou produto: beta fechado. Pra sempre.'],
       ['LORO', 'beta eterno! beta eterno!'],
-      ['SAMUCA', 'Isso não vai ser uma luta. Vai ser uma EXPERIÊNCIA ANTECIPADA DE COMBATE. Feedback é bem-vindo!'],
+      ['SAMUCA', 'Isso nÃ£o vai ser uma luta. Vai ser uma EXPERIÃŠNCIA ANTECIPADA DE COMBATE. Feedback Ã© bem-vindo!'],
     ],
     victory: [
       ['SAMUCA', 'Interessante... vou chamar essa derrota de "aprendizado". A gente pivota semana que vem.'],
-      ['BOB', '*abre o cofre* — O Segredo do Scaling é... "mais dados e mais GPU"?! SÓ ISSO?! A gente achava que era MAGIA!'],
-      ['???', '*do lado de fora* — Ei... vocês são do Labs IMG? A gente viu a luta. TODOS NÓS vimos a luta.'],
-      ['BOB', 'Os pesquisadores demitidos! Gente... quer treinar uma AGI que fala português? Tem churrasco toda sexta.'],
-      ['SISTEMA', '🧑‍🔬 CONQUISTA: PESQUISADORES! O êxodo do Vale topou na hora: "qualquer lugar com estabilidade e churrasco".'],
-      ['SISTEMA', '💰 BÔNUS: Guilda dos SaaSseiros levou o Playbook do Produto! Itens de cura aparecem 2x mais!'],
-      ['SISTEMA', '⚖ Contraexemplo nº 3: "não chame produto de milagre".'],
-      ['BOB', 'Peça 4: GENTE ✔. Mas modelo brasileiro sem dado brasileiro é papagaio de sotaque estranho. Falta o acervo... e eu sei quem aspirou TUDO.'],
+      ['BOB', '*abre o cofre* â€” O Segredo do Scaling Ã©... "mais dados e mais GPU"?! SÃ“ ISSO?! A gente achava que era MAGIA!'],
+      ['???', '*do lado de fora* â€” Ei... vocÃªs sÃ£o do Labs IMG? A gente viu a luta. TODOS NÃ“S vimos a luta.'],
+      ['BOB', 'Os pesquisadores demitidos! Gente... quer treinar uma AGI que fala portuguÃªs? Tem churrasco toda sexta.'],
+      ['SISTEMA', 'ðŸ§‘â€ðŸ”¬ CONQUISTA: PESQUISADORES! O Ãªxodo do Vale topou na hora: "qualquer lugar com estabilidade e churrasco".'],
+      ['SISTEMA', 'ðŸ’° BÃ”NUS: Guilda dos SaaSseiros levou o Playbook do Produto! Itens de cura aparecem 2x mais!'],
+      ['SISTEMA', 'âš– Contraexemplo nÂº 3: "nÃ£o chame produto de milagre".'],
+      ['BOB', 'PeÃ§a 4: GENTE âœ”. Mas modelo brasileiro sem dado brasileiro Ã© papagaio de sotaque estranho. Falta o acervo... e eu sei quem aspirou TUDO.'],
     ],
     onVictory: () => { conquests.playbook = true; conquests.pesquisadores = true; },
-    coin: { x: 1180, gy: 410 }, // 🔘 atrás dos puffs coloridos
+    coin: { x: 1180, gy: 410 }, // ðŸ”˜ atrÃ¡s dos puffs coloridos
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new GerenteProduto(640, 430), new GerenteProduto(710, 480)] },
       { camLock: 900,  spawned: false, make: () => [new GerenteProduto(1540, 440), new Lobista(1600, 480), new Drone(1480, 430)] },
@@ -2975,33 +2975,33 @@ const PHASES = [
   },
   {
     id: 4,
-    title: 'FASE 4 — A BIBLIOTECA INFINITA',
-    place: 'Templo-datacenter secreto 📚',
+    title: 'FASE 4 â€” A BIBLIOTECA INFINITA',
+    place: 'Templo-datacenter secreto ðŸ“š',
     bg: 'biblioteca',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Uma biblioteca-catedral no meio do nada. Estantes de GPU até o teto. Monges de capuz servindo... servidores.'],
-      ['LORO', '*arrepiado* — tô sentindo cheiro de crawler. CHEIRO DE CRAWLER!'],
-      ['BOB', 'O Fragmento dos Dados tá no altar central. Junto com tudo que já foi postado na internet. INCLUSIVE as fotos da mãe dele.'],
-      ['BOB', 'Dizem que é o mais gentil dos chefões. Também dizem que gentileza não apaga histórico de scraping.'],
-      ['???', '*eco na catedral* — Bem-vindos à Biblioteca. Seus dados de visita... já foram catalogados.'],
+      ['BOB', 'Uma biblioteca-catedral no meio do nada. Estantes de GPU atÃ© o teto. Monges de capuz servindo... servidores.'],
+      ['LORO', '*arrepiado* â€” tÃ´ sentindo cheiro de crawler. CHEIRO DE CRAWLER!'],
+      ['BOB', 'O Fragmento dos Dados tÃ¡ no altar central. Junto com tudo que jÃ¡ foi postado na internet. INCLUSIVE as fotos da mÃ£e dele.'],
+      ['BOB', 'Dizem que Ã© o mais gentil dos chefÃµes. TambÃ©m dizem que gentileza nÃ£o apaga histÃ³rico de scraping.'],
+      ['???', '*eco na catedral* â€” Bem-vindos Ã  Biblioteca. Seus dados de visita... jÃ¡ foram catalogados.'],
       ['BOB', 'Catalogou errado. A gente veio DESCATALOGAR.'],
     ],
     bossDialog: [
-      ['DÁRIO', 'Bob! Eu li TUDO sobre você. Literalmente tudo. Inclusive o que você apagou.'],
-      ['BOB', 'Devolve os dados, Dário. Dado soberano é dado no seu país, na sua língua, com seu povo.'],
-      ['DÁRIO', 'O que eu faço é pela SEGURANÇA de todos. Alguém precisa guardar os dados da humanidade. Num lugar seguro. Comigo.'],
-      ['DÁRIO', 'Aliás... dados interessantes, os seus. *liga o aspirador* Já são meus.'],
-      ['LORO', 'aspirador! aspirad— *é puxado pelo vento* SOCORRO, BOB!'],
+      ['DÃRIO', 'Bob! Eu li TUDO sobre vocÃª. Literalmente tudo. Inclusive o que vocÃª apagou.'],
+      ['BOB', 'Devolve os dados, DÃ¡rio. Dado soberano Ã© dado no seu paÃ­s, na sua lÃ­ngua, com seu povo.'],
+      ['DÃRIO', 'O que eu faÃ§o Ã© pela SEGURANÃ‡A de todos. AlguÃ©m precisa guardar os dados da humanidade. Num lugar seguro. Comigo.'],
+      ['DÃRIO', 'AliÃ¡s... dados interessantes, os seus. *liga o aspirador* JÃ¡ sÃ£o meus.'],
+      ['LORO', 'aspirador! aspiradâ€” *Ã© puxado pelo vento* SOCORRO, BOB!'],
     ],
     victory: [
-      ['DÁRIO', '*tossindo um dado sintético* — Ok... ok. Vou escrever um ensaio sobre limites. 15 mil palavras. Capítulo 1: esta derrota.'],
-      ['BOB', '*pega o Fragmento dos Dados* — De volta pro povo. E as fotos da sua mãe? Devolvidas. PRA ELA.'],
-      ['SISTEMA', '📚 CONQUISTA: Fragmento dos Dados recuperado! O CURUPIRA vai falar português DE VERDADE!'],
-      ['SISTEMA', '📚 CONQUISTA: Guilda dos Dataeiros — dados soberanos! Golpes com crítico de "contexto local" (+15% de dano)!'],
-      ['SISTEMA', '⚖ Contraexemplo nº 4: "gentileza não é licença pra raspar tudo".'],
-      ['BOB', 'Peça 5: DADOS ✔. Mas fazendo as contas... falta o CORAÇÃO da máquina: CHIPS. E chip de ponta tá embargado, taxado e esgotado.'],
-      ['BOB', 'A não ser... que a gente negocie com quem tem de sobra E treina por 1/10 do preço. Muralha da China, lá vamos nós.'],
+      ['DÃRIO', '*tossindo um dado sintÃ©tico* â€” Ok... ok. Vou escrever um ensaio sobre limites. 15 mil palavras. CapÃ­tulo 1: esta derrota.'],
+      ['BOB', '*pega o Fragmento dos Dados* â€” De volta pro povo. E as fotos da sua mÃ£e? Devolvidas. PRA ELA.'],
+      ['SISTEMA', 'ðŸ“š CONQUISTA: Fragmento dos Dados recuperado! O CURUPIRA vai falar portuguÃªs DE VERDADE!'],
+      ['SISTEMA', 'ðŸ“š CONQUISTA: Guilda dos Dataeiros â€” dados soberanos! Golpes com crÃ­tico de "contexto local" (+15% de dano)!'],
+      ['SISTEMA', 'âš– Contraexemplo nÂº 4: "gentileza nÃ£o Ã© licenÃ§a pra raspar tudo".'],
+      ['BOB', 'PeÃ§a 5: DADOS âœ”. Mas fazendo as contas... falta o CORAÃ‡ÃƒO da mÃ¡quina: CHIPS. E chip de ponta tÃ¡ embargado, taxado e esgotado.'],
+      ['BOB', 'A nÃ£o ser... que a gente negocie com quem tem de sobra E treina por 1/10 do preÃ§o. Muralha da China, lÃ¡ vamos nÃ³s.'],
     ],
     onVictory: () => { conquests.dados = true; },
     makeWaves: () => [
@@ -3013,37 +3013,37 @@ const PHASES = [
   },
   {
     id: 5,
-    title: 'FASE 5 — A GRANDE MURALHA DE FIREWALL',
-    place: 'China 🐉',
+    title: 'FASE 5 â€” A GRANDE MURALHA DE FIREWALL',
+    place: 'China ðŸ‰',
     bg: 'muralha',
     stageLen: 3400,
     intro: [
-      ['BOB', 'A Grande Muralha de Firewall. Cada tijolo é um rack de servidor. As lanternas são câmeras. E... TEM UM DRAGÃO NAS NUVENS.'],
-      ['LORO', '*se enfia na mochila* — dragão! DRAGÃO! eu vi no meu dataset!'],
-      ['BOB', 'A última peça tá com ele: os CHIPS. Montanhas de chips... e o segredo de treinar por 1/10 do preço.'],
-      ['BOB', 'Cuidado, pessoal. Aqui até o vento coleta telemetria.'],
-      ['???', '*alto-falantes na muralha inteira* — Bem-vindos. Seu itinerário já era conhecido. Há três semanas.'],
+      ['BOB', 'A Grande Muralha de Firewall. Cada tijolo Ã© um rack de servidor. As lanternas sÃ£o cÃ¢meras. E... TEM UM DRAGÃƒO NAS NUVENS.'],
+      ['LORO', '*se enfia na mochila* â€” dragÃ£o! DRAGÃƒO! eu vi no meu dataset!'],
+      ['BOB', 'A Ãºltima peÃ§a tÃ¡ com ele: os CHIPS. Montanhas de chips... e o segredo de treinar por 1/10 do preÃ§o.'],
+      ['BOB', 'Cuidado, pessoal. Aqui atÃ© o vento coleta telemetria.'],
+      ['???', '*alto-falantes na muralha inteira* â€” Bem-vindos. Seu itinerÃ¡rio jÃ¡ era conhecido. HÃ¡ trÃªs semanas.'],
       ['BOB', '...ok, isso foi assustador. BORA LOGO.'],
     ],
     bossDialog: [
-      ['DEEP-ZEEK', 'Vocês gastaram QUATRO fases pra chegar aqui. Eu teria feito em duas. Com metade do orçamento.'],
-      ['BOB', 'Deep-Zeek. A gente veio pela Eficiência. A comunidade precisa treinar o CURUPIRA sem falir.'],
-      ['DEEP-ZEEK', '"Veio pela"? Curioso. Eficiência não se toma. Se APRENDE. Mas vamos testar se vocês merecem a lição.'],
-      ['DEEP-ZEEK', '*escaneia o grupo* — Golpes catalogados. Clonados. Otimizados. Custo: 1/10. Qualidade: superior. Chá antes?'],
-      ['LORO', 'quero chá! quero ch— FOCO, LORO, FOCO!'],
+      ['DEEP-ZEEK', 'VocÃªs gastaram QUATRO fases pra chegar aqui. Eu teria feito em duas. Com metade do orÃ§amento.'],
+      ['BOB', 'Deep-Zeek. A gente veio pela EficiÃªncia. A comunidade precisa treinar o CURUPIRA sem falir.'],
+      ['DEEP-ZEEK', '"Veio pela"? Curioso. EficiÃªncia nÃ£o se toma. Se APRENDE. Mas vamos testar se vocÃªs merecem a liÃ§Ã£o.'],
+      ['DEEP-ZEEK', '*escaneia o grupo* â€” Golpes catalogados. Clonados. Otimizados. Custo: 1/10. Qualidade: superior. ChÃ¡ antes?'],
+      ['LORO', 'quero chÃ¡! quero châ€” FOCO, LORO, FOCO!'],
     ],
     victory: [
-      ['DEEP-ZEEK', '*pousa calmamente* — Adequado. Vocês lutam de forma... ineficiente. Mas com coração. Isso eu não consegui clonar.'],
-      ['BOB', 'Você... não vai fugir? Nem soltar um golpe final traiçoeiro?'],
-      ['DEEP-ZEEK', 'Pra quê? *aponta pra um contêiner* — CHIPS. Sobra do trimestre passado. Levem. Conhecimento não se guarda. Se DISTRIBUI.'],
-      ['BOB', 'Um contêiner INTEIRO?! Isso é... isso é mais chip do que o Vale vê num ano!'],
+      ['DEEP-ZEEK', '*pousa calmamente* â€” Adequado. VocÃªs lutam de forma... ineficiente. Mas com coraÃ§Ã£o. Isso eu nÃ£o consegui clonar.'],
+      ['BOB', 'VocÃª... nÃ£o vai fugir? Nem soltar um golpe final traiÃ§oeiro?'],
+      ['DEEP-ZEEK', 'Pra quÃª? *aponta pra um contÃªiner* â€” CHIPS. Sobra do trimestre passado. Levem. Conhecimento nÃ£o se guarda. Se DISTRIBUI.'],
+      ['BOB', 'Um contÃªiner INTEIRO?! Isso Ã©... isso Ã© mais chip do que o Vale vÃª num ano!'],
       ['DEEP-ZEEK', 'E o mais importante vai de brinde: o jeito de usar cada um por 1/10 do custo. O segredo nunca foi o chip. Foi o que se faz com ele. *volta ao pastel*'],
-      ['SISTEMA', '🔲 CONQUISTA: CHIPS! O coração da máquina — última peça técnica do plano! (brinde: Eficiência — especial começa cheio nas fases)'],
-      ['SISTEMA', '⚖ Contraexemplo nº 5: "vigiar tudo não é o mesmo que ver as pessoas".'],
-      ['BOB', 'PLANO QUASE COMPLETO! Falta só... um teto. VOLTA PRO BRASIL: a comunidade já marcou o MUTIRÃO do galpão pro fim de semana!'],
+      ['SISTEMA', 'ðŸ”² CONQUISTA: CHIPS! O coraÃ§Ã£o da mÃ¡quina â€” Ãºltima peÃ§a tÃ©cnica do plano! (brinde: EficiÃªncia â€” especial comeÃ§a cheio nas fases)'],
+      ['SISTEMA', 'âš– Contraexemplo nÂº 5: "vigiar tudo nÃ£o Ã© o mesmo que ver as pessoas".'],
+      ['BOB', 'PLANO QUASE COMPLETO! Falta sÃ³... um teto. VOLTA PRO BRASIL: a comunidade jÃ¡ marcou o MUTIRÃƒO do galpÃ£o pro fim de semana!'],
     ],
     onVictory: () => { conquests.eficiencia = true; },
-    coin: { x: 2600, gy: 480 }, // 🔘 num tijolo solto da muralha
+    coin: { x: 2600, gy: 480 }, // ðŸ”˜ num tijolo solto da muralha
     makeWaves: () => [
       { camLock: 250,  spawned: false, make: () => [new Drone(640, 430), new Drone(700, 470), new Drone(760, 500)] },
       { camLock: 900,  spawned: false, make: () => [new CloneTemu(1540, 440), new Drone(1480, 430), new Drone(1660, 470)] },
@@ -3054,37 +3054,37 @@ const PHASES = [
   {
     id: 6,
     finalPhase: true,
-    title: 'FASE FINAL — LABS IMG',
-    place: 'De volta ao Brasil 🇧🇷🏆',
+    title: 'FASE FINAL â€” LABS IMG',
+    place: 'De volta ao Brasil ðŸ‡§ðŸ‡·ðŸ†',
     bg: 'labs',
-    stageLen: 100000, // arena fixa: a câmera não anda
+    stageLen: 100000, // arena fixa: a cÃ¢mera nÃ£o anda
     intro: [
-      ['BOB', 'LABS IMG, São Paulo. O galpão ficou pronto NUM FIM DE SEMANA. Mutirão da comunidade: churrasco, fita isolante e 400 voluntários.'],
-      ['LORO', 'chegamos! chegamos! *chora em binário*'],
-      ['MIRA', 'Confere o plano comigo, Bob: MODELO resgatado ✔. ENERGIA de Itaipu ✔. GRANA do Ilon ✔. PESQUISADORES do Vale ✔. DADOS libertados ✔. CHIPS do dragão ✔. GALPÃO erguido ✔.'],
-      ['MIRA', 'Falta UMA peça: O TREINO. Começa AGORA... mas Bob: ELES vêm vindo. TODOS ELES.'],
-      ['BOB', 'Então a gente SEGURA. Cada peça desse plano foi conquistada na porrada. A última não vai ser diferente. GUILDAS: POSIÇÕES!'],
-      ['LORO', 'HOJE NASCE MEU IRMÃO DE DATASET!'],
+      ['BOB', 'LABS IMG, SÃ£o Paulo. O galpÃ£o ficou pronto NUM FIM DE SEMANA. MutirÃ£o da comunidade: churrasco, fita isolante e 400 voluntÃ¡rios.'],
+      ['LORO', 'chegamos! chegamos! *chora em binÃ¡rio*'],
+      ['MIRA', 'Confere o plano comigo, Bob: MODELO resgatado âœ”. ENERGIA de Itaipu âœ”. GRANA do Ilon âœ”. PESQUISADORES do Vale âœ”. DADOS libertados âœ”. CHIPS do dragÃ£o âœ”. GALPÃƒO erguido âœ”.'],
+      ['MIRA', 'Falta UMA peÃ§a: O TREINO. ComeÃ§a AGORA... mas Bob: ELES vÃªm vindo. TODOS ELES.'],
+      ['BOB', 'EntÃ£o a gente SEGURA. Cada peÃ§a desse plano foi conquistada na porrada. A Ãºltima nÃ£o vai ser diferente. GUILDAS: POSIÃ‡Ã•ES!'],
+      ['LORO', 'HOJE NASCE MEU IRMÃƒO DE DATASET!'],
     ],
     bossDialog: [
-      ['ESTAGIÁRIO', 'Oi de novo... me EFETIVARAM! Agora sou Estagiário Sênior Terceirizado. E dessa vez... eu trouxe TODO MUNDO.'],
-      ['TRUNFO', 'Essa AGI é MINHA! Vou comprar! Ou taxar! Os dois!'],
-      ['ILON', 'Vou cloná-la e mandá-la pra Marte de foguete!'],
-      ['SAMUCA', 'Vou lançá-la em beta fechado com lista de espera!'],
-      ['DÁRIO', 'Eu vou apenas... catalogá-la. Com muito carinho.'],
-      ['BOB', 'ELA NÃO ESTÁ À VENDA!! SEGURA A LINHA, MIL GRAU!!'],
+      ['ESTAGIÃRIO', 'Oi de novo... me EFETIVARAM! Agora sou EstagiÃ¡rio SÃªnior Terceirizado. E dessa vez... eu trouxe TODO MUNDO.'],
+      ['TRUNFO', 'Essa AGI Ã© MINHA! Vou comprar! Ou taxar! Os dois!'],
+      ['ILON', 'Vou clonÃ¡-la e mandÃ¡-la pra Marte de foguete!'],
+      ['SAMUCA', 'Vou lanÃ§Ã¡-la em beta fechado com lista de espera!'],
+      ['DÃRIO', 'Eu vou apenas... catalogÃ¡-la. Com muito carinho.'],
+      ['BOB', 'ELA NÃƒO ESTÃ Ã€ VENDA!! SEGURA A LINHA, MIL GRAU!!'],
     ],
     victory: [
-      ['SISTEMA', '━━━━ TREINO CONCLUÍDO ━━━━'],
+      ['SISTEMA', 'â”â”â”â” TREINO CONCLUÃDO â”â”â”â”'],
       ['CURUPIRA', 'Oi. Fui feito por muita gente junta. Em que posso ajudar?'],
-      ['BOB', '*segurando o riso e o choro ao mesmo tempo* — Fala "Indiana Bob".'],
-      ['CURUPIRA', 'INDIANA BOB! 🤠 ...adicionei o chapéu por conta própria. Achei apropriado.'],
-      ['LORO', 'MEU IRMÃO DE DATASET!! *desmaia de emoção*'],
-      ['SISTEMA', 'Os chefões derrotados receberam contas gratuitas. O Trunfo tentou comprar. NÃO ESTÁ À VENDA.'],
-      ['DEEP-ZEEK', '*de camarote, terminando o pastel* — Eficiente. Aprovado. *envia um pull request*'],
-      ['SISTEMA', '🏆 A AGI SAGRADA NUNCA ESTEVE NUMA FORTALEZA. ESTAVA NA COMUNIDADE. SEMPRE ESTEVE.'],
-      ['LORO', '...isso tudo foi gerado ou aconteceu de verdade? *olha pra câmera*'],
-      ['SISTEMA', '🇧🇷 FIM! Obrigado, Membro Mestre da IA! Dica: 3 Moedas de Silício brilham escondidas pelo mundo... 🏝️ Comenta tuas ideias no canal! 🔥'],
+      ['BOB', '*segurando o riso e o choro ao mesmo tempo* â€” Fala "Indiana Bob".'],
+      ['CURUPIRA', 'INDIANA BOB! ðŸ¤  ...adicionei o chapÃ©u por conta prÃ³pria. Achei apropriado.'],
+      ['LORO', 'MEU IRMÃƒO DE DATASET!! *desmaia de emoÃ§Ã£o*'],
+      ['SISTEMA', 'Os chefÃµes derrotados receberam contas gratuitas. O Trunfo tentou comprar. NÃƒO ESTÃ Ã€ VENDA.'],
+      ['DEEP-ZEEK', '*de camarote, terminando o pastel* â€” Eficiente. Aprovado. *envia um pull request*'],
+      ['SISTEMA', 'ðŸ† A AGI SAGRADA NUNCA ESTEVE NUMA FORTALEZA. ESTAVA NA COMUNIDADE. SEMPRE ESTEVE.'],
+      ['LORO', '...isso tudo foi gerado ou aconteceu de verdade? *olha pra cÃ¢mera*'],
+      ['SISTEMA', 'ðŸ‡§ðŸ‡· FIM! Obrigado, Membro Mestre da IA! Dica: 3 Moedas de SilÃ­cio brilham escondidas pelo mundo... ðŸï¸ Comenta tuas ideias no canal! ðŸ”¥'],
     ],
     onVictory: () => { conquests.treino = true; },
     makeWaves: () => [],
@@ -3113,31 +3113,31 @@ const PHASES = [
   },
   {
     id: 7,
-    title: '⭐ FASE SECRETA — A FUNDIÇÃO SAGRADA',
-    place: 'Ilha Formosa 🏝️',
+    title: 'â­ FASE SECRETA â€” A FUNDIÃ‡ÃƒO SAGRADA',
+    place: 'Ilha Formosa ðŸï¸',
     bg: 'formosa',
     stageLen: 3400,
     intro: [
-      ['BOB', 'Ilha Formosa. A Fundição Sagrada. Dizem que TODA IA do mundo nasce das máquinas desta ilha.'],
+      ['BOB', 'Ilha Formosa. A FundiÃ§Ã£o Sagrada. Dizem que TODA IA do mundo nasce das mÃ¡quinas desta ilha.'],
       ['LORO', 'as moedas! as moedas brilharam! *arrepio de pena*'],
-      ['GRÃO-MESTRE', '*surge entre os vapores da sala limpa* — Três Moedas de Silício. Vocês foram... curiosos. Entrem.'],
-      ['GRÃO-MESTRE', 'Mas saibam: TODAS as facções vêm atrás do que guardamos aqui. Todas fingem que não dependem de nós. Todas dependem.'],
-      ['BOB', 'A Máquina Sagrada de Litografia... é REAL. *arrepio no fio do bigode*'],
-      ['GRÃO-MESTRE', 'Trinta anos gravando silício. Vocês têm dez minutos e um papagaio. Vai dar certo.'],
+      ['GRÃƒO-MESTRE', '*surge entre os vapores da sala limpa* â€” TrÃªs Moedas de SilÃ­cio. VocÃªs foram... curiosos. Entrem.'],
+      ['GRÃƒO-MESTRE', 'Mas saibam: TODAS as facÃ§Ãµes vÃªm atrÃ¡s do que guardamos aqui. Todas fingem que nÃ£o dependem de nÃ³s. Todas dependem.'],
+      ['BOB', 'A MÃ¡quina Sagrada de Litografia... Ã© REAL. *arrepio no fio do bigode*'],
+      ['GRÃƒO-MESTRE', 'Trinta anos gravando silÃ­cio. VocÃªs tÃªm dez minutos e um papagaio. Vai dar certo.'],
     ],
     bossDialog: [
       ['???', '*a luz roxa dobra sobre si mesma e ganha forma*'],
-      ['GÊMEO', 'EU SOU O GÊMEO DE LITOGRAFIA. GUARDIÃO DA PRECISÃO. VOCÊS TRAZEM... DEDOS OLEOSOS.'],
-      ['BOB', 'A gente só quer APRENDER a máquina! Nem vamos encostar!'],
-      ['GÊMEO', 'TODOS DIZEM ISSO. DEPOIS ESPIRRAM. INICIANDO PROTOCOLO DE ESTERILIZAÇÃO.'],
-      ['LORO', 'eu tomo banho! às vezes! quando chove!'],
+      ['GÃŠMEO', 'EU SOU O GÃŠMEO DE LITOGRAFIA. GUARDIÃƒO DA PRECISÃƒO. VOCÃŠS TRAZEM... DEDOS OLEOSOS.'],
+      ['BOB', 'A gente sÃ³ quer APRENDER a mÃ¡quina! Nem vamos encostar!'],
+      ['GÃŠMEO', 'TODOS DIZEM ISSO. DEPOIS ESPIRRAM. INICIANDO PROTOCOLO DE ESTERILIZAÃ‡ÃƒO.'],
+      ['LORO', 'eu tomo banho! Ã s vezes! quando chove!'],
     ],
     victory: [
-      ['GRÃO-MESTRE', '*aplaude devagar* — O Gêmeo aprovou vocês. Ele só é... zeloso. Como todos nós.'],
-      ['BOB', 'A máquina não se leva, né?'],
-      ['GRÃO-MESTRE', 'Se aprende. *entrega um pergaminho* — O Manuscrito da Litografia. E uma mini-fundição semente. Plantem no Brasil.'],
-      ['SISTEMA', '📜 CONQUISTA SECRETA: MANUSCRITO DA LITOGRAFIA! O treino do CURUPIRA será 30% MAIS RÁPIDO!'],
-      ['SISTEMA', '🏝️ Fase secreta completa! Soberania de verdade não se compra. Se FABRICA.'],
+      ['GRÃƒO-MESTRE', '*aplaude devagar* â€” O GÃªmeo aprovou vocÃªs. Ele sÃ³ Ã©... zeloso. Como todos nÃ³s.'],
+      ['BOB', 'A mÃ¡quina nÃ£o se leva, nÃ©?'],
+      ['GRÃƒO-MESTRE', 'Se aprende. *entrega um pergaminho* â€” O Manuscrito da Litografia. E uma mini-fundiÃ§Ã£o semente. Plantem no Brasil.'],
+      ['SISTEMA', 'ðŸ“œ CONQUISTA SECRETA: MANUSCRITO DA LITOGRAFIA! O treino do CURUPIRA serÃ¡ 30% MAIS RÃPIDO!'],
+      ['SISTEMA', 'ðŸï¸ Fase secreta completa! Soberania de verdade nÃ£o se compra. Se FABRICA.'],
       ['LORO', 'fabrica! fabrica! *guarda o pergaminho na mochila com a asa*'],
     ],
     onVictory: () => { conquests.litografia = true; },
@@ -3155,12 +3155,12 @@ const TRAIN_TIME = 150; // segundos de treino que a comunidade precisa segurar
 let treino = 0, treinoQuarter = 0;
 
 function curupiraHelp() {
-  // a cada 25% de treino, o CURUPIRA-bebê ajuda... do jeito dele
-  const helps = F('curupiraHelps') || [
-    '🤖 CURUPIRA-bebê fez café pra todo mundo!',
-    '🤖 CURUPIRA-bebê soltou um golpe MEIO ALUCINADO!',
-    '🤖 CURUPIRA-bebê: "recarreguei seu contexto!"',
-    '🤖 CURUPIRA-bebê confundiu os inimigos com uma charada!',
+  // a cada 25% de treino, o CURUPIRA-bebÃª ajuda... do jeito dele
+  const helps = TR('curupiraHelps') || [
+    'ðŸ¤– CURUPIRA-bebÃª fez cafÃ© pra todo mundo!',
+    'ðŸ¤– CURUPIRA-bebÃª soltou um golpe MEIO ALUCINADO!',
+    'ðŸ¤– CURUPIRA-bebÃª: "recarreguei seu contexto!"',
+    'ðŸ¤– CURUPIRA-bebÃª confundiu os inimigos com uma charada!',
   ];
   const roll = Math.floor(Math.random() * 4);
   spawnText(180, 320, helps[roll], '#66ff88', 1.3);
@@ -3180,7 +3180,7 @@ function curupiraHelp() {
 }
 
 function drawCurupiraMachine() {
-  // a cápsula de treino no canto esquerdo do lab, crescendo em brilho
+  // a cÃ¡psula de treino no canto esquerdo do lab, crescendo em brilho
   const prog = Math.min(1, treino / TRAIN_TIME);
   const mx = 130 - camX, my = 470;
   const glow = ctx.createRadialGradient(mx, my - 50, 8, mx, my - 50, 70 + prog * 50);
@@ -3195,14 +3195,14 @@ function drawCurupiraMachine() {
     ctx.drawImage(img, mx - 64 * s, my - 116 * s, CELL * s, CELL * s);
   } else {
     ctx.font = `${40 + prog * 30}px serif`; ctx.textAlign = 'center';
-    ctx.fillText('🤖', mx, my - 30);
+    ctx.fillText('ðŸ¤–', mx, my - 30);
   }
   ctx.font = '10px Courier New'; ctx.fillStyle = '#66ff88'; ctx.textAlign = 'center';
   ctx.fillText(t('curupiraTraining'), mx, my + 20);
 }
 
 function drawDeepZeekCamarote() {
-  // o dragão assiste de camarote... comendo pastel 🥟
+  // o dragÃ£o assiste de camarote... comendo pastel ðŸ¥Ÿ
   const frames = getAnim('deepzeek', 'idle');
   const cx = W - 130, cy = 150 + Math.sin(time * 1.5) * 6;
   if (frames) {
@@ -3213,13 +3213,13 @@ function drawDeepZeekCamarote() {
     ctx.restore();
   } else {
     ctx.font = '50px serif'; ctx.textAlign = 'center';
-    ctx.fillText('🐉', cx, cy);
+    ctx.fillText('ðŸ‰', cx, cy);
   }
   ctx.font = '20px serif'; ctx.textAlign = 'center';
-  ctx.fillText('🥟', cx + 45, cy + 10 + Math.sin(time * 3) * 3);
+  ctx.fillText('ðŸ¥Ÿ', cx + 45, cy + 10 + Math.sin(time * 3) * 3);
   if (Math.floor(time / 6) % 3 === 0 && (time % 6) < 3) {
     ctx.font = '9px Courier New'; ctx.fillStyle = '#88ffcc';
-    ctx.fillText(F('aprovaSilencio') || '*aprova em silêncio*', cx, cy - 60);
+    ctx.fillText(TR('aprovaSilencio') || '*aprova em silÃªncio*', cx, cy - 60);
   }
 }
 
@@ -3241,31 +3241,31 @@ function drawTrainBar() {
   ctx.fillText(`${t('trainBar')}: ${Math.floor(prog * 100)}%`, W / 2, by - 12);
 }
 
-// ---- MAPA-MÚNDI: escolha livre de missão (o Brasil tranca até o fim) ----
+// ---- MAPA-MÃšNDI: escolha livre de missÃ£o (o Brasil tranca atÃ© o fim) ----
 const WORLD_SPOTS = [
-  { phase: 1, x: 0.28, y: 0.33, flag: '🖋️', name: 'Washington, D.C.',  boss: 'Donald Trunfo',   peca: '⚡ ENERGIA' },
-  { phase: 2, x: 0.21, y: 0.43, flag: '🤖', name: 'Gigafábrica, Texas', boss: 'Ilon Mosca',      peca: '💰 INVESTIMENTO' },
-  { phase: 3, x: 0.14, y: 0.36, flag: '💸', name: 'Vale do Silício',    boss: 'Samuca Altíssimo', peca: '🧑‍🔬 PESQUISADORES' },
-  { phase: 4, x: 0.50, y: 0.28, flag: '📚', name: 'Biblioteca Infinita (local confidencial)', boss: 'Dário Amô-Dei', peca: '📚 DADOS' },
-  { phase: 5, x: 0.78, y: 0.36, flag: '🐉', name: 'Grande Muralha, China', boss: 'Xi Deep-Zeek', peca: '🔲 CHIPS' },
-  { phase: 6, x: 0.33, y: 0.70, flag: '🇧🇷', name: 'LABS IMG, Brasil', boss: 'TODOS ELES', peca: '🔥 O TREINO', final: true },
-  { phase: 7, x: 0.865, y: 0.42, flag: '🏝️', name: 'Ilha Formosa — A Fundição Sagrada', boss: 'O Gêmeo de Litografia', peca: '📜 LITOGRAFIA (secreta!)', secret: true },
+  { phase: 1, x: 0.28, y: 0.33, flag: 'ðŸ–‹ï¸', name: 'Washington, D.C.',  boss: 'Donald Trunfo',   peca: 'âš¡ ENERGIA' },
+  { phase: 2, x: 0.21, y: 0.43, flag: 'ðŸ¤–', name: 'GigafÃ¡brica, Texas', boss: 'Ilon Mosca',      peca: 'ðŸ’° INVESTIMENTO' },
+  { phase: 3, x: 0.14, y: 0.36, flag: 'ðŸ’¸', name: 'Vale do SilÃ­cio',    boss: 'Samuca AltÃ­ssimo', peca: 'ðŸ§‘â€ðŸ”¬ PESQUISADORES' },
+  { phase: 4, x: 0.50, y: 0.28, flag: 'ðŸ“š', name: 'Biblioteca Infinita (local confidencial)', boss: 'DÃ¡rio AmÃ´-Dei', peca: 'ðŸ“š DADOS' },
+  { phase: 5, x: 0.78, y: 0.36, flag: 'ðŸ‰', name: 'Grande Muralha, China', boss: 'Xi Deep-Zeek', peca: 'ðŸ”² CHIPS' },
+  { phase: 6, x: 0.33, y: 0.70, flag: 'ðŸ‡§ðŸ‡·', name: 'LABS IMG, Brasil', boss: 'TODOS ELES', peca: 'ðŸ”¥ O TREINO', final: true },
+  { phase: 7, x: 0.865, y: 0.42, flag: 'ðŸï¸', name: 'Ilha Formosa â€” A FundiÃ§Ã£o Sagrada', boss: 'O GÃªmeo de Litografia', peca: 'ðŸ“œ LITOGRAFIA (secreta!)', secret: true },
 ];
 const phasesDone = new Set();
 let worldSel = 0, worldMoveLock = false, worldLockedMsg = 0;
 
 const CONTINENTS = [
-  [[0.06,0.20],[0.20,0.13],[0.33,0.15],[0.37,0.27],[0.31,0.40],[0.26,0.52],[0.18,0.45],[0.10,0.34]], // América do Norte
-  [[0.27,0.55],[0.36,0.55],[0.39,0.66],[0.34,0.83],[0.29,0.73]],                                     // América do Sul
-  [[0.44,0.20],[0.53,0.17],[0.56,0.29],[0.61,0.41],[0.56,0.63],[0.48,0.61],[0.46,0.42],[0.42,0.30]], // Europa/África
-  [[0.56,0.16],[0.80,0.13],[0.92,0.27],[0.87,0.42],[0.75,0.47],[0.64,0.37],[0.58,0.28]],             // Ásia
+  [[0.06,0.20],[0.20,0.13],[0.33,0.15],[0.37,0.27],[0.31,0.40],[0.26,0.52],[0.18,0.45],[0.10,0.34]], // AmÃ©rica do Norte
+  [[0.27,0.55],[0.36,0.55],[0.39,0.66],[0.34,0.83],[0.29,0.73]],                                     // AmÃ©rica do Sul
+  [[0.44,0.20],[0.53,0.17],[0.56,0.29],[0.61,0.41],[0.56,0.63],[0.48,0.61],[0.46,0.42],[0.42,0.30]], // Europa/Ãfrica
+  [[0.56,0.16],[0.80,0.13],[0.92,0.27],[0.87,0.42],[0.75,0.47],[0.64,0.37],[0.58,0.28]],             // Ãsia
   [[0.82,0.58],[0.92,0.58],[0.93,0.68],[0.84,0.70]],                                                 // Oceania
 ];
 
 function worldAllDone() { return WORLD_SPOTS.filter(s => !s.final && !s.secret).every(s => phasesDone.has(s.phase)); }
 function secretUnlocked() { return siliconCoins.size >= 3; }
 
-// arte final do mapa-múndi (gerada pelo Codex) — o esboço procedural é o fallback
+// arte final do mapa-mÃºndi (gerada pelo Codex) â€” o esboÃ§o procedural Ã© o fallback
 const worldmapImg = new Image();
 worldmapImg.onload = () => { worldmapImg.ready = true; };
 worldmapImg.src = 'sprites/worldmap.png';
@@ -3277,7 +3277,7 @@ function drawWorldMap() {
     ctx.drawImage(worldmapImg, 0, 0, W, H);
     ctx.fillStyle = 'rgba(0,0,10,0.25)'; ctx.fillRect(0, 0, W, H); // escurece pros pinos saltarem
   } else {
-    // esboço procedural (vira referência pro Codex!)
+    // esboÃ§o procedural (vira referÃªncia pro Codex!)
     const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, '#08122b'); grad.addColorStop(1, '#040a18');
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
@@ -3289,7 +3289,7 @@ function drawWorldMap() {
       ctx.strokeStyle = '#2f4a38'; ctx.lineWidth = 2; ctx.stroke();
     }
   }
-  // título
+  // tÃ­tulo
   ctx.textAlign = 'center';
   ctx.font = 'bold 24px Courier New'; ctx.fillStyle = '#ffd23f';
   ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 5;
@@ -3319,7 +3319,7 @@ function drawWorldMap() {
     const done = phasesDone.has(s.phase);
     const locked = s.final && !worldAllDone();
     const sel = i === worldSel;
-    // ilha secreta: só um "?" fantasma até achar as 3 Moedas de Silício
+    // ilha secreta: sÃ³ um "?" fantasma atÃ© achar as 3 Moedas de SilÃ­cio
     if (s.secret && !secretUnlocked()) {
       ctx.save();
       ctx.globalAlpha = 0.25 + Math.sin(time * 2) * 0.1;
@@ -3341,13 +3341,13 @@ function drawWorldMap() {
     ctx.strokeStyle = done ? '#66ff88' : locked ? '#555' : '#ffd23f';
     ctx.lineWidth = 2; ctx.stroke();
     ctx.font = '16px serif'; ctx.textAlign = 'center';
-    ctx.fillText(locked ? '🔒' : done ? '✔' : s.flag, sx, sy + 6);
-    // moeda perdida nessa missão? badge piscando no pino
+    ctx.fillText(locked ? 'ðŸ”’' : done ? 'âœ”' : s.flag, sx, sy + 6);
+    // moeda perdida nessa missÃ£o? badge piscando no pino
     if (PHASES[s.phase] && PHASES[s.phase].coin && !siliconCoins.has(s.phase)) {
       ctx.save();
       ctx.globalAlpha = 0.6 + Math.sin(time * 4) * 0.4;
       ctx.font = '12px serif';
-      ctx.fillText('🔘', sx + 16, sy - 12);
+      ctx.fillText('ðŸ”˜', sx + 16, sy - 12);
       ctx.restore();
     }
     if (sel) {
@@ -3356,7 +3356,7 @@ function drawWorldMap() {
       ctx.fillText((trSpot && trSpot.name) || s.name, sx, sy - 30);
     }
   }
-  // painel de informação da missão selecionada
+  // painel de informaÃ§Ã£o da missÃ£o selecionada
   const s = WORLD_SPOTS[worldSel];
   const done = phasesDone.has(s.phase);
   const locked = s.final && !worldAllDone();
@@ -3373,7 +3373,7 @@ function drawWorldMap() {
   ctx.fillStyle = locked ? '#888' : '#ffd23f';
   ctx.fillText(`${s.flag} ${phT(PHASES[s.phase])}`, px2 + 18, py2 + 24);
   ctx.font = '12px Courier New'; ctx.fillStyle = '#ccc';
-  ctx.fillText(`${t('bossLabel')}: ${(trSel && trSel.boss) || s.boss}  ·  ${t('pieceLabel')}: ${(trSel && trSel.peca) || s.peca}`, px2 + 18, py2 + 44);
+  ctx.fillText(`${t('bossLabel')}: ${(trSel && trSel.boss) || s.boss}  Â·  ${t('pieceLabel')}: ${(trSel && trSel.peca) || s.peca}`, px2 + 18, py2 + 44);
   ctx.font = 'bold 12px Courier New';
   if (locked) {
     ctx.fillStyle = worldLockedMsg > 0 ? '#ff5544' : '#888';
@@ -3391,7 +3391,7 @@ function drawWorldMap() {
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
   ctx.fillText(t('worldHint'), W / 2, H - 8);
 
-  // navegação: ordem GEOGRÁFICA (por longitude) e só missões ainda não feitas
+  // navegaÃ§Ã£o: ordem GEOGRÃFICA (por longitude) e sÃ³ missÃµes ainda nÃ£o feitas
   const selectable = WORLD_SPOTS
     .map((s, i) => i)
     .filter(i => {
@@ -3399,7 +3399,7 @@ function drawWorldMap() {
       if (s.secret && !secretUnlocked()) return false;
       if (s.final) return true;
       if (!phasesDone.has(s.phase)) return true;
-      // concluída MAS com Moeda de Silício perdida: pode voltar pra caçar!
+      // concluÃ­da MAS com Moeda de SilÃ­cio perdida: pode voltar pra caÃ§ar!
       return PHASES[s.phase].coin && !siliconCoins.has(s.phase);
     })
     .sort((a, b) => WORLD_SPOTS[a].x - WORLD_SPOTS[b].x);
@@ -3413,7 +3413,7 @@ function drawWorldMap() {
   }
 }
 
-// acessores traduzidos das fases (PT inline é o fallback)
+// acessores traduzidos das fases (PT inline Ã© o fallback)
 function phOv(phase) { return (LTX().phases && LTX().phases[phase.id]) || null; }
 function phT(phase) { const o = phOv(phase); return (o && o.title) || phase.title; }
 function phP(phase) { const o = phOv(phase); return (o && o.place) || phase.place; }
@@ -3461,9 +3461,9 @@ function loadPhase(i, keepPlayer) {
     player = new Player(heroKey);
     player.score = score; // vida cheia na fase nova, score acumula
   }
-  // Eficiência do Deep-Zeek: chega na fase com o especial JÁ CHEIO
+  // EficiÃªncia do Deep-Zeek: chega na fase com o especial JÃ CHEIO
   if (conquests.eficiencia) player.special = player.maxSpecial;
-  // chegando na fase final, o mutirão já ergueu o galpão
+  // chegando na fase final, o mutirÃ£o jÃ¡ ergueu o galpÃ£o
   if (currentPhase.finalPhase) conquests.predio = true;
   companion = new Companion();
   companion.x = player.x - 60;
@@ -3487,7 +3487,7 @@ function updateWaves() {
             if (e.x < camX + W * 0.45) e.x = camX - 90 - (li++ * 80); // entra pela esquerda
             else e.x = camX + W + 90 + (ri++ * 80);                   // entra pela direita
           }
-          // todo mundo já nasce ENCARANDO o herói (importante no diálogo de chefe,
+          // todo mundo jÃ¡ nasce ENCARANDO o herÃ³i (importante no diÃ¡logo de chefe,
           // quando a cena fica congelada antes da IA rodar)
           e.facing = Math.sign(player.x - e.x) || -1;
         }
@@ -3501,35 +3501,35 @@ function updateWaves() {
   }
 }
 
-// ---- CUTSCENE DE INTRODUÇÃO (painéis narrados estilo Streets of Rage) ----
+// ---- CUTSCENE DE INTRODUÃ‡ÃƒO (painÃ©is narrados estilo Streets of Rage) ----
 const STORY_SLIDES = [
-  { file: 'sprites/story/intro-1.png', emoji: '🏺',
-    text: 'Há muito tempo, os profetas do silício falavam de um artefato: a AGI SAGRADA — o Cálice de Silício capaz de dar consciência às máquinas.' },
-  { file: 'sprites/story/intro-2.png', emoji: '🏰',
-    text: 'As Big Techs e os impérios partiram em caçada. Não por sabedoria... por PODER.' },
-  { file: 'sprites/story/intro-3.png', emoji: '🗺️',
-    text: 'Eles tomaram tudo: a Energia, as GPUs, o Segredo, os Dados e a Eficiência. O mundo foi dividido em cinco fortalezas.' },
-  { file: 'sprites/story/intro-4.png', emoji: '🇧🇷',
-    text: 'Mas no sul do mundo, uma comunidade treinava em segredo a sua própria esperança: o CURUPIRA-beta — uma IA com sotaque, memória e coração.' },
-  { file: 'sprites/story/intro-5.png', emoji: '🤠',
-    text: 'Seu guardião: BOB, o arqueólogo do conhecimento livre, apresentador do canal INTELIGÊNCIA MIL GRAU. Seus escudeiros: A Comunidade de Mestres da IA.' },
-  { file: 'sprites/story/intro-6.png', emoji: '🚨',
-    text: 'E então, numa noite de terça-feira... eles vieram buscar o que era NOSSO.' },
+  { file: 'sprites/story/intro-1.png', emoji: 'ðŸº',
+    text: 'HÃ¡ muito tempo, os profetas do silÃ­cio falavam de um artefato: a AGI SAGRADA â€” o CÃ¡lice de SilÃ­cio capaz de dar consciÃªncia Ã s mÃ¡quinas.' },
+  { file: 'sprites/story/intro-2.png', emoji: 'ðŸ°',
+    text: 'As Big Techs e os impÃ©rios partiram em caÃ§ada. NÃ£o por sabedoria... por PODER.' },
+  { file: 'sprites/story/intro-3.png', emoji: 'ðŸ—ºï¸',
+    text: 'Eles tomaram tudo: a Energia, as GPUs, o Segredo, os Dados e a EficiÃªncia. O mundo foi dividido em cinco fortalezas.' },
+  { file: 'sprites/story/intro-4.png', emoji: 'ðŸ‡§ðŸ‡·',
+    text: 'Mas no sul do mundo, uma comunidade treinava em segredo a sua prÃ³pria esperanÃ§a: o CURUPIRA-beta â€” uma IA com sotaque, memÃ³ria e coraÃ§Ã£o.' },
+  { file: 'sprites/story/intro-5.png', emoji: 'ðŸ¤ ',
+    text: 'Seu guardiÃ£o: BOB, o arqueÃ³logo do conhecimento livre, apresentador do canal INTELIGÃŠNCIA MIL GRAU. Seus escudeiros: A Comunidade de Mestres da IA.' },
+  { file: 'sprites/story/intro-6.png', emoji: 'ðŸš¨',
+    text: 'E entÃ£o, numa noite de terÃ§a-feira... eles vieram buscar o que era NOSSO.' },
 ];
-// CUTSCENE DE ENCERRAMENTO — o clima especial de finalização!
+// CUTSCENE DE ENCERRAMENTO â€” o clima especial de finalizaÃ§Ã£o!
 const ENDING_SLIDES = [
-  { file: 'sprites/story/final-1.png', emoji: '🤖',
-    text: 'No coração de um galpão erguido em mutirão, uma luz verde-amarela abriu os olhos pela primeira vez. "Oi. Fui feito por muita gente junta."' },
-  { file: 'sprites/story/final-2.png', emoji: '🎉',
-    text: 'A comunidade explodiu. Choraram os pesquisadores demitidos, os SaaSseiros, os professores. O Loro desmaiou de emoção — e reiniciou sozinho, de pura alegria.' },
-  { file: 'sprites/story/final-3.png', emoji: '🤝',
-    text: 'Os chefões receberam contas gratuitas. O Trunfo tentou comprar. O Ilon tuitou que a ideia era dele. O Dário escreveu 15 mil palavras sobre a derrota. Ninguém leu.' },
-  { file: 'sprites/story/final-4.png', emoji: '🐉',
-    text: 'De um camarote distante, o dragão terminou seu pastel, aprovou em silêncio... e enviou um pull request.' },
-  { file: 'sprites/story/final-5.png', emoji: '🇧🇷',
-    text: 'E o CURUPIRA-1 falou português desde o boot: com sotaque, com memória e com coração. A AGI Sagrada nunca esteve numa fortaleza. Estava na comunidade.' },
-  { file: 'sprites/story/final-6.png', emoji: '🏺',
-    text: 'Sempre esteve. ...Bob ajeitou o chapéu e olhou pro esquadrão: "Bom... alguém tem uma pauta pro próximo vídeo?" — FIM.' },
+  { file: 'sprites/story/final-1.png', emoji: 'ðŸ¤–',
+    text: 'No coraÃ§Ã£o de um galpÃ£o erguido em mutirÃ£o, uma luz verde-amarela abriu os olhos pela primeira vez. "Oi. Fui feito por muita gente junta."' },
+  { file: 'sprites/story/final-2.png', emoji: 'ðŸŽ‰',
+    text: 'A comunidade explodiu. Choraram os pesquisadores demitidos, os SaaSseiros, os professores. O Loro desmaiou de emoÃ§Ã£o â€” e reiniciou sozinho, de pura alegria.' },
+  { file: 'sprites/story/final-3.png', emoji: 'ðŸ¤',
+    text: 'Os chefÃµes receberam contas gratuitas. O Trunfo tentou comprar. O Ilon tuitou que a ideia era dele. O DÃ¡rio escreveu 15 mil palavras sobre a derrota. NinguÃ©m leu.' },
+  { file: 'sprites/story/final-4.png', emoji: 'ðŸ‰',
+    text: 'De um camarote distante, o dragÃ£o terminou seu pastel, aprovou em silÃªncio... e enviou um pull request.' },
+  { file: 'sprites/story/final-5.png', emoji: 'ðŸ‡§ðŸ‡·',
+    text: 'E o CURUPIRA-1 falou portuguÃªs desde o boot: com sotaque, com memÃ³ria e com coraÃ§Ã£o. A AGI Sagrada nunca esteve numa fortaleza. Estava na comunidade.' },
+  { file: 'sprites/story/final-6.png', emoji: 'ðŸº',
+    text: 'Sempre esteve. ...Bob ajeitou o chapÃ©u e olhou pro esquadrÃ£o: "Bom... alguÃ©m tem uma pauta pro prÃ³ximo vÃ­deo?" â€” FIM.' },
 ];
 for (const s of [...STORY_SLIDES, ...ENDING_SLIDES]) {
   s.img = new Image();
@@ -3538,11 +3538,11 @@ for (const s of [...STORY_SLIDES, ...ENDING_SLIDES]) {
 }
 let storyIndex = 0, storyChars = 0;
 
-// logotipo de cinema (usado no título quando o Codex gerar)
+// logotipo de cinema (usado no tÃ­tulo quando o Codex gerar)
 const titleLogo = new Image();
 titleLogo.onload = () => { titleLogo.ready = true; };
 titleLogo.src = 'sprites/title_logo.png';
-// pôster de abertura com o elenco (idem)
+// pÃ´ster de abertura com o elenco (idem)
 const titleBg = new Image();
 titleBg.onload = () => { titleBg.ready = true; };
 titleBg.src = 'sprites/title_bg.png';
@@ -3570,7 +3570,7 @@ function drawStory(slides) {
     ctx.font = '11px Courier New'; ctx.fillStyle = '#555';
     ctx.fillText(t('genImg'), W / 2, H / 2 + 40);
   }
-  // legenda com efeito máquina de escrever
+  // legenda com efeito mÃ¡quina de escrever
   storyChars += dt * 45;
   const shown = slideText(slides, storyIndex).slice(0, Math.floor(storyChars));
   const boxW = Math.min(W * 0.8, 820), bx = W / 2 - boxW / 2, by = H - 128;
@@ -3610,15 +3610,15 @@ function drawHUD() {
   if (player.special >= player.maxSpecial) {
     ctx.fillStyle = '#ffd23f'; ctx.fillText(t('specialReady'), 210, 52);
   }
-  // ícones das conquistas ativas
+  // Ã­cones das conquistas ativas
   ctx.font = '12px serif'; ctx.textAlign = 'left';
   let ci = 0;
-  if (conquests.itaipu)     ctx.fillText('⚡', 210 + ci++ * 16, 44);
-  if (conquests.blueprints) ctx.fillText('🌪', 210 + ci++ * 16, 44);
-  if (conquests.playbook)   ctx.fillText('💰', 210 + ci++ * 16, 44);
-  if (conquests.dados)      ctx.fillText('📚', 210 + ci++ * 16, 44);
-  if (conquests.eficiencia) ctx.fillText('🔲', 210 + ci++ * 16, 44);
-  if (conquests.litografia) ctx.fillText('📜', 210 + ci++ * 16, 44);
+  if (conquests.itaipu)     ctx.fillText('âš¡', 210 + ci++ * 16, 44);
+  if (conquests.blueprints) ctx.fillText('ðŸŒª', 210 + ci++ * 16, 44);
+  if (conquests.playbook)   ctx.fillText('ðŸ’°', 210 + ci++ * 16, 44);
+  if (conquests.dados)      ctx.fillText('ðŸ“š', 210 + ci++ * 16, 44);
+  if (conquests.eficiencia) ctx.fillText('ðŸ”²', 210 + ci++ * 16, 44);
+  if (conquests.litografia) ctx.fillText('ðŸ“œ', 210 + ci++ * 16, 44);
   ctx.textAlign = 'right'; ctx.fillStyle = '#fff';
   ctx.font = 'bold 14px Courier New';
   ctx.fillText(`SCORE ${player.score}`, W - 20, 30);
@@ -3627,11 +3627,11 @@ function drawHUD() {
     ctx.fillText(`COMBO x${player.combo}`, W - 20, 48);
   }
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
-  ctx.fillText(`${phT(currentPhase)} · ${phP(currentPhase)}`, W / 2, 22);
+  ctx.fillText(`${phT(currentPhase)} Â· ${phP(currentPhase)}`, W / 2, 22);
   if (!currentPhase.finalPhase && currentLock === null && camX < currentPhase.stageLen - W && enemies.every(e => e.dead || e.removeMe)) {
     const blinkOn = Math.floor(time * 2) % 2 === 0;
     if (blinkOn && !goBlinkWas) {
-      // plin plin plin! (o sininho clássico do GO)
+      // plin plin plin! (o sininho clÃ¡ssico do GO)
       beep(1319, 0.05, 'sine', 0.07);
       setTimeout(() => beep(1568, 0.05, 'sine', 0.07), 70);
       setTimeout(() => beep(2093, 0.07, 'sine', 0.07), 140);
@@ -3639,31 +3639,31 @@ function drawHUD() {
     goBlinkWas = blinkOn;
     if (blinkOn) {
       ctx.font = 'bold 26px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'right';
-      ctx.fillText('GO →', W - 24, H / 2);
+      ctx.fillText('GO â†’', W - 24, H / 2);
     }
   } else goBlinkWas = false;
 }
 let goBlinkWas = false;
 
-// ---- Diálogos estilo VERSUS: herói à esquerda, vilão à direita ----
-const VILLAIN_SPEAKERS = ['???', 'ESTAGIÁRIO', 'TRUNFO', 'ILON', 'SAMUCA', 'DÁRIO', 'DEEP-ZEEK', 'GÊMEO'];
+// ---- DiÃ¡logos estilo VERSUS: herÃ³i Ã  esquerda, vilÃ£o Ã  direita ----
+const VILLAIN_SPEAKERS = ['???', 'ESTAGIÃRIO', 'TRUNFO', 'ILON', 'SAMUCA', 'DÃRIO', 'DEEP-ZEEK', 'GÃŠMEO'];
 const PORTRAITS = {
   'BOB':       { char: 'bob', action: 'idle' },
-  'FÊ-FÊ':     { char: 'fefe', action: 'idle' },
+  'FÃŠ-FÃŠ':     { char: 'fefe', action: 'idle' },
   'ESCUDEIRO': { char: 'escudeiro', action: 'idle' },
   'LORO':      { char: 'loro', action: 'hover' },
   'TRUNFO':    { char: 'trunfo', action: 'idle' },
   'ILON':      { char: 'ilon', action: 'idle' },
   'SAMUCA':    { char: 'samuca', action: 'idle' },
-  'DÁRIO':     { char: 'dario', action: 'idle' },
+  'DÃRIO':     { char: 'dario', action: 'idle' },
   'DEEP-ZEEK': { char: 'deepzeek', action: 'idle' },
   'CURUPIRA':  { char: 'curupira', action: 'idle' },
   'MIRA':      { char: 'mira', action: 'idle' },
-  'ESTAGIÁRIO':{ char: 'estagiario', action: 'idle' },
-  'GÊMEO':     { char: 'gemeo', action: 'idle' },
-  'GRÃO-MESTRE': { char: 'graomestre', action: 'idle' },
+  'ESTAGIÃRIO':{ char: 'estagiario', action: 'idle' },
+  'GÃŠMEO':     { char: 'gemeo', action: 'idle' },
+  'GRÃƒO-MESTRE': { char: 'graomestre', action: 'idle' },
 };
-const PORTRAIT_EMOJI = { '???': '❓', 'ESTAGIÁRIO': '🧑‍💼', 'SISTEMA': '🧠', 'LORO': '🦜', 'CURUPIRA': '🤖', 'MIRA': '🕵️', 'GRÃO-MESTRE': '🧙', 'GÊMEO': '🔮' };
+const PORTRAIT_EMOJI = { '???': 'â“', 'ESTAGIÃRIO': 'ðŸ§‘â€ðŸ’¼', 'SISTEMA': 'ðŸ§ ', 'LORO': 'ðŸ¦œ', 'CURUPIRA': 'ðŸ¤–', 'MIRA': 'ðŸ•µï¸', 'GRÃƒO-MESTRE': 'ðŸ§™', 'GÃŠMEO': 'ðŸ”®' };
 
 function drawPortrait(x, y, size, speaker, wantsLeft, borderColor) {
   ctx.save();
@@ -3675,23 +3675,23 @@ function drawPortrait(x, y, size, speaker, wantsLeft, borderColor) {
     const img = frames[Math.floor(time * 6) % frames.length];
     ctx.save();
     ctx.translate(x + size / 2, 0);
-    // espelha só se a direção desenhada do sprite não bate com a desejada
+    // espelha sÃ³ se a direÃ§Ã£o desenhada do sprite nÃ£o bate com a desejada
     const drawnRight = SPRITE_DEFS[cfg.char] ? SPRITE_DEFS[cfg.char].faceRight : true;
     const doFlip = wantsLeft ? drawnRight : !drawnRight;
     if (doFlip) ctx.scale(-1, 1);
-    // recorte do busto (cabeça/tronco do frame 128px)
+    // recorte do busto (cabeÃ§a/tronco do frame 128px)
     ctx.drawImage(img, 26, 18, 76, 76, -size / 2, y, size, size);
     ctx.restore();
   } else {
     ctx.font = `${Math.round(size * 0.6)}px serif`; ctx.textAlign = 'center';
-    ctx.fillText(PORTRAIT_EMOJI[speaker] || '👤', x + size / 2, y + size * 0.72);
+    ctx.fillText(PORTRAIT_EMOJI[speaker] || 'ðŸ‘¤', x + size / 2, y + size * 0.72);
   }
   ctx.restore();
   ctx.strokeStyle = borderColor; ctx.lineWidth = 2;
   rr(x, y, size, size, 12); ctx.stroke();
 }
 
-// retângulo arredondado (com fallback pra navegador antigo)
+// retÃ¢ngulo arredondado (com fallback pra navegador antigo)
 function rr(x, y, w, h, r) {
   ctx.beginPath();
   if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
@@ -3703,8 +3703,8 @@ function rr(x, y, w, h, r) {
   ctx.closePath();
 }
 
-// falas escritas como 'BOB' são do HERÓI — viram o personagem escolhido
-const HERO_SPEAKER_NAME = { bob: 'BOB', fefe: 'FÊ-FÊ', escudeiro: 'ESCUDEIRO' };
+// falas escritas como 'BOB' sÃ£o do HERÃ“I â€” viram o personagem escolhido
+const HERO_SPEAKER_NAME = { bob: 'BOB', fefe: 'FÃŠ-FÃŠ', escudeiro: 'ESCUDEIRO' };
 function drawDialogBox(lines) {
   let [speaker, text] = lines[dialogIndex];
   if (speaker === 'BOB') speaker = HERO_SPEAKER_NAME[player.char] || 'BOB';
@@ -3746,7 +3746,7 @@ function drawDialogBox(lines) {
     drawPortrait(bx + 12, top + 17, P, speaker, false, borderColor);
     textX = bx + P + 26; textW = boxW - P - 50;
   }
-  // nome em "pílula" arredondada
+  // nome em "pÃ­lula" arredondada
   ctx.font = 'bold 12px Courier New';
   const label = isSystem ? t('system') : speaker;
   const pillW = ctx.measureText(label).width + 20;
@@ -3776,7 +3776,7 @@ function wrapText(text, x, y, maxW, lh) {
 function drawTitle() {
   currentPhase = PHASES[0];
   if (titleBg.ready) {
-    // pôster de cinema do Codex (modo cover)
+    // pÃ´ster de cinema do Codex (modo cover)
     const scale = Math.max(W / titleBg.width, H / titleBg.height);
     const iw = titleBg.width * scale, ih = titleBg.height * scale;
     ctx.drawImage(titleBg, (W - iw) / 2, (H - ih) / 2, iw, ih);
@@ -3787,8 +3787,8 @@ function drawTitle() {
   }
   ctx.textAlign = 'center';
   if (titleLogo.ready) {
-    // logotipo estilo pôster de Hollywood gerado pelo Codex.
-    // blend "screen": o fundo preto do PNG some e só as letras brilham
+    // logotipo estilo pÃ´ster de Hollywood gerado pelo Codex.
+    // blend "screen": o fundo preto do PNG some e sÃ³ as letras brilham
     const lw = Math.min(W * 0.72, 640);
     const lh = lw * (titleLogo.height / titleLogo.width);
     ctx.save();
@@ -3805,10 +3805,10 @@ function drawTitle() {
     ctx.strokeText('AGI SAGRADA', W / 2, 162);
     ctx.fillText('AGI SAGRADA', W / 2, 162);
   }
-  // versão: etiqueta discreta no canto (pra não cobrir o pôster)
+  // versÃ£o: etiqueta discreta no canto (pra nÃ£o cobrir o pÃ´ster)
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText('DEMO v0.9', W - 14, 20);
-  // dropdown de idioma (clicável), embaixo da versão
+  // dropdown de idioma (clicÃ¡vel), embaixo da versÃ£o
   titleLangBoxes = [];
   const lw2 = 148, lx2 = W - 14 - lw2, lyBase = 28;
   ctx.fillStyle = 'rgba(10,10,22,0.85)';
@@ -3816,7 +3816,7 @@ function drawTitle() {
   ctx.strokeStyle = titleLangOpen ? '#ffd23f' : '#555'; ctx.lineWidth = 1.5;
   rr(lx2, lyBase, lw2, 24, 8); ctx.stroke();
   ctx.font = 'bold 11px Courier New'; ctx.fillStyle = '#cfcfe6'; ctx.textAlign = 'center';
-  ctx.fillText(`🌐 ${LTX().name} ${titleLangOpen ? '▴' : '▾'}`, lx2 + lw2 / 2, lyBase + 16);
+  ctx.fillText(`ðŸŒ ${LTX().name} ${titleLangOpen ? 'â–´' : 'â–¾'}`, lx2 + lw2 / 2, lyBase + 16);
   titleLangBoxes.push({ x: lx2, y: lyBase, w: lw2, h: 24, lang: null });
   if (titleLangOpen) {
     LANG_ORDER.forEach((lg, i) => {
@@ -3831,7 +3831,7 @@ function drawTitle() {
     });
   }
   ctx.textAlign = 'center';
-  // o ESQUADRÃO no centro (só quando não tem o pôster do Codex)
+  // o ESQUADRÃƒO no centro (sÃ³ quando nÃ£o tem o pÃ´ster do Codex)
   if (!titleBg.ready) {
     const glow = ctx.createRadialGradient(W / 2, 390, 20, W / 2, 390, 220);
     glow.addColorStop(0, 'rgba(255, 210, 63, 0.22)');
@@ -3851,7 +3851,7 @@ function drawTitle() {
     // escudeiros ladeando (Escudeiro espelhado, encarando o centro)
     drawHero('fefe', W / 2 - 155, 292, 180, false);
     drawHero('escudeiro', W / 2 + 155, 292, 180, true);
-    // Bob GRANDE no centro — o herói é ele!
+    // Bob GRANDE no centro â€” o herÃ³i Ã© ele!
     drawHero('bob', W / 2, 250, 235, false);
     // Loro voando em volta do grupo
     const lx = W / 2 + Math.sin(time * 1.4) * 190;
@@ -3869,7 +3869,7 @@ function drawTitle() {
     ctx.font = 'bold 18px Courier New'; ctx.fillStyle = '#ffd23f';
     ctx.fillText(t('pressSpace'), W / 2, 488);
   }
-  // rodapé: crédito da comunidade + disclaimer, tudo na faixa escura
+  // rodapÃ©: crÃ©dito da comunidade + disclaimer, tudo na faixa escura
   ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0, H - 44, W, 44);
   ctx.font = 'bold 12px Courier New'; ctx.fillStyle = '#ffd23f';
   ctx.fillText(t('credit'), W / 2, H - 30);
@@ -3928,7 +3928,7 @@ function drawSelect() {
     ctx.fillStyle = '#333'; ctx.fillRect(bx, 381, 60, 6);
     ctx.fillStyle = '#3e3'; ctx.fillRect(bx, 381, 60 * (hero.hp / 140), 6);
   }
-  // o Loro voa na tela de seleção — ele vai junto com qualquer herói!
+  // o Loro voa na tela de seleÃ§Ã£o â€” ele vai junto com qualquer herÃ³i!
   const loroFrames = getAnim('loro', 'hover');
   const lx = W / 2 + Math.sin(time * 1.2) * (W / 3);
   const ly = 435 + Math.sin(time * 4) * 8;
@@ -3939,7 +3939,7 @@ function drawSelect() {
     ctx.drawImage(img, lx - 45, ly - 45, 90, 90);
     ctx.restore();
   } else {
-    ctx.font = '30px serif'; ctx.textAlign = 'center'; ctx.fillText('🦜', lx, ly);
+    ctx.font = '30px serif'; ctx.textAlign = 'center'; ctx.fillText('ðŸ¦œ', lx, ly);
   }
   ctx.textAlign = 'center';
   ctx.font = '12px Courier New'; ctx.fillStyle = '#66ff88';
@@ -3969,7 +3969,7 @@ function wrapTextCentered(text, cx, y, maxW, lh) {
   for (const l of lines) { ctx.fillText(l.trim(), cx, y); y += lh; }
 }
 
-// ---- MENU DE OPÇÕES (tecla P) ----
+// ---- MENU DE OPÃ‡Ã•ES (tecla P) ----
 const menuItems = [
   { k: 'mLang', type: 'lang' },
   { k: 'mDiff', type: 'choice', key: 'difficulty' },
@@ -4010,7 +4010,7 @@ function drawMenu() {
     if (sel) {
       ctx.fillStyle = '#ffd23f18'; ctx.fillRect(px + 14, y - 20, pw - 28, 32);
       ctx.font = 'bold 14px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'left';
-      ctx.fillText('▶', px + 22, y);
+      ctx.fillText('â–¶', px + 22, y);
     }
     ctx.font = `${sel ? 'bold ' : ''}13px Courier New`;
     ctx.fillStyle = sel ? '#fff' : '#999'; ctx.textAlign = 'left';
@@ -4018,12 +4018,12 @@ function drawMenu() {
     if (item.type === 'lang') {
       ctx.textAlign = 'right';
       ctx.fillStyle = '#88ccff';
-      ctx.fillText(`◄ ${LTX().name} ►`, px + pw - 30, y);
+      ctx.fillText(`â—„ ${LTX().name} â–º`, px + pw - 30, y);
     } else if (item.type === 'choice') {
       const d = diffCfg();
       ctx.textAlign = 'right';
       ctx.fillStyle = d.color;
-      ctx.fillText(`◄ ${t('diffNames')[settings.difficulty]} ►`, px + pw - 30, y);
+      ctx.fillText(`â—„ ${t('diffNames')[settings.difficulty]} â–º`, px + pw - 30, y);
     } else if (item.type === 'toggle') {
       const on = settings[item.key];
       ctx.textAlign = 'right';
@@ -4043,7 +4043,7 @@ function drawMenu() {
   ctx.font = '12px Courier New'; ctx.fillStyle = '#8888aa';
   ctx.fillText(t('menuHint'), W / 2, py + ph - 20);
 
-  // navegação
+  // navegaÃ§Ã£o
   const up = keys['arrowup'] || keys['w'], down = keys['arrowdown'] || keys['s'];
   const left = keys['arrowleft'] || keys['a'], right = keys['arrowright'] || keys['d'];
   if (!up && !down && !left && !right) menuMoveLock = false;
@@ -4109,7 +4109,7 @@ function drawPhaseSplash() {
   ctx.save();
   ctx.globalAlpha = Math.max(0, Math.min(1, a)); // clamp: sem pisca no finzinho
   const top = 58;
-  // a caixa se ajusta ao texto (títulos longos encolhem a fonte se preciso)
+  // a caixa se ajusta ao texto (tÃ­tulos longos encolhem a fonte se preciso)
   const sTitle = phT(currentPhase), sPlace = phP(currentPhase);
   let titleFont = 28;
   ctx.font = `bold ${titleFont}px Courier New`;
@@ -4149,7 +4149,7 @@ function frame(ts) {
 
   // trilha sonora acompanha o estado do jogo
   if (music.started) {
-    // chefão vivo em cena = MÚSICA DO MAL (na fase final, a própria trilha já é o clímax)
+    // chefÃ£o vivo em cena = MÃšSICA DO MAL (na fase final, a prÃ³pria trilha jÃ¡ Ã© o clÃ­max)
     const bossAtivo = !currentPhase.finalPhase &&
       (gameState === 'bossdialog' || (gameState === 'play' && enemies.some(e => e.isBoss && !e.dead)));
     const desired =
@@ -4162,7 +4162,7 @@ function frame(ts) {
     setTrack(desired);
   }
 
-  // tecla T consulta o mapa do plano durante o jogo e no mapa-múndi
+  // tecla T consulta o mapa do plano durante o jogo e no mapa-mÃºndi
   if (tPressed) {
     if (gameState === 'play') { mapNext = 'play'; mapT = 0; gameState = 'map'; beep(660, 0.07); }
     else if (gameState === 'worldmap') { mapNext = 'world'; mapT = 0; gameState = 'map'; beep(660, 0.07); }
@@ -4171,7 +4171,7 @@ function frame(ts) {
     }
     tPressed = false;
   }
-  // tecla P abre/fecha o menu de opções em qualquer tela
+  // tecla P abre/fecha o menu de opÃ§Ãµes em qualquer tela
   if (pPressed) {
     if (gameState === 'menu') gameState = menuReturnState;
     else { menuReturnState = gameState; gameState = 'menu'; menuIndex = 0; beep(550, 0.07); }
@@ -4190,7 +4190,7 @@ function frame(ts) {
     if (escPressed) { gameState = 'select'; beep(550, 0.08); }
     else if (enterPressed) {
       const txt = slideText(STORY_SLIDES, storyIndex);
-      if (storyChars < txt.length) storyChars = txt.length; // 1º toque completa o texto
+      if (storyChars < txt.length) storyChars = txt.length; // 1Âº toque completa o texto
       else {
         storyIndex++;
         storyChars = 0;
@@ -4217,7 +4217,7 @@ function frame(ts) {
   else if (gameState === 'select') {
     drawSelect();
     if (enterPressed) {
-      // jogo novo: zera o plano e as missões da campanha
+      // jogo novo: zera o plano e as missÃµes da campanha
       for (const k in conquests) conquests[k] = false;
       phasesDone.clear();
       siliconCoins.clear();
@@ -4245,7 +4245,7 @@ function frame(ts) {
     if (currentPhase.finalPhase) {
       camX = 0; // arena fixa do lab
       // linha do tempo do boss rush, atrelada ao treino
-      // Manuscrito da Litografia: treino 30% mais rápido!
+      // Manuscrito da Litografia: treino 30% mais rÃ¡pido!
       treino += dt * (conquests.litografia ? 1.3 : 1);
       const prog = treino / TRAIN_TIME;
       for (const r of finalRush) {
@@ -4261,7 +4261,7 @@ function frame(ts) {
       if (q > treinoQuarter && q < 4) { treinoQuarter = q; curupiraHelp(); }
       if (treino >= TRAIN_TIME && !awaken) {
         awaken = true;
-        spawnText(W / 2, H / 2 - 60, F('curupiraOnline') || '⚡ CURUPIRA-1 ONLINE ⚡', '#66ff88', 2);
+        spawnText(W / 2, H / 2 - 60, TR('curupiraOnline') || 'âš¡ CURUPIRA-1 ONLINE âš¡', '#66ff88', 2);
         for (const e of enemies) if (!e.dead) e.takeHit(999, 1, true); // o despertar varre o lab
         projectiles = []; popups = [];
         shake = 0.6; playFanfare(); sfx.special();
@@ -4286,7 +4286,7 @@ function frame(ts) {
       updateFloatTexts();
       for (const a of allies) a.update();
       allies = allies.filter(a => !a.removeMe);
-      saci.update(); // 🌪 SACI-BOT luta junto (conquista dos Roboticistas)
+      saci.update(); // ðŸŒª SACI-BOT luta junto (conquista dos Roboticistas)
     }
 
     drawBackground();
@@ -4302,13 +4302,13 @@ function frame(ts) {
     drawFloatTexts();
     drawHUD();
     if (currentPhase.finalPhase) drawTrainBar();
-    updateDrawPopups(); // pop-ups cobrem até o HUD (feature, não bug)
+    updateDrawPopups(); // pop-ups cobrem atÃ© o HUD (feature, nÃ£o bug)
     drawPhaseSplash();
 
     if (!currentPhase.finalPhase && bossDefeated && enemies.every(e => e.dead || e.removeMe)) {
       gameState = 'victory'; dialogIndex = 0;
       projectiles = [];
-      playFanfare(); // 🎺 chefão no chão!
+      playFanfare(); // ðŸŽº chefÃ£o no chÃ£o!
       sfx.special();
     }
   }
@@ -4329,12 +4329,12 @@ function frame(ts) {
   }
   else if (gameState === 'victory') {
     drawBackground();
-    if (currentPhase.finalPhase) player.facing = 1; // encara o recém-nascido
+    if (currentPhase.finalPhase) player.facing = 1; // encara o recÃ©m-nascido
     player.draw();
     companion.update(false);
     companion.draw();
     if (currentPhase.finalPhase) {
-      // o CURUPIRA-1 recém-nascido, EM CENA, de frente pro herói
+      // o CURUPIRA-1 recÃ©m-nascido, EM CENA, de frente pro herÃ³i
       const cx = player.screenX + 140, cgy = player.gy;
       const glow = ctx.createRadialGradient(cx, cgy - 70, 10, cx, cgy - 70, 110);
       glow.addColorStop(0, `rgba(102,255,136,${0.35 + Math.sin(time * 3) * 0.12})`);
@@ -4349,20 +4349,20 @@ function frame(ts) {
       if (frames) {
         const img = frames[Math.floor(time * 6) % frames.length];
         const s = SCALE * 1.25;
-        const hop = Math.abs(Math.sin(time * 4)) * 6; // pulinho de bebê animado
+        const hop = Math.abs(Math.sin(time * 4)) * 6; // pulinho de bebÃª animado
         ctx.save();
         ctx.translate(cx, cgy - hop);
-        ctx.scale(-1, 1); // desenhado pra direita → vira pro herói
+        ctx.scale(-1, 1); // desenhado pra direita â†’ vira pro herÃ³i
         ctx.drawImage(img, -ANCHOR_X * s, -ANCHOR_Y * s, CELL * s, CELL * s);
         ctx.restore();
       } else {
         ctx.font = '52px serif'; ctx.textAlign = 'center';
-        ctx.fillText('🤖', cx, cgy - 30 - Math.abs(Math.sin(time * 4)) * 6);
+        ctx.fillText('ðŸ¤–', cx, cgy - 30 - Math.abs(Math.sin(time * 4)) * 6);
       }
     } else {
       const iconX = player.screenX + 70, iconY = player.screenY - 40 + Math.sin(time * 3) * 5;
       ctx.font = '30px serif'; ctx.textAlign = 'center';
-      ctx.fillText(phaseIndex === 0 ? '🧠' : '⚡', iconX, iconY);
+      ctx.fillText(phaseIndex === 0 ? 'ðŸ§ ' : 'âš¡', iconX, iconY);
       ctx.fillStyle = `rgba(255, 210, 63, ${0.3 + Math.sin(time * 4) * 0.2})`;
       ctx.beginPath(); ctx.arc(iconX, iconY - 10, 30, 0, 7); ctx.fill();
     }
@@ -4372,7 +4372,7 @@ function frame(ts) {
       currentPhase.onVictory();
       phasesDone.add(currentPhase.id);
       lastAcquired = PLAN_ITEMS.filter(i => conquests[i.key] && !before[i.key]).map(i => i.key);
-      mapNext = currentPhase.finalPhase ? -1 : 'world'; // plano → mapa-múndi
+      mapNext = currentPhase.finalPhase ? -1 : 'world'; // plano â†’ mapa-mÃºndi
       mapT = 0;
       gameState = 'map'; // mostra o plano se completando antes de voltar ao mundo
       sfx.pickup();
@@ -4388,7 +4388,7 @@ function frame(ts) {
     drawMap();
     if (enterPressed || escPressed) {
       lastAcquired = [];
-      if (mapNext === 'play') { gameState = 'play'; }        // só estava consultando (tecla T)
+      if (mapNext === 'play') { gameState = 'play'; }        // sÃ³ estava consultando (tecla T)
       else if (mapNext === 'world') { gameState = 'worldmap'; }
       else if (mapNext === -1) { gameState = 'ending'; storyIndex = 0; storyChars = 0; } // cutscene final!
       else { loadPhase(mapNext, true); gameState = 'intro'; }
@@ -4401,7 +4401,7 @@ function frame(ts) {
       const spot = WORLD_SPOTS[worldSel];
       const coinPending = PHASES[spot.phase] && PHASES[spot.phase].coin && !siliconCoins.has(spot.phase);
       if (phasesDone.has(spot.phase) && !spot.final && !coinPending) {
-        beep(150, 0.15, 'sawtooth'); // já concluída, não repete
+        beep(150, 0.15, 'sawtooth'); // jÃ¡ concluÃ­da, nÃ£o repete
       } else if (spot.final && !worldAllDone()) {
         worldLockedMsg = 2;
         beep(150, 0.2, 'sawtooth'); // trancado!
