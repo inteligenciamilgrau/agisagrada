@@ -344,7 +344,7 @@ Actions, one grid each:
 Generate and QC the walk first.
 ```
 
-### 12c. O Estagiário Terceirizado (mini-chefe Fase 0) → `sprites/estagiario/`
+### 12c. O Estagiário Vibe-Coder (mini-chefe Fase 0) → `sprites/estagiario/`
 ```
 $generate2dsprite
 Create a mini-boss NPC action bundle in pixel_art style (16-bit Sega

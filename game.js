@@ -1804,7 +1804,7 @@ class Drone extends Entity {
   }
 }
 
-// ---- Mini-chefe Fase 0: O Estagiário Terceirizado ----
+// ---- Mini-chefe Fase 0: O Estagiário Vibe-Coder ----
 class Estagiario extends Lobista {
   constructor(x, gy) {
     super(x, gy);
@@ -1818,7 +1818,7 @@ class Estagiario extends Lobista {
     this.scoreValue = 800;
     this.isBoss = true;
     this.nameKey = 'estagiario';
-    this.bossName = '⚠ O ESTAGIÁRIO TERCEIRIZADO — "consultoria gringa" ⚠';
+    this.bossName = '⚠ O ESTAGIÁRIO VIBE-CODER — "o agente fez sozinho" ⚠';
   }
   update() {
     if (!this.dead) {
@@ -1826,7 +1826,7 @@ class Estagiario extends Lobista {
       this.talkCd -= dt;
       if (this.talkCd <= 0) {
         this.talkCd = 4 + Math.random() * 3;
-        const falas = TR('estagiario') || ['tô só cumprindo OKR!', 'isso não tava no escopo!', 'vou escalar pro meu gestor!', 'era pra ser só um estágio!'];
+        const falas = TR('estagiario') || ['tô só cumprindo OKR!', 'isso não tava no escopo!', 'vou escalar pro meu gestor!', 'o agente escreveu isso sozinho!', 'funciona na minha IDE!'];
         spawnText(this.screenX, this.screenY - 130, falas[Math.floor(Math.random() * falas.length)], '#aaddff', 1.1);
       }
       // invocação com animação própria (levanta o tablet!)
@@ -2829,7 +2829,7 @@ const PHASES = [
     bossDialog: [
       ['???', 'PARADO AÍ, INFLUENCERZINHO DE IA!'],
       ['BOB', 'Quem é você?! E... por que esse crachá tem o logo de TRÊS consultorias ao mesmo tempo?'],
-      ['ESTAGIÁRIO', 'Sou o ESTAGIÁRIO TERCEIRIZADO! Braço armado das Big Techs! A contratação mais barata do trimestre!'],
+      ['ESTAGIÁRIO', 'Sou o ESTAGIÁRIO VIBE-CODER! Braço armado das Big Techs! Nunca li uma linha do código que eu entrego!'],
       ['ESTAGIÁRIO', 'Me mandaram exfiltrar seus pesos. Não é pessoal, Bob... é OKR.'],
       ['BOB', 'Você tá roubando a AGI de uma comunidade INTEIRA... por uma bolsa-auxílio?'],
       ['ESTAGIÁRIO', 'Eles prometeram EFETIVAÇÃO!! *aperta o botão de chamar drones*'],
@@ -3067,7 +3067,7 @@ const PHASES = [
       ['LORO', 'HOJE NASCE MEU IRMÃO DE DATASET!'],
     ],
     bossDialog: [
-      ['ESTAGIÁRIO', 'Oi de novo... me EFETIVARAM! Agora sou Estagiário Sênior Terceirizado. E dessa vez... eu trouxe TODO MUNDO.'],
+      ['ESTAGIÁRIO', 'Oi de novo... me EFETIVARAM! Agora sou Estagiário Vibe-Coder SÊNIOR. E dessa vez... eu trouxe TODO MUNDO.'],
       ['TRUNFO', 'Essa AGI é MINHA! Vou comprar! Ou taxar! Os dois!'],
       ['ILON', 'Vou cloná-la e mandá-la pra Marte de foguete!'],
       ['SAMUCA', 'Vou lançá-la em beta fechado com lista de espera!'],

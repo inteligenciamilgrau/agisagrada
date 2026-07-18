@@ -87,7 +87,7 @@ no último combate.
   Prompt Mágico e sai na porrada. No fim, ao rodar o modelo recuperado, descobre que
   o mapa dos 5 Fragmentos estava escondido NOS PESOS (conhecimento emergente!).
 - **Inimigos:** Drones-vagalume, robôs de scraping (caranguejos com logo genérico).
-- **Mini-chefe:** **O Estagiário Terceirizado** — humano de crachá "consultoria gringa",
+- **Mini-chefe:** **O Estagiário Vibe-Coder** — humano de crachá "consultoria gringa",
   luta mal mas chama drones infinitos ("tô só cumprindo OKR!").
 
 ### FASE 1 — "A Canetada" — Washington, D.C. 🖋️

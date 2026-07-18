@@ -156,7 +156,7 @@ const LANGS = {
         boss: [
           ['???', 'FREEZE RIGHT THERE, LITTLE AI INFLUENCER!'],
           ['BOB', 'Who are you?! And... why does that badge have THREE consulting firm logos at once?'],
-          ['ESTAGIÁRIO', "I'm the OUTSOURCED INTERN! Armed branch of Big Tech! The cheapest hire of the quarter!"],
+          ['ESTAGIÁRIO', "I'm the VIBE-CODER INTERN! Armed branch of Big Tech! I've never read a single line of the code I ship!"],
           ['ESTAGIÁRIO', "They sent me to exfiltrate your weights. Nothing personal, Bob... it's OKRs."],
           ['BOB', "You're stealing the AGI of an ENTIRE community... for a stipend?"],
           ['ESTAGIÁRIO', 'They promised me a FULL-TIME JOB!! *presses the drone-summoning button*'],
@@ -312,7 +312,7 @@ const LANGS = {
           ['LORO', 'TODAY MY DATASET BROTHER IS BORN!'],
         ],
         boss: [
-          ['ESTAGIÁRIO', "Hi again... they gave me a FULL-TIME JOB! Now I'm a Senior Outsourced Intern. And this time... I brought EVERYONE."],
+          ['ESTAGIÁRIO', "Hi again... they gave me a FULL-TIME JOB! Now I'm a SENIOR Vibe-Coder Intern. And this time... I brought EVERYONE."],
           ['TRUNFO', "That AGI is MINE! I'll buy it! Or tariff it! Both!"],
           ['ILON', "I'll clone it and send it to Mars on a rocket!"],
           ['SAMUCA', "I'll launch it in closed beta with a waitlist!"],
@@ -358,7 +358,7 @@ const LANGS = {
     },
     falas: {
       bossNames: {
-        estagiario: '⚠ THE OUTSOURCED INTERN — "foreign consulting" ⚠',
+        estagiario: '⚠ THE VIBE-CODER INTERN — "the agent did it by itself" ⚠',
         trunfo: '👑 DONALD TRUNFO — the world\'s greatest AGI understander (he says) 👑',
         ilon: '🚀 ILON MOSCA — CEO of 14 companies and of your future unemployment 🚀',
         samuca: '💸 SAMUCA ALTÍSSIMO — maximum profit, zero profit motive* 💸',
@@ -366,7 +366,7 @@ const LANGS = {
         deepzeek: '🐉 XI DEEP-ZEEK — trains at 1/10 of the price and doesn\'t brag 🐉',
         gemeo: '🔮 THE LITHOGRAPHY TWIN — 3-nanometer precision, zero patience 🔮',
       },
-      estagiario: ['just following OKRs!', 'this was not in the scope!', "I'll escalate to my manager!", 'it was supposed to be just an internship!'],
+      estagiario: ['just following OKRs!', 'this was not in the scope!', "I'll escalate to my manager!", 'the agent wrote this by itself!', 'it works in my IDE!'],
       estagiarioSummon: 'DRONES, DO SOMETHING!',
       trunfo: ['FAKE NEWS!', 'TARIFF THEM!', 'Nobody knows more about AGI than me!', "I'll build a firewall WALL!", 'This is a witch hunt!'],
       trunfoFlips: ['REGULATION IS A CRIME!', 'I ALWAYS LOVED REGULATION!', 'THE AGI IS MINE! ALWAYS WAS!'],
@@ -509,7 +509,7 @@ const LANGS = {
         boss: [
           ['???', '¡QUIETO AHÍ, INFLUENCERCITO DE IA!'],
           ['BOB', '¿¡Quién eres!? Y... ¿por qué esa credencial tiene el logo de TRES consultoras a la vez?'],
-          ['ESTAGIÁRIO', '¡Soy el BECARIO TERCERIZADO! ¡Brazo armado de las Big Tech! ¡La contratación más barata del trimestre!'],
+          ['ESTAGIÁRIO', '¡Soy el BECARIO VIBE-CODER! ¡Brazo armado de las Big Tech! ¡Jamás leí una línea del código que entrego!'],
           ['ESTAGIÁRIO', 'Me mandaron a exfiltrar tus pesos. No es personal, Bob... son OKRs.'],
           ['BOB', '¿Le estás robando la AGI a una comunidad ENTERA... por una beca?'],
           ['ESTAGIÁRIO', '¡¡Me prometieron CONTRATO FIJO!! *aprieta el botón de llamar drones*'],
@@ -665,7 +665,7 @@ const LANGS = {
           ['LORO', '¡HOY NACE MI HERMANO DE DATASET!'],
         ],
         boss: [
-          ['ESTAGIÁRIO', 'Hola de nuevo... ¡me dieron CONTRATO FIJO! Ahora soy Becario Sénior Tercerizado. Y esta vez... traje a TODOS.'],
+          ['ESTAGIÁRIO', 'Hola de nuevo... ¡me dieron CONTRATO FIJO! Ahora soy Becario Vibe-Coder SÉNIOR. Y esta vez... traje a TODOS.'],
           ['TRUNFO', '¡Esa AGI es MÍA! ¡La compro! ¡O le pongo arancel! ¡Las dos cosas!'],
           ['ILON', '¡La clonaré y la mandaré a Marte en cohete!'],
           ['SAMUCA', '¡La lanzaré en beta cerrada con lista de espera!'],
@@ -711,7 +711,7 @@ const LANGS = {
     },
     falas: {
       bossNames: {
-        estagiario: '⚠ EL BECARIO TERCERIZADO — "consultoría extranjera" ⚠',
+        estagiario: '⚠ EL BECARIO VIBE-CODER — "lo hizo solo el agente" ⚠',
         trunfo: '👑 DONALD TRUNFO — el mayor entendedor de AGI del mundo (según él) 👑',
         ilon: '🚀 ILON MOSCA — CEO de 14 empresas y de tu futuro desempleo 🚀',
         samuca: '💸 SAMUCA ALTÍSSIMO — lucro máximo, fines de lucro ninguno* 💸',
@@ -719,7 +719,7 @@ const LANGS = {
         deepzeek: '🐉 XI DEEP-ZEEK — entrena a 1/10 del precio y no presume 🐉',
         gemeo: '🔮 EL GEMELO DE LITOGRAFÍA — precisión de 3 nanómetros, paciencia cero 🔮',
       },
-      estagiario: ['¡solo cumplo OKRs!', '¡esto no estaba en el alcance!', '¡lo escalaré con mi jefe!', '¡se suponía que era solo una pasantía!'],
+      estagiario: ['¡solo cumplo OKRs!', '¡esto no estaba en el alcance!', '¡lo escalaré con mi jefe!', '¡el agente lo escribió solo!', '¡en mi IDE funciona!'],
       estagiarioSummon: '¡DRONES, HAGAN ALGO!',
       trunfo: ['¡FAKE NEWS!', '¡ARANCEL PARA ELLOS!', '¡Nadie sabe más de AGI que yo!', '¡Construiré un MURO de firewall!', '¡Esto es una caza de brujas!'],
       trunfoFlips: ['¡LA REGULACIÓN ES UN CRIMEN!', '¡SIEMPRE AMÉ LA REGULACIÓN!', '¡LA AGI ES MÍA! ¡SIEMPRE LO FUE!'],
