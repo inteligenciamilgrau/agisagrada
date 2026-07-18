@@ -3643,8 +3643,13 @@ function drawHUD() {
     }
     goBlinkWas = blinkOn;
     if (blinkOn) {
-      ctx.font = 'bold 26px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'right';
+      ctx.save();
+      ctx.font = 'bold 44px Courier New'; ctx.textAlign = 'right';
+      ctx.strokeStyle = '#a3320b'; ctx.lineWidth = 6;
+      ctx.strokeText('GO →', W - 24, H / 2);
+      ctx.fillStyle = '#ffd23f';
       ctx.fillText('GO →', W - 24, H / 2);
+      ctx.restore();
     }
   } else goBlinkWas = false;
 }
