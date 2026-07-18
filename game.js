@@ -3751,9 +3751,10 @@ function drawDialogBox(lines) {
     drawPortrait(bx + 12, top + 17, P, speaker, false, borderColor);
     textX = bx + P + 26; textW = boxW - P - 50;
   }
-  // nome em "pílula" arredondada
+  // nome em "pílula" arredondada (alguns falantes têm nome de exibição completo)
+  const displayNames = TR('speakerNames') || { 'ESTAGIÁRIO': 'ESTAGIÁRIO VIBE-CODER' };
   ctx.font = 'bold 12px Courier New';
-  const label = isSystem ? t('system') : speaker;
+  const label = isSystem ? t('system') : (displayNames[speaker] || speaker);
   const pillW = ctx.measureText(label).width + 20;
   const pillX = isSystem ? bx + boxW / 2 - pillW / 2 : isVillain ? bx + boxW - P - 24 - pillW : textX;
   ctx.fillStyle = borderColor;
