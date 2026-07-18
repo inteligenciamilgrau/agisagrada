@@ -986,7 +986,7 @@ function drawPlaceholderDrone(sx, sy, t) {
 // ---- Heróis jogáveis ----
 const HEROES = {
   bob: {
-    key: 'bob', name: 'BOB "INDIANA" MILGRAU', desc: 'equilibrado — o líder',
+    key: 'bob', name: '"INDIANA" BOB', desc: 'equilibrado — o líder',
     hp: 100, speed: 190, dmg: 8,
     idle: 'idle', walk: 'walk',
     specialText: 'PROMPT ENGENHEIRADO!', specialColor: '#ffd23f', specialDmg: 40,
