@@ -730,8 +730,6 @@ function drawMap() {
     ctx.fillText('— ESPAÇO pra continuar —', W / 2, H - 14);
   }
 }
-let saciTimer = 9; // Saci-Bot rouba armas quando os Roboticistas o montarem
-let saciRevengeCd = 0; // e REVIDA quando o herói apanha (guarda-costas!)
 
 // ---- Textos flutuantes ----
 const floatTexts = [];
@@ -1163,6 +1161,89 @@ class Companion {
 }
 let companion = new Companion();
 
+// ---- SACI-BOT — companion terrestre (após a conquista dos Roboticistas) ----
+// Espelho do Loro: quando o herói ataca NO CHÃO, o Saci avança no inimigo mais próximo!
+class SaciBot {
+  constructor() {
+    this.x = 0; this.gy = 460;
+    this.facing = 1;
+    this.frame = 0; this.frameTime = 0;
+    this.target = null;
+    this.hitFlash = 0;
+  }
+  attack() {
+    if (!conquests.blueprints) return;
+    const alvos = enemies.filter(e => !e.dead);
+    if (!alvos.length) return;
+    this.target = alvos.reduce((a, b) =>
+      Math.abs(a.x - player.x) < Math.abs(b.x - player.x) ? a : b);
+    beep(900, 0.06, 'triangle');
+  }
+  update() {
+    if (!conquests.blueprints) return;
+    this.hitFlash = Math.max(0, this.hitFlash - dt);
+    if (this.target) {
+      const alvo = this.target;
+      if (alvo.dead || alvo.removeMe) { this.target = null; }
+      else {
+        // redemoinho: avança rasteiro no alvo
+        const tdx = alvo.x - this.x, tdy = alvo.gy - this.gy;
+        this.x += Math.sign(tdx) * Math.min(Math.abs(tdx), 560 * dt);
+        this.gy += Math.sign(tdy) * Math.min(Math.abs(tdy), 380 * dt);
+        this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
+        this.facing = Math.sign(tdx) || this.facing;
+        if (Math.abs(tdx) < 44 && Math.abs(tdy) < 24) {
+          const dmg = 2 + Math.floor(Math.random() * 4); // pancada: 2 a 5
+          alvo.takeHit(dmg, this.facing, false);
+          spawnText(alvo.screenX, alvo.screenY - 90, `🌪 PANCADA! (${dmg})`, '#ff5533', 1.1);
+          this.hitFlash = 0.4;
+          sfx.hit();
+          this.target = null;
+        }
+      }
+    } else {
+      // segue o herói pelo chão, do lado oposto ao Loro
+      const tx = player.x - player.facing * 36;
+      const ty = player.gy + 16;
+      this.x += (tx - this.x) * Math.min(1, dt * 4);
+      this.gy += (ty - this.gy) * Math.min(1, dt * 4);
+      this.gy = Math.max(GROUND_TOP, Math.min(GROUND_BOTTOM, this.gy));
+      this.facing = player.facing;
+    }
+    this.frameTime += dt;
+    const frames = getAnim('sacibot', this.target ? 'teleport' : 'idle') || getAnim('sacibot', 'idle');
+    const n = frames ? frames.length : 4;
+    while (this.frameTime > 1 / 8) { this.frameTime -= 1 / 8; this.frame = (this.frame + 1) % n; }
+  }
+  draw() {
+    if (!conquests.blueprints) return;
+    const sx = this.x - camX, sy = this.gy;
+    // sombra
+    ctx.save();
+    ctx.globalAlpha = 0.3; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(sx, sy + 4, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    const frames = getAnim('sacibot', this.target ? 'teleport' : 'idle') || getAnim('sacibot', 'idle');
+    if (frames) {
+      const img = frames[this.frame % frames.length];
+      const s = SCALE * 0.85;
+      ctx.save();
+      ctx.translate(sx, sy - Math.abs(Math.sin(time * 6)) * 5); // pulinho na turbina
+      if (this.facing === -1) ctx.scale(-1, 1);
+      if (this.hitFlash > 0) ctx.filter = 'brightness(1.8)';
+      ctx.drawImage(img, -ANCHOR_X * s, -ANCHOR_Y * s, CELL * s, CELL * s);
+      ctx.restore();
+    } else {
+      // placeholder: redemoinho com gorro
+      ctx.font = '24px serif'; ctx.textAlign = 'center';
+      ctx.fillText('🌪', sx, sy - 8 - Math.abs(Math.sin(time * 6)) * 5);
+      ctx.font = '10px serif';
+      ctx.fillText('🔴', sx, sy - 32 - Math.abs(Math.sin(time * 6)) * 5);
+    }
+  }
+}
+let saci = new SaciBot();
+
 // ---- Player ----
 class Player extends Entity {
   constructor(heroKey) {
@@ -1269,8 +1350,10 @@ class Player extends Entity {
     if (attackPressed) {
       attackPressed = false;
       this.attackHitDone = false;
-      if (this.jumpH === 0) this.setState('attack');
-      else {
+      if (this.jumpH === 0) {
+        this.setState('attack');
+        saci.attack(); // golpe no chão: o SACI-BOT avança junto!
+      } else {
         this.setState('airattack'); beep(500, 0.06, 'triangle'); // voadora!
         companion.diveAttack(); // e o Loro mergulha no inimigo mais próximo!
       }
@@ -1324,20 +1407,6 @@ class Player extends Entity {
     this.x += dir * 24;
     sfx.hurt(); shake = Math.max(shake, 0.15);
     spawnText(this.screenX, this.screenY - 120, `-${dmg}`, '#ff5555');
-    // SACI-BOT guarda-costas: teleporta no agressor e revida na hora!
-    if (conquests.blueprints && saciRevengeCd <= 0) {
-      const alvos = enemies.filter(e => !e.dead);
-      if (alvos.length) {
-        const alvo = alvos.reduce((a, b) =>
-          Math.abs(a.x - this.x) < Math.abs(b.x - this.x) ? a : b);
-        saciRevengeCd = 6;
-        const rdmg = 8 + Math.floor(Math.random() * 6);
-        alvo.takeHit(rdmg, Math.sign(alvo.x - this.x) || 1, false);
-        alvo.attackCd = (alvo.attackCd || 0) + 2.5;
-        spawnText(alvo.screenX, alvo.screenY - 120, `🌪 SACI-BOT REVIDOU! (${rdmg})`, '#ff5533', 1.2);
-        beep(1200, 0.1, 'triangle');
-      }
-    }
     if (this.hp <= 0) { this.hp = 0; gameState = 'gameover'; }
   }
   draw() {
@@ -2807,7 +2876,7 @@ const PHASES = [
       ['ILON', 'Eu... perdi? EU PERDI?! Isso nunca aconteceu. Bem... uma aposta é uma aposta. *assina o cheque chorando em ASCII*'],
       ['BOB', 'PATROCÍNIO GARANTIDO! E olha: ele fez questão de 1% do projeto. Sem direito a voto. Pra tristeza dele.'],
       ['SISTEMA', '💰 CONQUISTA: INVESTIMENTO! O Ilon agora financia o Labs IMG (e tuíta que a ideia foi dele).'],
-      ['SISTEMA', '🤖 BÔNUS: Guilda dos Roboticistas montou o SACI-BOT com os blueprints do Optimus! Ele rouba armas na luta!'],
+      ['SISTEMA', '🤖 BÔNUS: Guilda dos Roboticistas montou o SACI-BOT com os blueprints do Optimus! Ele luta JUNTO: quando você bate no chão, ele avança no inimigo mais próximo!'],
       ['SISTEMA', '⚖ Contraexemplo nº 2: "não demita quem te carrega".'],
       ['BOB', 'Peça 3: GRANA ✔. Agora falta GENTE que saiba treinar modelo. E soube que o Vale do Silício anda demitindo os melhores...'],
     ],
@@ -3337,6 +3406,9 @@ function loadPhase(i, keepPlayer) {
   companion = new Companion();
   companion.x = player.x - 60;
   companion.gy = player.gy;
+  saci = new SaciBot();
+  saci.x = player.x - 40;
+  saci.gy = player.gy + 16;
 }
 
 function updateWaves() {
@@ -4093,22 +4165,7 @@ function frame(ts) {
       updateFloatTexts();
       for (const a of allies) a.update();
       allies = allies.filter(a => !a.removeMe);
-      saciRevengeCd = Math.max(0, saciRevengeCd - dt);
-      // 🌪 SACI-BOT (conquista dos Roboticistas): rouba a arma de um inimigo
-      if (conquests.blueprints) {
-        saciTimer -= dt;
-        if (saciTimer <= 0) {
-          saciTimer = 9;
-          const alvos = enemies.filter(e => !e.dead);
-          if (alvos.length) {
-            const alvo = alvos[Math.floor(Math.random() * alvos.length)];
-            alvo.attackCd = (alvo.attackCd || 0) + 4;
-            if (alvo.launchCd !== undefined) alvo.launchCd += 4;
-            spawnText(alvo.screenX, alvo.screenY - 120, '🌪 SACI-BOT roubou a arma!', '#ff5533', 1.2);
-            beep(1200, 0.08, 'triangle');
-          }
-        }
-      }
+      saci.update(); // 🌪 SACI-BOT luta junto (conquista dos Roboticistas)
     }
 
     drawBackground();
@@ -4118,13 +4175,7 @@ function frame(ts) {
     updateDrawCoin();
     for (const ent of all) ent.draw();
     companion.draw();
-    // Saci-Bot fica de guarda perto do herói (quando o sprite chegar do Codex)
-    if (conquests.blueprints && hasAnim('sacibot', 'idle')) {
-      const frames = assets.anims.sacibot.idle;
-      const img = frames[Math.floor(time * 6) % frames.length];
-      const s = SCALE * 0.8;
-      ctx.drawImage(img, player.screenX + 40 - 64 * s, player.screenY - 116 * s, CELL * s, CELL * s);
-    }
+    saci.draw();
     drawProjectiles();
     updateDrawImpacts();
     drawFloatTexts();
