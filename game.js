@@ -3567,12 +3567,21 @@ function drawHUD() {
   ctx.font = '11px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'center';
   ctx.fillText(`${currentPhase.title} · ${currentPhase.place}`, W / 2, 22);
   if (!currentPhase.finalPhase && currentLock === null && camX < currentPhase.stageLen - W && enemies.every(e => e.dead || e.removeMe)) {
-    if (Math.floor(time * 2) % 2 === 0) {
+    const blinkOn = Math.floor(time * 2) % 2 === 0;
+    if (blinkOn && !goBlinkWas) {
+      // plin plin plin! (o sininho clássico do GO)
+      beep(1319, 0.05, 'sine', 0.07);
+      setTimeout(() => beep(1568, 0.05, 'sine', 0.07), 70);
+      setTimeout(() => beep(2093, 0.07, 'sine', 0.07), 140);
+    }
+    goBlinkWas = blinkOn;
+    if (blinkOn) {
       ctx.font = 'bold 26px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'right';
       ctx.fillText('GO →', W - 24, H / 2);
     }
-  }
+  } else goBlinkWas = false;
 }
+let goBlinkWas = false;
 
 // ---- Diálogos estilo VERSUS: herói à esquerda, vilão à direita ----
 const VILLAIN_SPEAKERS = ['???', 'ESTAGIÁRIO', 'TRUNFO', 'ILON', 'SAMUCA', 'DÁRIO', 'DEEP-ZEEK', 'GÊMEO'];
