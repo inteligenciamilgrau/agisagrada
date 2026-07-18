@@ -1,8 +1,1 @@
-Use case: logo-brand
-Asset type: game title logo
-Primary request: a Hollywood blockbuster adventure title logo containing exactly the Portuguese title "BOB EM BUSCA DA AGI SAGRADA"
-Style/medium: massive 3D golden beveled adventure-film lettering, warm metallic shine, weathered ancient-relic texture, subtle circuit-board engravings inside the letter faces, dramatic rim light
-Composition/framing: wide landscape on a perfectly solid black background; "BOB EM BUSCA DA" smaller on the top line, "AGI SAGRADA" very large below, gentle upward arc, centered with generous margins
-Text (verbatim): "BOB EM BUSCA DA AGI SAGRADA"
-Spelling lock: B-O-B / E-M / B-U-S-C-A / D-A / A-G-I / S-A-G-R-A-D-A
-Constraints: render the exact title once, all caps, no accent changes, no extra words, no other text, no watermark, no unrelated symbols
+Edit the attached title logo only. Preserve the exact lettering and exact spelling, line breaks, composition, perspective, proportions, gold circuit-engraved surfaces, beveled 3D depth, highlights, and warm glow: top line exactly "BOB EM BUSCA DA"; bottom line exactly "AGI SAGRADA". Replace the entire black background with one perfectly flat, uniform, fully saturated solid #FF00FF magenta chroma-key field, including every background opening and negative space around and inside the letters. Do not create transparency preview checkers, checkerboard squares, gradients, texture, shadows on the background, or any background variation. Keep black/dark pixels only where they belong to the logo's attached 3D bevel/shadow. No black rectangle, scenery, extra symbols, watermark, or new text. Output the complete logo with generous magenta margin, ready for chroma-key removal. Final accepted asset is chroma-key cleaned to real RGBA transparency.
