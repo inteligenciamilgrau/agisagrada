@@ -4019,13 +4019,24 @@ function drawPhaseSplash() {
   ctx.save();
   ctx.globalAlpha = Math.max(0, Math.min(1, a)); // clamp: sem pisca no finzinho
   const top = 58;
+  // a caixa se ajusta ao texto (títulos longos encolhem a fonte se preciso)
+  let titleFont = 28;
+  ctx.font = `bold ${titleFont}px Courier New`;
+  while (titleFont > 16 && ctx.measureText(currentPhase.title).width > W - 120) {
+    titleFont -= 2;
+    ctx.font = `bold ${titleFont}px Courier New`;
+  }
+  const wTitle = ctx.measureText(currentPhase.title).width;
+  ctx.font = '15px Courier New';
+  const wPlace = ctx.measureText(currentPhase.place).width;
+  const boxW = Math.min(W - 40, Math.max(wTitle, wPlace) + 70);
   ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
   ctx.fillStyle = 'rgba(8,8,18,0.85)';
-  rr(W / 2 - 330, top, 660, 84, 14); ctx.fill();
+  rr(W / 2 - boxW / 2, top, boxW, 84, 14); ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 2;
-  rr(W / 2 - 330, top, 660, 84, 14); ctx.stroke();
-  ctx.font = 'bold 28px Courier New'; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'center';
+  rr(W / 2 - boxW / 2, top, boxW, 84, 14); ctx.stroke();
+  ctx.font = `bold ${titleFont}px Courier New`; ctx.fillStyle = '#ffd23f'; ctx.textAlign = 'center';
   ctx.fillText(currentPhase.title, W / 2, top + 38);
   ctx.font = '15px Courier New'; ctx.fillStyle = '#fff';
   ctx.fillText(currentPhase.place, W / 2, top + 66);
