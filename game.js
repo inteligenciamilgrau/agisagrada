@@ -22,6 +22,12 @@ function resize() {
 resize();
 addEventListener('resize', resize);
 
+// telas de toque costumam ter menos altura de viewport que os 540px internos do
+// jogo (ex.: celular em landscape ~375-430px) — o canvas acaba encolhido pelo CSS
+// e o texto pequeno das caixas de diálogo/história fica ilegível; nesses casos
+// aumentamos a fonte e as caixas só nessas telas específicas.
+const isTouchDevice = matchMedia('(hover: none) and (pointer: coarse)').matches;
+
 // ---- Configuração dos sprites (formato agent-sprite-forge) ----
 // células 128x128, pés ancorados em (64,116) — vem do pipeline-meta.json
 const CELL = 128, ANCHOR_X = 64, ANCHOR_Y = 116;
@@ -156,6 +162,56 @@ document.querySelectorAll('#touchControls [data-key]').forEach(el => {
   el.addEventListener('pointerleave', deactivate);
   el.addEventListener('contextmenu', e => e.preventDefault());
 });
+
+// ---- D-pad de arrasto: desliza o dedo entre as direções sem soltar (inclui diagonal) ----
+const tcDpad = document.getElementById('tcDpad');
+if (tcDpad) {
+  const dpadBtn = {
+    arrowup: tcDpad.querySelector('.tc-up'),
+    arrowdown: tcDpad.querySelector('.tc-down'),
+    arrowleft: tcDpad.querySelector('.tc-left'),
+    arrowright: tcDpad.querySelector('.tc-right'),
+  };
+  const DEADZONE = 20;
+  let dpadActive = new Set();
+  let dpadPointerId = null;
+
+  function computeDirs(clientX, clientY) {
+    const rect = tcDpad.getBoundingClientRect();
+    const dx = clientX - (rect.left + rect.width / 2);
+    const dy = clientY - (rect.top + rect.height / 2);
+    const dirs = new Set();
+    if (dx < -DEADZONE) dirs.add('arrowleft');
+    if (dx > DEADZONE) dirs.add('arrowright');
+    if (dy < -DEADZONE) dirs.add('arrowup');
+    if (dy > DEADZONE) dirs.add('arrowdown');
+    return dirs;
+  }
+  function applyDirs(newDirs) {
+    for (const k of dpadActive) {
+      if (!newDirs.has(k)) { releaseKey(k); dpadBtn[k] && dpadBtn[k].classList.remove('tc-active'); }
+    }
+    for (const k of newDirs) {
+      if (!dpadActive.has(k)) { tryAutoFullscreen(); pressKey(k); dpadBtn[k] && dpadBtn[k].classList.add('tc-active'); }
+    }
+    dpadActive = newDirs;
+  }
+  function releaseAllDpad() { applyDirs(new Set()); dpadPointerId = null; }
+
+  tcDpad.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    dpadPointerId = e.pointerId;
+    tcDpad.setPointerCapture(e.pointerId);
+    applyDirs(computeDirs(e.clientX, e.clientY));
+  });
+  tcDpad.addEventListener('pointermove', e => {
+    if (e.pointerId !== dpadPointerId) return;
+    e.preventDefault();
+    applyDirs(computeDirs(e.clientX, e.clientY));
+  });
+  tcDpad.addEventListener('pointerup', e => { if (e.pointerId === dpadPointerId) releaseAllDpad(); });
+  tcDpad.addEventListener('pointercancel', e => { if (e.pointerId === dpadPointerId) releaseAllDpad(); });
+}
 
 // ---- Configurações de áudio (persistem no navegador) ----
 const settings = {
@@ -3614,23 +3670,25 @@ function drawStory(slides) {
   // legenda com efeito máquina de escrever
   storyChars += dt * 45;
   const shown = slideText(slides, storyIndex).slice(0, Math.floor(storyChars));
-  const boxW = Math.min(W * 0.8, 820), bx = W / 2 - boxW / 2, by = H - 128;
+  const textFont = isTouchDevice ? 18 : 14, lh = isTouchDevice ? 25 : 20;
+  const boxH = isTouchDevice ? 128 : 92;
+  const boxW = Math.min(W * 0.8, 820), bx = W / 2 - boxW / 2, by = H - boxH - 36;
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
   ctx.fillStyle = 'rgba(10,10,20,0.88)';
-  rr(bx, by, boxW, 92, 14); ctx.fill();
+  rr(bx, by, boxW, boxH, 14); ctx.fill();
   ctx.restore();
   ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 2;
-  rr(bx, by, boxW, 92, 14); ctx.stroke();
-  ctx.font = '14px Courier New'; ctx.fillStyle = '#f5e6b8'; ctx.textAlign = 'left';
-  wrapText(shown, bx + 24, by + 30, boxW - 48, 20);
+  rr(bx, by, boxW, boxH, 14); ctx.stroke();
+  ctx.font = `${textFont}px Courier New`; ctx.fillStyle = '#f5e6b8'; ctx.textAlign = 'left';
+  wrapText(shown, bx + 24, by + textFont + 12, boxW - 48, lh);
   // progresso (pontinhos) + dica
   ctx.textAlign = 'center';
   for (let i = 0; i < slides.length; i++) {
     ctx.fillStyle = i === storyIndex ? '#ffd23f' : '#444';
     ctx.beginPath(); ctx.arc(W / 2 - (slides.length - 1) * 9 + i * 18, H - 16, 4, 0, 7); ctx.fill();
   }
-  ctx.font = '10px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
+  ctx.font = `${isTouchDevice ? 13 : 10}px Courier New`; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText(t('storyHint'), W - 20, H - 12);
 }
 
@@ -3756,8 +3814,10 @@ function drawDialogBox(lines) {
   if (speaker === 'BOB') speaker = HERO_SPEAKER_NAME[player.char] || 'BOB';
   const isVillain = VILLAIN_SPEAKERS.includes(speaker);
   const isSystem = speaker === 'SISTEMA';
-  const top = 24, boxH = 112, P = 78;
-  const boxW = Math.min(W * 0.66, 640);
+  const top = 24, boxH = isTouchDevice ? 146 : 112, P = isTouchDevice ? 88 : 78;
+  const boxW = Math.min(W * (isTouchDevice ? 0.78 : 0.66), isTouchDevice ? 760 : 640);
+  const nameFont = isTouchDevice ? 15 : 12, textFont = isTouchDevice ? 17 : 13, hintFont = isTouchDevice ? 13 : 10;
+  const textLh = isTouchDevice ? 22 : 17;
   const bx = isSystem ? W / 2 - boxW / 2 : isVillain ? W - 30 - boxW : 30;
   const borderColor = isSystem ? '#66ff88' : isVillain ? '#ff5544' : '#ffd23f';
 
@@ -3794,18 +3854,19 @@ function drawDialogBox(lines) {
   }
   // nome em "pílula" arredondada (alguns falantes têm nome de exibição completo)
   const displayNames = TR('speakerNames') || { 'ESTAGIÁRIO': 'ESTAGIÁRIO VIBE-CODER' };
-  ctx.font = 'bold 12px Courier New';
+  ctx.font = `bold ${nameFont}px Courier New`;
   const label = isSystem ? t('system') : (displayNames[speaker] || speaker);
   const pillW = ctx.measureText(label).width + 20;
+  const pillH = nameFont + 7;
   const pillX = isSystem ? bx + boxW / 2 - pillW / 2 : isVillain ? bx + boxW - P - 24 - pillW : textX;
   ctx.fillStyle = borderColor;
-  rr(pillX, top + 10, pillW, 19, 9); ctx.fill();
+  rr(pillX, top + 10, pillW, pillH, 9); ctx.fill();
   ctx.fillStyle = '#101018'; ctx.textAlign = 'center';
-  ctx.fillText(label, pillX + pillW / 2, top + 24);
+  ctx.fillText(label, pillX + pillW / 2, top + 10 + pillH / 2 + nameFont * 0.35);
 
-  ctx.font = '13px Courier New'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-  wrapText(text, textX, top + 50, textW, 17);
-  ctx.font = '10px Courier New'; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
+  ctx.font = `${textFont}px Courier New`; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+  wrapText(text, textX, top + 20 + textFont, textW, textLh);
+  ctx.font = `${hintFont}px Courier New`; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText(t('dialogHint'), bx + boxW - 16, top + boxH - 9);
 }
 function wrapText(text, x, y, maxW, lh) {

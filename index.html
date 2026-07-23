@@ -49,7 +49,10 @@
     left: calc(16px + env(safe-area-inset-left));
     bottom: calc(16px + env(safe-area-inset-bottom));
     width: 150px; height: 150px;
+    pointer-events: auto;
+    touch-action: none;
   }
+  .tc-dpad-btn { pointer-events: none; }
   .tc-dpad-btn { width: 50px; height: 50px; }
   .tc-up    { top: 0;   left: 50px; border-radius: 10px 10px 0 0; }
   .tc-left  { top: 50px; left: 0;   border-radius: 10px 0 0 10px; }
@@ -103,10 +106,10 @@
 
   <div id="touchControls">
     <div id="tcDpad">
-      <button class="tc-btn tc-dpad-btn tc-up" data-key="arrowup">▲</button>
-      <button class="tc-btn tc-dpad-btn tc-left" data-key="arrowleft">◀</button>
-      <button class="tc-btn tc-dpad-btn tc-right" data-key="arrowright">▶</button>
-      <button class="tc-btn tc-dpad-btn tc-down" data-key="arrowdown">▼</button>
+      <button class="tc-btn tc-dpad-btn tc-up">▲</button>
+      <button class="tc-btn tc-dpad-btn tc-left">◀</button>
+      <button class="tc-btn tc-dpad-btn tc-right">▶</button>
+      <button class="tc-btn tc-dpad-btn tc-down">▼</button>
     </div>
     <div id="tcActions">
       <button class="tc-btn tc-round tc-l" data-key="l">L</button>
