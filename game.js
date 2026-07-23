@@ -136,9 +136,19 @@ document.addEventListener('visibilitychange', releaseAllKeys);
 document.addEventListener('fullscreenchange', releaseAllKeys);
 
 // ---- Controles de toque (mobile) ----
+// primeiro toque tenta esconder a barra de endereço (equivalente ao F11 no mobile);
+// no iOS a Fullscreen API não existe fora de <video>, então isso só funciona no Android/Chrome
+let triedAutoFullscreen = false;
+function tryAutoFullscreen() {
+  if (triedAutoFullscreen) return;
+  triedAutoFullscreen = true;
+  if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
 document.querySelectorAll('#touchControls [data-key]').forEach(el => {
   const k = el.dataset.key;
-  const activate = e => { e.preventDefault(); el.classList.add('tc-active'); pressKey(k); };
+  const activate = e => { e.preventDefault(); tryAutoFullscreen(); el.classList.add('tc-active'); pressKey(k); };
   const deactivate = e => { e.preventDefault(); el.classList.remove('tc-active'); releaseKey(k); };
   el.addEventListener('pointerdown', activate);
   el.addEventListener('pointerup', deactivate);

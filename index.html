@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Bob em Busca da AGI Sagrada</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<!-- iOS: se o jogador adicionar à Tela de Início, abre sem a barra do Safari (não existe Fullscreen API pra página normal no iOS) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bob AGI">
+<meta name="theme-color" content="#000000">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000; overscroll-behavior: none; }
@@ -112,6 +118,7 @@
       <button class="tc-mini tc-btn" data-key="t" title="Plano">🗺</button>
       <button class="tc-mini tc-btn" data-key="m" title="Mudo">🔊</button>
       <button class="tc-mini tc-btn" data-key="o" title="Opções">⚙</button>
+      <button class="tc-mini tc-btn" data-key="f" title="Tela cheia">⛶</button>
       <button class="tc-mini tc-btn" data-key="escape" title="Voltar">⎋</button>
     </div>
   </div>
