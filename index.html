@@ -2,21 +2,125 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Bob em Busca da AGI Sagrada</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; overscroll-behavior: none; }
   canvas {
     display: block;
     width: 100vw; height: 100vh;
     image-rendering: pixelated; image-rendering: crisp-edges;
   }
+
+  /* ---- Controles de toque (celular/tablet) ---- */
+  #touchControls {
+    position: fixed; inset: 0; z-index: 10;
+    display: none;
+    pointer-events: none;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    #touchControls { display: block; }
+  }
+  .tc-btn, .tc-mini, #tcOk {
+    position: absolute;
+    pointer-events: auto;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    background: rgba(255,255,255,0.14);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: #fff;
+    font: bold 18px 'Courier New', monospace;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tc-btn.tc-active, .tc-mini.tc-active, #tcOk.tc-active { background: rgba(255,255,255,0.4); }
+
+  #tcDpad {
+    position: absolute;
+    left: calc(16px + env(safe-area-inset-left));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 150px; height: 150px;
+  }
+  .tc-dpad-btn { width: 50px; height: 50px; }
+  .tc-up    { top: 0;   left: 50px; border-radius: 10px 10px 0 0; }
+  .tc-left  { top: 50px; left: 0;   border-radius: 10px 0 0 10px; }
+  .tc-right { top: 50px; left: 100px; border-radius: 0 10px 10px 0; }
+  .tc-down  { top: 100px; left: 50px; border-radius: 0 0 10px 10px; }
+
+  #tcActions {
+    position: absolute;
+    right: calc(16px + env(safe-area-inset-right));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 170px; height: 170px;
+  }
+  .tc-round { border-radius: 50%; }
+  .tc-l { width: 60px; height: 60px; right: 96px; bottom: 96px; }
+  .tc-k { width: 60px; height: 60px; right: 0;    bottom: 96px; }
+  .tc-j { width: 76px; height: 76px; right: 45px; bottom: 10px; font-size: 20px; }
+
+  #tcOk {
+    left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    min-width: 90px; height: 44px; border-radius: 22px;
+    font-size: 13px; letter-spacing: 1px;
+  }
+
+  #tcTop {
+    position: absolute;
+    top: calc(8px + env(safe-area-inset-top));
+    right: calc(8px + env(safe-area-inset-right));
+    display: flex; gap: 8px;
+  }
+  .tc-mini { position: static; width: 36px; height: 36px; border-radius: 8px; font-size: 15px; }
+
+  #rotateOverlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 20;
+    background: #000; color: #fff;
+    flex-direction: column; align-items: center; justify-content: center;
+    font: bold 15px 'Courier New', monospace; text-align: center; gap: 14px;
+    padding: 20px;
+  }
+  .rotate-icon { font-size: 48px; animation: tcRotate 1.6s ease-in-out infinite; }
+  @keyframes tcRotate { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+
+  @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+    #rotateOverlay { display: flex; }
+    canvas, #touchControls { visibility: hidden; }
+  }
 </style>
 </head>
 <body>
   <canvas id="game"></canvas>
+
+  <div id="touchControls">
+    <div id="tcDpad">
+      <button class="tc-btn tc-dpad-btn tc-up" data-key="arrowup">▲</button>
+      <button class="tc-btn tc-dpad-btn tc-left" data-key="arrowleft">◀</button>
+      <button class="tc-btn tc-dpad-btn tc-right" data-key="arrowright">▶</button>
+      <button class="tc-btn tc-dpad-btn tc-down" data-key="arrowdown">▼</button>
+    </div>
+    <div id="tcActions">
+      <button class="tc-btn tc-round tc-l" data-key="l">L</button>
+      <button class="tc-btn tc-round tc-k" data-key="k">K</button>
+      <button class="tc-btn tc-round tc-j" data-key="j">J</button>
+    </div>
+    <button id="tcOk" class="tc-btn" data-key="enter">OK ▶</button>
+    <div id="tcTop">
+      <button class="tc-mini tc-btn" data-key="t" title="Plano">🗺</button>
+      <button class="tc-mini tc-btn" data-key="m" title="Mudo">🔊</button>
+      <button class="tc-mini tc-btn" data-key="o" title="Opções">⚙</button>
+      <button class="tc-mini tc-btn" data-key="escape" title="Voltar">⎋</button>
+    </div>
+  </div>
+
+  <div id="rotateOverlay">
+    <div class="rotate-icon">🔄</div>
+    <div id="rotateText">GIRE O CELULAR PARA JOGAR</div>
+  </div>
+
   <script src="lang.js"></script>
   <script src="game.js"></script>
 </body>

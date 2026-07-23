@@ -104,8 +104,8 @@ function getAnim(charKey, action) {
 // ---- Input ----
 const keys = {};
 let enterPressed = false, attackPressed = false, escPressed = false, pPressed = false, tPressed = false;
-addEventListener('keydown', e => {
-  const k = e.key.toLowerCase();
+// pressKey/releaseKey: mesma lógica do teclado, reutilizada pelos controles de toque
+function pressKey(k) {
   // ESC fora do guard: ao sair do fullscreen o navegador engole o keyup
   if (k === 'escape') { escPressed = true; return; }
   startMusic(); // navegador só libera áudio após gesto do usuário
@@ -121,13 +121,31 @@ addEventListener('keydown', e => {
     }
   }
   keys[k] = true;
+}
+function releaseKey(k) { keys[k] = false; }
+
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  pressKey(k);
   if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
 });
-addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+addEventListener('keyup', e => { releaseKey(e.key.toLowerCase()); });
 function releaseAllKeys() { for (const k in keys) keys[k] = false; }
 addEventListener('blur', releaseAllKeys);
 document.addEventListener('visibilitychange', releaseAllKeys);
 document.addEventListener('fullscreenchange', releaseAllKeys);
+
+// ---- Controles de toque (mobile) ----
+document.querySelectorAll('#touchControls [data-key]').forEach(el => {
+  const k = el.dataset.key;
+  const activate = e => { e.preventDefault(); el.classList.add('tc-active'); pressKey(k); };
+  const deactivate = e => { e.preventDefault(); el.classList.remove('tc-active'); releaseKey(k); };
+  el.addEventListener('pointerdown', activate);
+  el.addEventListener('pointerup', deactivate);
+  el.addEventListener('pointercancel', deactivate);
+  el.addEventListener('pointerleave', deactivate);
+  el.addEventListener('contextmenu', e => e.preventDefault());
+});
 
 // ---- Configurações de áudio (persistem no navegador) ----
 const settings = {
@@ -145,6 +163,14 @@ const t = k => {
 };
 const TR = k => (LTX().falas && LTX().falas[k]) || null; // null → usa o PT inline
 const fmt = (s, n) => s.replace('{n}', n);
+
+// ---- Sincroniza rótulos dos controles de toque (idioma / mudo) ----
+const tcMuteBtn = document.querySelector('#touchControls [data-key="m"]');
+const rotateTextEl = document.getElementById('rotateText');
+setInterval(() => {
+  if (tcMuteBtn) tcMuteBtn.textContent = settings.musicOn ? '🔊' : '🔇';
+  if (rotateTextEl) rotateTextEl.textContent = t('rotateHint');
+}, 300);
 const DIFF_LEVELS = ['facil', 'medio', 'dificil'];
 const DIFF_INFO = {
   facil:   { label: 'FÁCIL',   take: 1,    deal: 1,    color: '#3e3' },

@@ -54,6 +54,7 @@ const LANGS = {
       popupTitle: '⭐ ACEITE OS TERMOS',
       popupBody: ['Ao continuar respirando, você', 'concorda com os 900 termos,', 'inclusive a cláusula 47-B (sua', 'alma agora é um dado de treino).'],
       popupBtn: 'ACEITAR TUDO',
+      rotateHint: 'GIRE O CELULAR PARA JOGAR',
     },
   },
 
@@ -105,6 +106,7 @@ const LANGS = {
       popupTitle: '⭐ ACCEPT THE TERMS',
       popupBody: ['By continuing to breathe, you', 'agree to all 900 terms,', 'including clause 47-B (your', 'soul is now training data).'],
       popupBtn: 'ACCEPT ALL',
+      rotateHint: 'ROTATE YOUR PHONE TO PLAY',
     },
     heroes: { bob: 'ENGINEERED PROMPT!', fefe: 'IMAGENET!', escudeiro: 'CHAT RAID!' },
     plan: [
@@ -459,6 +461,7 @@ const LANGS = {
       popupTitle: '⭐ ACEPTA LOS TÉRMINOS',
       popupBody: ['Al seguir respirando, aceptas', 'los 900 términos, incluida', 'la cláusula 47-B (tu alma', 'ahora es dato de entrenamiento).'],
       popupBtn: 'ACEPTAR TODO',
+      rotateHint: 'GIRA EL CELULAR PARA JUGAR',
     },
     heroes: { bob: '¡PROMPT INGENIERIZADO!', fefe: '¡IMAGENET!', escudeiro: '¡RAID DEL CHAT!' },
     plan: [
