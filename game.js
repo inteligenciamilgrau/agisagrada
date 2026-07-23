@@ -116,7 +116,9 @@ function pressKey(k) {
   if (k === 'escape') { escPressed = true; return; }
   startMusic(); // navegador só libera áudio após gesto do usuário
   if (!keys[k]) {
-    if (k === 'enter' || k === ' ') enterPressed = true;
+    // fora do jogo (menus/diálogo/história) J, K e L também confirmam/avançam,
+    // já que nesses estados o jogo nunca olha pra attackPressed/keys['k']/keys['l']
+    if (k === 'enter' || k === ' ' || k === 'j' || k === 'k' || k === 'l') enterPressed = true;
     if (k === 'j') attackPressed = true;
     if (k === 'm') { settings.musicOn = !settings.musicOn; saveSettings(); }
     if (k === 'o') pPressed = true; // O de Opções
@@ -152,23 +154,10 @@ function tryAutoFullscreen() {
     document.documentElement.requestFullscreen().catch(() => {});
   }
 }
-// sem botão de OK: nas telas de menu/diálogo (fora do 'play') J/K/L não fazem
-// ataque/pulo/especial, então valem como confirmar/avançar texto também
 document.querySelectorAll('#touchControls [data-key]').forEach(el => {
   const k = el.dataset.key;
-  const alsoEnter = k === 'j' || k === 'k' || k === 'l';
-  const activate = e => {
-    e.preventDefault(); tryAutoFullscreen();
-    el.classList.add('tc-active');
-    pressKey(k);
-    if (alsoEnter) pressKey('enter');
-  };
-  const deactivate = e => {
-    e.preventDefault();
-    el.classList.remove('tc-active');
-    releaseKey(k);
-    if (alsoEnter) releaseKey('enter');
-  };
+  const activate = e => { e.preventDefault(); tryAutoFullscreen(); el.classList.add('tc-active'); pressKey(k); };
+  const deactivate = e => { e.preventDefault(); el.classList.remove('tc-active'); releaseKey(k); };
   el.addEventListener('pointerdown', activate);
   el.addEventListener('pointerup', deactivate);
   el.addEventListener('pointercancel', deactivate);
