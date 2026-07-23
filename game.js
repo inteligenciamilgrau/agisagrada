@@ -3883,7 +3883,7 @@ function drawDialogBox(lines) {
   ctx.fillText(label, pillX + pillW / 2, top + 10 + pillH / 2 + nameFont * 0.35);
 
   ctx.font = `${textFont}px Courier New`; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-  wrapText(text, textX, top + 20 + textFont, textW, textLh);
+  wrapText(text, textX, top + 10 + pillH + Math.round(textFont * 1.6), textW, textLh);
   ctx.font = `${hintFont}px Courier New`; ctx.fillStyle = '#8888aa'; ctx.textAlign = 'right';
   ctx.fillText(t('dialogHint'), bx + boxW - 16, top + boxH - 9);
 }
