@@ -152,10 +152,23 @@ function tryAutoFullscreen() {
     document.documentElement.requestFullscreen().catch(() => {});
   }
 }
+// sem botão de OK: nas telas de menu/diálogo (fora do 'play') J/K/L não fazem
+// ataque/pulo/especial, então valem como confirmar/avançar texto também
 document.querySelectorAll('#touchControls [data-key]').forEach(el => {
   const k = el.dataset.key;
-  const activate = e => { e.preventDefault(); tryAutoFullscreen(); el.classList.add('tc-active'); pressKey(k); };
-  const deactivate = e => { e.preventDefault(); el.classList.remove('tc-active'); releaseKey(k); };
+  const alsoEnter = k === 'j' || k === 'k' || k === 'l';
+  const activate = e => {
+    e.preventDefault(); tryAutoFullscreen();
+    el.classList.add('tc-active');
+    pressKey(k);
+    if (alsoEnter) pressKey('enter');
+  };
+  const deactivate = e => {
+    e.preventDefault();
+    el.classList.remove('tc-active');
+    releaseKey(k);
+    if (alsoEnter) releaseKey('enter');
+  };
   el.addEventListener('pointerdown', activate);
   el.addEventListener('pointerup', deactivate);
   el.addEventListener('pointercancel', deactivate);
@@ -163,51 +176,67 @@ document.querySelectorAll('#touchControls [data-key]').forEach(el => {
   el.addEventListener('contextmenu', e => e.preventDefault());
 });
 
-// ---- D-pad de arrasto: desliza o dedo entre as direções sem soltar (inclui diagonal) ----
+// ---- Direcional circular (joystick): sem freio no centro — a direção reage assim
+// que o dedo sai do ponto de toque, em 8 sentidos; só para quando o dedo solta ----
 const tcDpad = document.getElementById('tcDpad');
+const tcDpadKnob = document.getElementById('tcDpadKnob');
 if (tcDpad) {
-  const dpadBtn = {
-    arrowup: tcDpad.querySelector('.tc-up'),
-    arrowdown: tcDpad.querySelector('.tc-down'),
-    arrowleft: tcDpad.querySelector('.tc-left'),
-    arrowright: tcDpad.querySelector('.tc-right'),
-  };
-  const DEADZONE = 20;
+  const MIN_R = 6; // só o suficiente pra não gerar direção indefinida em cima do próprio dedo
+  const KNOB_TRAVEL = 50; // até onde o manche acompanha visualmente o dedo
   let dpadActive = new Set();
   let dpadPointerId = null;
 
-  function computeDirs(clientX, clientY) {
-    const rect = tcDpad.getBoundingClientRect();
-    const dx = clientX - (rect.left + rect.width / 2);
-    const dy = clientY - (rect.top + rect.height / 2);
+  // 8 setores de 45°, ângulo 0 = direita, sentido horário (y cresce pra baixo)
+  function dirsFromAngle(dx, dy) {
     const dirs = new Set();
-    if (dx < -DEADZONE) dirs.add('arrowleft');
-    if (dx > DEADZONE) dirs.add('arrowright');
-    if (dy < -DEADZONE) dirs.add('arrowup');
-    if (dy > DEADZONE) dirs.add('arrowdown');
+    if (Math.hypot(dx, dy) < MIN_R) return dirs;
+    const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+    if (deg > -22.5 && deg <= 22.5) dirs.add('arrowright');
+    else if (deg > 22.5 && deg <= 67.5) { dirs.add('arrowright'); dirs.add('arrowdown'); }
+    else if (deg > 67.5 && deg <= 112.5) dirs.add('arrowdown');
+    else if (deg > 112.5 && deg <= 157.5) { dirs.add('arrowleft'); dirs.add('arrowdown'); }
+    else if (deg > 157.5 || deg <= -157.5) dirs.add('arrowleft');
+    else if (deg > -157.5 && deg <= -112.5) { dirs.add('arrowleft'); dirs.add('arrowup'); }
+    else if (deg > -112.5 && deg <= -67.5) dirs.add('arrowup');
+    else { dirs.add('arrowright'); dirs.add('arrowup'); }
     return dirs;
   }
   function applyDirs(newDirs) {
-    for (const k of dpadActive) {
-      if (!newDirs.has(k)) { releaseKey(k); dpadBtn[k] && dpadBtn[k].classList.remove('tc-active'); }
-    }
-    for (const k of newDirs) {
-      if (!dpadActive.has(k)) { tryAutoFullscreen(); pressKey(k); dpadBtn[k] && dpadBtn[k].classList.add('tc-active'); }
-    }
+    for (const k of dpadActive) if (!newDirs.has(k)) releaseKey(k);
+    for (const k of newDirs) if (!dpadActive.has(k)) { tryAutoFullscreen(); pressKey(k); }
     dpadActive = newDirs;
+    if (tcDpadKnob) tcDpadKnob.classList.toggle('tc-active', newDirs.size > 0);
   }
-  function releaseAllDpad() { applyDirs(new Set()); dpadPointerId = null; }
+  function moveKnob(dx, dy) {
+    if (!tcDpadKnob) return;
+    const r = Math.hypot(dx, dy);
+    const clamped = Math.min(r, KNOB_TRAVEL);
+    const kx = r === 0 ? 0 : (dx / r) * clamped, ky = r === 0 ? 0 : (dy / r) * clamped;
+    tcDpadKnob.style.transform = `translate(${kx}px, ${ky}px)`;
+  }
+  function handlePos(clientX, clientY) {
+    const rect = tcDpad.getBoundingClientRect();
+    const dx = clientX - (rect.left + rect.width / 2);
+    const dy = clientY - (rect.top + rect.height / 2);
+    moveKnob(dx, dy);
+    applyDirs(dirsFromAngle(dx, dy));
+  }
+  function releaseAllDpad() {
+    applyDirs(new Set());
+    if (tcDpadKnob) tcDpadKnob.style.transform = 'translate(0,0)';
+    dpadPointerId = null;
+  }
 
   tcDpad.addEventListener('pointerdown', e => {
     e.preventDefault();
     dpadPointerId = e.pointerId;
     tcDpad.setPointerCapture(e.pointerId);
-    applyDirs(computeDirs(e.clientX, e.clientY));
+    handlePos(e.clientX, e.clientY);
   });
   tcDpad.addEventListener('pointermove', e => {
     if (e.pointerId !== dpadPointerId) return;
     e.preventDefault();
-    applyDirs(computeDirs(e.clientX, e.clientY));
+    handlePos(e.clientX, e.clientY);
   });
   tcDpad.addEventListener('pointerup', e => { if (e.pointerId === dpadPointerId) releaseAllDpad(); });
   tcDpad.addEventListener('pointercancel', e => { if (e.pointerId === dpadPointerId) releaseAllDpad(); });
